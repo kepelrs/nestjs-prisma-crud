@@ -1,9 +1,8 @@
+> **NOTE:** This project is still in early development.
+
 # nestjs-prisma-crud
 
-CRUD utility for simpler REST use cases.
-
-1. Builds on top of NestJS and Prisma 2+
-1. Subset of NestJSX/Crud features (TODO: Specify)
+CRUD utility for simple REST use cases. Builds on top of [NestJS](https://github.com/nestjs/nest) and [Prisma 2](https://github.com/prisma/prisma). Inspired by [@nestjsx/crud](https://github.com/nestjsx).
 
 ## Installation
 
@@ -11,8 +10,28 @@ CRUD utility for simpler REST use cases.
 
 ## Why
 
-1. TODO: Define what this project is
-2. Define what it is NOT
+When building REST API's there are recurrent themes that we would prefer not to implement again and again. This package offers opinionated out of the box solutions for some of those (see bellow).
+
+### Features
+
+1. Pagination.
+2. Advanced querying (filtering) by frontend.
+    - Any valid prisma `.where` can be sent by the frontend.
+    - Backend offers validation to safeguard against arbitrarily deep `.where` clauses by clients.
+    - Support for including only specific properties in the response. _(TODO)_
+3. Access control.
+    - `@AccessPolicy` decorator with default utilities that provide [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)/[ABAC](https://en.wikipedia.org/wiki/Attribute-based_access_control) like functionalities.
+4. Easy joins.
+    - Load nested relations with a single http request.
+    - Define `allowedJoins`/`defaultJoins` in your backend.
+5. Atomic operations
+    - Supports POST/PATCH with nested objects.
+    - Transaction support when extending controller functionality. _(TODO)_
+6. Schematics
+    - Modified `resource` schematic that scaffolds the entire CRUD module.
+    - TODO: Add example.
+
+For more complex scenarios you can write your own completely custom [NestJS](https://github.com/nestjs/nest)/[Prisma](https://github.com/prisma/prisma) controllers, or you can leverage the `PrismaCrudService` to retain some of the above features.
 
 ## Quickstart
 
@@ -21,6 +40,9 @@ TODO
 ## More examples
 
 TODO example folder
+
+1. Creating Custom policies
+2. ...
 
 ## Roadmap
 
@@ -41,11 +63,16 @@ TODO example folder
 -   [ ] crud schematics
 -   [ ] improve module configuration
 -   [ ] additional transaction support tests and examples
+-   [ ] test nested create cannot happen passed allowed joins
 
-## Limitations & known issues
+## Current limitations & known issues
 
--   JSON support. nestjs-prisma-crud assumes an object is a relation when `typeof somePossiblyNestedProperty === 'object'`. Prisma does not provide public model API to retrieve information about which properties are relations. TODO: investigate_further
--   TODO
+-   id fields are not yet configurable
+    -   models must have PK called id and must be of type string
+-   NO JSON support. nestjs-prisma-crud assumes an object is a relation when `typeof somePossiblyNestedProperty === 'object'`. TODO: investigate_further
+    -   Current workaround: use middleware for transforming into string on both frontend and backend
+-   Prisma keywords may not be used as model properties
+    -   TODO: document which are those words or automate validation
 
 ## Built with
 
