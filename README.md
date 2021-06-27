@@ -1,8 +1,11 @@
-> **NOTE:** This project is still in early development.
+[![Build Status](https://www.travis-ci.com/kepelrs/nestjs-prisma-crud.svg?branch=master)](https://www.travis-ci.com/kepelrs/nestjs-prisma-crud)
+[![codecov](https://codecov.io/gh/kepelrs/nestjs-prisma-crud/branch/master/graph/badge.svg?token=X2KQ8AMFA7)](https://codecov.io/gh/kepelrs/nestjs-prisma-crud)
 
 # nestjs-prisma-crud
 
 CRUD utility for simple REST use cases. Builds on top of [NestJS](https://github.com/nestjs/nest) and [Prisma 2](https://github.com/prisma/prisma). Inspired by [@nestjsx/crud](https://github.com/nestjsx).
+
+> **NOTE:** This project is in early development.
 
 ## Installation
 

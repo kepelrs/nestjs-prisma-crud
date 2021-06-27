@@ -5,4 +5,4 @@ before_script:
     - cd testApp && npm i && cp .env-example .env
     - npm install -g codecov
 script:
-    - cd testApp && npm run test:cov && codecov
+    - npm run test:cov && codecov
