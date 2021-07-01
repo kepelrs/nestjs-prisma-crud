@@ -485,6 +485,27 @@ describe('CRUD controllers (without policy) e2e', () => {
                 });
         });
 
+        it("updating related record's properties is not allowed (set to null)", async () => {
+            let users;
+            await request(app.getHttpServer())
+                .get(`/users`)
+                .expect(200)
+                .then((res) => {
+                    users = res.body.data;
+                });
+
+            const user = users.find((u) => u.posts.length);
+            const { someNullableValue } = user.country;
+            user.country.someNullableValue = null;
+            await request(app.getHttpServer())
+                .patch(`/users/${user.id}`)
+                .send(user)
+                .expect(200)
+                .then((res) => {
+                    expect(res?.body?.country?.someNullableValue).toBe(someNullableValue);
+                });
+        });
+
         it('removing related records (posts) altogether works', async () => {
             let users;
             await request(app.getHttpServer())
@@ -589,7 +610,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                 });
         });
 
-        it('relation can be replaced by passing only nested .id for 1:n relations', async () => {
+        it('relation can be replaced by passing only nested .id for n:1 relations', async () => {
             let users;
             await request(app.getHttpServer())
                 .get(`/users`)
@@ -611,7 +632,6 @@ describe('CRUD controllers (without policy) e2e', () => {
                 });
         });
 
-        // create/delete issue
         it('creating and deleting different relations at once works (new object without id + omitted adjacent object)', async () => {
             let users;
             await request(app.getHttpServer())
@@ -637,6 +657,52 @@ describe('CRUD controllers (without policy) e2e', () => {
                     const responsePosts = res?.body?.posts;
                     expect(responsePosts.length).toBe(1);
                     expect(responsePosts[0].id).not.toBe(id);
+                });
+        });
+
+        it('relation can be removed by passing null object', async () => {
+            let user;
+            await request(app.getHttpServer())
+                .get(`/users`)
+                .expect(200)
+                .then((res) => {
+                    user = res.body.data[0];
+                });
+
+            // remove country
+            await request(app.getHttpServer())
+                .patch(`/users/${user.id}`)
+                .send({ ...user, country: null })
+                .expect(200)
+                .then((res) => {
+                    expect(res?.body?.country).toBe(null);
+                });
+
+            // second update (empty) confirms if subsequent saves will also work
+            await request(app.getHttpServer())
+                .patch(`/users/${user.id}`)
+                .send({ ...user, country: null })
+                .expect(200)
+                .then((res) => {
+                    expect(res?.body?.country).toBe(null);
+                });
+        });
+
+        it('nullable shallow value can be set to null', async () => {
+            let user;
+            await request(app.getHttpServer())
+                .get(`/users`)
+                .expect(200)
+                .then((res) => {
+                    user = res.body.data[0];
+                });
+
+            await request(app.getHttpServer())
+                .patch(`/users/${user.id}`)
+                .send({ ...user, name: null })
+                .expect(200)
+                .then((res) => {
+                    expect(res?.body?.name).toBe(null);
                 });
         });
     });

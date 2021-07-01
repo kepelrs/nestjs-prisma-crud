@@ -38,6 +38,7 @@ function generateSeeds(n: number) {
             country: {
                 create: {
                     name: `country${i}`,
+                    someNullableValue: `someNullableValue${i}`,
                 },
             },
         });

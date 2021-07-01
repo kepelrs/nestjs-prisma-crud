@@ -18,13 +18,14 @@ model User {
   posts     Post[]
   // comments Comment[]
   profile   Profile?
-  country   Country  @relation(fields: [countryId], references: [id])
-  countryId String
+  country   Country? @relation(fields: [countryId], references: [id])
+  countryId String?
 }
 
 model Country {
-  id   String @id @default(uuid())
-  name String @unique
+  id                String  @id @default(uuid())
+  name              String  @unique
+  someNullableValue String?
 
   user User[]
 }

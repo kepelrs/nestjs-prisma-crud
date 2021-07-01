@@ -34,6 +34,7 @@ export function transformForNestedCreate(
             meta.currentPath?.replace(/.\d+./, '.') as string,
         );
 
+        // TODO: Refactor, split into subfunctions at least the main condition blocks
         if (parentIsObject && parentIsNotArray && valueIsObject && keyIsNotKeyword) {
             parent = parent!;
             key = key!;
@@ -73,8 +74,24 @@ export function transformForNestedCreate(
                     create: value,
                 };
             }
+        } else if (parentIsObject && value === null) {
+            parent = parent!;
+            key = key!;
+
+            // TODO: Refactor, split into subfunctions at least the main condition blocks
+            const persistedValue = getNestedProperty(currentPersistedObject, `${meta.currentPath}`);
+            const persistedValueIsRelation = persistedValue instanceof Object;
+            const persistedValueIsAlreadyNull = persistedValue === null;
+            if (persistedValueIsRelation) {
+                parent[key] = {
+                    disconnect: true,
+                };
+            } else if (persistedValueIsAlreadyNull) {
+                parent[key] = undefined;
+            }
         }
     });
+
     return copy;
 }
 
