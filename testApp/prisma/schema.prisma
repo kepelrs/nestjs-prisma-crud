@@ -15,9 +15,18 @@ model User {
   email String  @unique
   name  String?
 
-  posts   Post[]
+  posts     Post[]
   // comments Comment[]
-  profile Profile?
+  profile   Profile?
+  country   Country  @relation(fields: [countryId], references: [id])
+  countryId String
+}
+
+model Country {
+  id   String @id @default(uuid())
+  name String @unique
+
+  user User[]
 }
 
 model Profile {

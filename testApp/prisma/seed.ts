@@ -35,6 +35,11 @@ function generateSeeds(n: number) {
                     fullName: unique,
                 },
             },
+            country: {
+                create: {
+                    name: `country${i}`,
+                },
+            },
         });
     }
 
@@ -48,6 +53,11 @@ export const dummySeedValueString = dummySeedFullObj.id;
 
 export async function seed(deleteFirst = false) {
     if (deleteFirst === true) {
+        await prisma.$queryRaw(`Delete from Category`);
+        await prisma.$queryRaw(`Delete from Comment`);
+        await prisma.$queryRaw(`Delete from Country`);
+        await prisma.$queryRaw(`Delete from Post`);
+        await prisma.$queryRaw(`Delete from Profile`);
         await prisma.$queryRaw(`Delete from User`);
     }
 

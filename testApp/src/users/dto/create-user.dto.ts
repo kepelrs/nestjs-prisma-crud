@@ -20,6 +20,10 @@ export class CreateUserDto implements Prisma.UserCreateInput {
     @IsObject()
     profile: Prisma.ProfileCreateNestedOneWithoutUserInput;
 
+    @IsNotEmpty()
+    @IsObject()
+    country: Prisma.CountryCreateNestedOneWithoutUserInput;
+
     constructor(partial: Partial<CreateUserDto>) {
         Object.assign(this, partial);
     }

@@ -30,6 +30,13 @@ describe('CRUD controllers (without policy) e2e', () => {
     });
 
     describe('POST /users', () => {
+        let countries;
+
+        beforeEach(async () => {
+            const prismaService = app.get(PrismaService);
+            countries = await prismaService.country.findMany();
+        });
+
         it('creates nested posts, comments and profile', () => {
             const now = Date.now();
             const stringNow = String(now);
@@ -50,6 +57,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     profile: {
                         fullName: stringNow,
                     },
+                    country: countries[0],
                 })
                 .expect(201)
                 .then((res) => {
@@ -84,6 +92,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     profile: {
                         fullName: stringNow,
                     },
+                    country: countries[0],
                 })
                 .expect(403);
 
@@ -91,13 +100,14 @@ describe('CRUD controllers (without policy) e2e', () => {
             expect(categoryCountBefore).toBe(categoryCountAfter);
         });
 
-        it('does not fail when relations are absent ', () => {
+        it('does not fail when optional relations are absent ', () => {
             const now = Date.now();
             const stringNow = String(now);
             return request(app.getHttpServer())
                 .post('/users')
                 .send({
                     email: stringNow,
+                    country: countries[0],
                 })
                 .expect(201)
                 .then((res) => {
@@ -403,7 +413,7 @@ describe('CRUD controllers (without policy) e2e', () => {
     describe('PATCH /users/id', () => {
         it('shallow property update works', async () => {
             const changedName = `${dummySeedValueString}aaa`;
-            const { posts, profile, ...shallowPayload } = dummySeedFullObj;
+            const { posts, profile, country, ...shallowPayload } = dummySeedFullObj;
             shallowPayload.name = changedName;
             await request(app.getHttpServer())
                 .patch(`/users/${dummySeedValueString}`)
@@ -576,6 +586,28 @@ describe('CRUD controllers (without policy) e2e', () => {
                     delete movedPostInResponse.authorId;
                     delete user2post.authorId;
                     expect(movedPostInResponse).toEqual(user2post);
+                });
+        });
+
+        it('relation can be replaced by passing only nested .id for 1:n relations', async () => {
+            let users;
+            await request(app.getHttpServer())
+                .get(`/users`)
+                .expect(200)
+                .then((res) => {
+                    users = res.body.data;
+                });
+
+            const user1 = users[0];
+            const user2 = users.find((u) => u.country.id !== user1.country.id);
+            const user2country = user2.country;
+            await request(app.getHttpServer())
+                .patch(`/users/${user1.id}`)
+                .send({ ...user1, country: { id: user2country.id } })
+                .expect(200)
+                .then((res) => {
+                    expect(res?.body?.country.id).not.toBe(user1);
+                    expect(res?.body?.country.id).toBe(user2country.id);
                 });
         });
 

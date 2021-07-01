@@ -39,7 +39,7 @@ function getModuleMetadata(opts: { strictMode: boolean }) {
                 provide: APP_PIPE,
                 useValue: new ValidationPipe({
                     whitelist: true,
-                    forbidNonWhitelisted: true, // requires whitelist: true
+                    // forbidNonWhitelisted: true, // requires whitelist: true
                 }),
             },
         ],

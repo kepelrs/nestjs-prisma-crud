@@ -20,7 +20,8 @@
         "test:clear": "jest --clearCache",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "prisma migrate reset --force && jest --config ./test/jest-e2e.json --runInBand",
-        "generate-migration": "prisma migrate dev",
+        "reset": "prisma migrate reset",
+        "generate-migration": "prisma migrate dev --create-only",
         "migrate": "prisma migrate deploy",
         "scaffold-module": "nest generate resource"
     },
