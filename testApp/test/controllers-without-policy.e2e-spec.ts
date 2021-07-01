@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { dummySeedFullObj, dummySeedValueString, seed } from '../prisma/seed';
 import { AppModule } from '../src/app.module';
+import { PrismaService } from '../src/prisma.service';
 
 describe('CRUD controllers (without policy) e2e', () => {
     let app: INestApplication;
@@ -56,7 +57,41 @@ describe('CRUD controllers (without policy) e2e', () => {
                 });
         });
 
-        it('does not fail when realtions are abscent ', () => {
+        it('does not create relations that are outside allowedJoins', async () => {
+            const prismaService = app.get(PrismaService);
+            const now = Date.now();
+            const stringNow = String(now);
+            const categoryCountBefore = await prismaService.category.count();
+            await request(app.getHttpServer())
+                .post('/users')
+                .send({
+                    email: stringNow,
+                    posts: [
+                        {
+                            title: stringNow,
+                            comments: [
+                                {
+                                    title: stringNow,
+                                },
+                            ],
+                            categories: [
+                                {
+                                    title: stringNow,
+                                },
+                            ],
+                        },
+                    ],
+                    profile: {
+                        fullName: stringNow,
+                    },
+                })
+                .expect(403);
+
+            const categoryCountAfter = await prismaService.category.count();
+            expect(categoryCountBefore).toBe(categoryCountAfter);
+        });
+
+        it('does not fail when relations are absent ', () => {
             const now = Date.now();
             const stringNow = String(now);
             return request(app.getHttpServer())
@@ -394,10 +429,11 @@ describe('CRUD controllers (without policy) e2e', () => {
                 const { author, authorId, ...postWithoutAuthor } = p;
                 return postWithoutAuthor;
             });
+            const payload = { ...user1, posts: [...postsToAddFromUser2] };
             // move posts and check response
             await request(app.getHttpServer())
                 .patch(`/users/${user1.id}`)
-                .send({ ...user1, posts: [...postsToAddFromUser2] })
+                .send(payload)
                 .expect(200)
                 .then((res) => {
                     const { body } = res;

@@ -115,7 +115,12 @@ export class PrismaCrudService {
 
     public async create(createDto: any) {
         const entity = await this.repo.create({
-            data: transformForNestedCreate(createDto),
+            data: transformForNestedCreate(
+                createDto,
+                null,
+                this.allowedJoinsSet,
+                this.forbiddenError,
+            ),
         });
         return this.findOne(entity.id);
     }
@@ -172,7 +177,12 @@ export class PrismaCrudService {
         // update and return standard findOne
         await this.repo.update({
             where: { id: entity.id },
-            data: transformForNestedCreate(updateDto, entity),
+            data: transformForNestedCreate(
+                updateDto,
+                entity,
+                this.allowedJoinsSet,
+                this.forbiddenError,
+            ),
         });
 
         return this.findOne(id, crudQ);

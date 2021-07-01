@@ -34,9 +34,10 @@ model Post {
   content   String?
   published Boolean? @default(false)
 
-  author   User?     @relation(fields: [authorId], references: [id])
-  authorId String? // ? in order for set:[] to work: https://github.com/prisma/prisma/issues/2328
-  comments Comment[]
+  author     User?      @relation(fields: [authorId], references: [id])
+  authorId   String? // ? in order for set:[] to work: https://github.com/prisma/prisma/issues/2328
+  comments   Comment[]
+  categories Category[]
 }
 
 model Comment {
@@ -50,4 +51,10 @@ model Comment {
 
   post   Post   @relation(fields: [postId], references: [id])
   postId String
+}
+
+model Category {
+  id    String @id @default(uuid())
+  title String
+  posts Post[]
 }

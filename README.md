@@ -66,7 +66,7 @@ TODO example folder
 -   [ ] crud schematics
 -   [ ] improve module configuration
 -   [ ] additional transaction support tests and examples
--   [ ] test nested create cannot happen passed allowed joins
+-   [x] test nested create cannot happen passed allowed joins
 
 ## Current limitations & known issues
 

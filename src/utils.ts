@@ -5,8 +5,13 @@ import { traverse } from 'object-traversal';
  * Turns  {name: 'hello', friends: [{name: 'rick'}]}
  * into   {name: 'hello', friends: {create: [{name: 'rick'}]}}
  */
-export function transformForNestedCreate(v: any, originalRootObject?: any) {
-    const copy = JSON.parse(JSON.stringify(v));
+export function transformForNestedCreate(
+    objectToPersist: any,
+    currentPersistedObject: any,
+    allowedJoinSet: Set<string>,
+    forbiddenError: any,
+) {
+    const copy = JSON.parse(JSON.stringify(objectToPersist));
     const keywords = new Set([
         'connectOrCreate',
         'where',
@@ -17,29 +22,54 @@ export function transformForNestedCreate(v: any, originalRootObject?: any) {
     ]); // TODO: improve .includes or document these words are reserved
 
     traverse(copy, (context) => {
-        const { parent, key, value, meta } = context;
+        let { parent, key } = context;
+        const { value, meta } = context;
+
         const keyIsNotKeyword = !keywords.has(key!);
-        if (parent && value instanceof Object && !(parent instanceof Array) && keyIsNotKeyword) {
-            if (value instanceof Array) {
-                const toCreate = value.filter((v) => !v.id);
-                const toConnect = value.filter((v) => !!v.id).map((v) => ({ id: v.id }));
+        const parentIsObject = parent instanceof Object;
+        const parentIsNotArray = !(parent instanceof Array);
+        const valueIsObject = value instanceof Object;
+        const valueIsArray = value instanceof Array;
+        const pathIsWithinAllowedJoins = allowedJoinSet.has(
+            meta.currentPath?.replace(/.\d+./, '.') as string,
+        );
+
+        if (parentIsObject && parentIsNotArray && valueIsObject && keyIsNotKeyword) {
+            parent = parent!;
+            key = key!;
+
+            if (!pathIsWithinAllowedJoins) {
+                throw forbiddenError;
+            }
+
+            if (valueIsArray) {
+                const toCreate = value.filter((v: any) => !v.id);
+                const toConnect = value.filter((v: any) => !!v.id).map((v: any) => ({ id: v.id }));
                 const idsToDisconnect = getIdsToDisconnect(
                     toConnect,
-                    getNestedProperty(originalRootObject, meta.currentPath!),
+                    getNestedProperty(currentPersistedObject, meta.currentPath!),
                 );
-                parent[key!] = {
+                parent[key] = {
                     create: toCreate.length ? toCreate : undefined,
                     connect: toConnect.length ? toConnect : undefined,
                     disconnect: idsToDisconnect.length ? idsToDisconnect : undefined,
                 };
             }
-            // value is object but not array
+            // value is object but not array (non many relations eg. one to one)
             else if (value.id) {
-                parent[key!] = {
-                    connect: { id: value.id },
+                const currentPersistedId = getNestedProperty(
+                    currentPersistedObject,
+                    `${meta.currentPath}.id`,
+                );
+                const idChanged = value.id !== currentPersistedId;
+
+                parent[key] = {
+                    connect: idChanged ? { id: value.id } : undefined,
                 };
-            } else {
-                parent[key!] = {
+            }
+            // value is object without id -> being created!
+            else {
+                parent[key] = {
                     create: value,
                 };
             }

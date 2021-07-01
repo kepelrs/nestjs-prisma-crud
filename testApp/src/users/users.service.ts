@@ -7,7 +7,7 @@ export class UsersService extends PrismaCrudService {
     constructor(public prismaService: PrismaService) {
         super({
             repo: prismaService.user,
-            allowedJoins: ['posts.comments'],
+            allowedJoins: ['posts.comments', 'profile'],
             notFoundError: new NotFoundException(),
             forbiddenError: new ForbiddenException(),
         });
