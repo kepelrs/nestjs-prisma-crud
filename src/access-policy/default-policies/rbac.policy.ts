@@ -31,7 +31,7 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
     }
 
     // if this is reached type of allowedRoles: RbacParams is AllowedRolesId
-    const userRolesArray = [...userRolesSet];
+    const userRolesArray = Array.from(userRolesSet);
     const allowedRolesSet = new Set(allowedRoles as any[]);
     for (let i = 0; i < userRolesArray.length; i++) {
         const role = userRolesArray[i];

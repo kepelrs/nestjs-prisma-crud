@@ -42,9 +42,9 @@ export class PrismaCrudService {
     private getSanitizedDefaultJoins(
         defaultJoins: string[] | undefined | null,
         allowedJoinsSet: Set<string>,
-    ) {
+    ): string[] {
         if (!(defaultJoins instanceof Array)) {
-            return [...allowedJoinsSet]; // defaultJoins equals allowedJoins when not specified
+            return Array.from(allowedJoinsSet); // defaultJoins equals allowedJoins when not specified
         }
 
         for (let i = 0; i < defaultJoins.length; i++) {
@@ -56,7 +56,7 @@ export class PrismaCrudService {
             }
         }
 
-        return [...new Set(defaultJoins)];
+        return Array.from(new Set(defaultJoins));
     }
 
     private getIncludes(requestSpecificIncludes: string[] | undefined | null) {
@@ -75,7 +75,7 @@ export class PrismaCrudService {
             }
         }
 
-        return transformJoinsToInclude([...new Set(allowedJoins)]);
+        return transformJoinsToInclude(Array.from(new Set(allowedJoins)));
     }
 
     private parseCrudQ(crudQ: undefined | null | string): CrudObj {

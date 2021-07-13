@@ -105,7 +105,7 @@ export function transformJoinsToInclude(joins: string[]) {
         return {};
     }
 
-    joins = [...joins];
+    joins = joins.slice();
     joins.sort(function(a, b) {
         // ASC  -> a.length - b.length
         // DESC -> b.length - a.length
