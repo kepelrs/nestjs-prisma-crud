@@ -3,6 +3,7 @@ import {
     transformJoinsToInclude,
     transformForNestedCreate,
     validateNestedWhere,
+    deletePaths,
 } from './utils';
 
 export type CrudObj = any; // TODO: strong type all any's
@@ -19,11 +20,13 @@ export class PrismaCrudService {
     private allowedJoinsSet: Set<string>;
     private defaultJoins: string[];
     private repo: any;
+    private forbiddenPaths: Array<string | RegExp>;
 
     constructor(args: {
         repo: any;
         allowedJoins: string[];
         defaultJoins?: string[];
+        forbiddenPaths?: Array<string | RegExp>; // TODO: Document that this is still fetched from the database!!
         notFoundError: any;
         forbiddenError: any;
     }) {
@@ -37,6 +40,8 @@ export class PrismaCrudService {
 
         this.notFoundError = args.notFoundError;
         this.forbiddenError = args.forbiddenError;
+
+        this.forbiddenPaths = args.forbiddenPaths || [];
     }
 
     private getSanitizedDefaultJoins(
@@ -125,7 +130,7 @@ export class PrismaCrudService {
         return this.findOne(entity.id);
     }
 
-    public async findAll(crudQ?: string) {
+    public async findAll(crudQ?: string, excludeForbiddenPaths: boolean = true) {
         const crudObj = this.parseCrudQ(crudQ);
         const where = this.getAndValidateWhere(crudObj);
         const { skip, take, orderBy, page, pageSize } = this.getAndValidatePagination(crudObj);
@@ -138,12 +143,19 @@ export class PrismaCrudService {
         const recordsPerPage = take;
         const pageCount = Math.ceil(count / recordsPerPage);
 
-        const matches = await this.repo.findMany({
+        let matches = await this.repo.findMany({
             where: { ...where },
             ...this.getIncludes(crudObj.joins),
             skip,
             take,
         });
+
+        if (excludeForbiddenPaths) {
+            for (let i = 0; i < matches.length; i++) {
+                const match = matches[i];
+                deletePaths(match, this.forbiddenPaths, true);
+            }
+        }
 
         return {
             data: matches,
@@ -155,17 +167,21 @@ export class PrismaCrudService {
         };
     }
 
-    public async findOne(id: string, crudQ?: string) {
+    public async findOne(id: string, crudQ?: string, excludeForbiddenPaths: boolean = true) {
         const crudObj = this.parseCrudQ(crudQ);
         const where = this.getAndValidateWhere(crudObj);
 
-        const match = await this.repo.findFirst({
+        let match = await this.repo.findFirst({
             where: { ...where, id },
             ...this.getIncludes(crudObj.joins),
         });
 
         if (!match) {
             throw this.notFoundError;
+        }
+
+        if (excludeForbiddenPaths) {
+            match = deletePaths(match, this.forbiddenPaths, true);
         }
         return match;
     }

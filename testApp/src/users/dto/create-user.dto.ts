@@ -9,6 +9,9 @@ export class CreateUserDto implements Prisma.UserCreateInput {
     @IsString()
     name?: string;
 
+    @IsString()
+    password: string;
+
     @IsOptional()
     @IsArray()
     posts?: Prisma.PostCreateNestedManyWithoutAuthorInput;

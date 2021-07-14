@@ -12,6 +12,7 @@ function generateSeeds(n: number) {
             id: unique,
             email: unique,
             name: unique,
+            password: 'some hashed password',
             posts: {
                 create: [
                     {
@@ -24,6 +25,8 @@ function generateSeeds(n: number) {
                                     published: false,
                                     title: unique,
                                     content: unique,
+                                    exampleForbiddenProperty:
+                                        'some property that will not be present in responses',
                                 },
                             ],
                         },

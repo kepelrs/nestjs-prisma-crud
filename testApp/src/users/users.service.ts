@@ -8,6 +8,7 @@ export class UsersService extends PrismaCrudService {
         super({
             repo: prismaService.user,
             allowedJoins: ['posts.comments', 'profile', 'country'],
+            forbiddenPaths: ['password', /comments\.\d+\.exampleForbiddenProperty$/],
             notFoundError: new NotFoundException(),
             forbiddenError: new ForbiddenException(),
         });

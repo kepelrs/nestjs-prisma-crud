@@ -7,6 +7,7 @@ import { PrismaService } from '../src/prisma.service';
 
 describe('CRUD controllers (without policy) e2e', () => {
     let app: INestApplication;
+    let prismaService: PrismaService;
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -15,6 +16,7 @@ describe('CRUD controllers (without policy) e2e', () => {
 
         app = moduleFixture.createNestApplication();
         await app.init();
+        prismaService = app.get(PrismaService);
     });
 
     beforeEach(async () => {
@@ -44,12 +46,15 @@ describe('CRUD controllers (without policy) e2e', () => {
                 .post('/users')
                 .send({
                     email: stringNow,
+                    password: 'this value should not come in response',
                     posts: [
                         {
                             title: stringNow,
                             comments: [
                                 {
                                     title: stringNow,
+                                    exampleForbiddenProperty:
+                                        'this value should not come in response',
                                 },
                             ],
                         },
@@ -74,6 +79,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                 .post('/users')
                 .send({
                     email: stringNow,
+                    password: 'this value should not come in response',
                     posts: [
                         {
                             title: stringNow,
@@ -85,6 +91,8 @@ describe('CRUD controllers (without policy) e2e', () => {
                             categories: [
                                 {
                                     title: stringNow,
+                                    exampleForbiddenProperty:
+                                        'this value should not come in response',
                                 },
                             ],
                         },
@@ -107,6 +115,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                 .post('/users')
                 .send({
                     email: stringNow,
+                    password: 'this value should not come in response',
                     country: countries[0],
                 })
                 .expect(201)
@@ -733,6 +742,87 @@ describe('CRUD controllers (without policy) e2e', () => {
                 });
 
             await request(app.getHttpServer()).get(`/comments/${commentId}`).expect(404);
+        });
+    });
+
+    describe('Forbidden properties', () => {
+        it('GET many excludes forbiddenPaths', () => {
+            return request(app.getHttpServer())
+                .get('/users')
+                .expect(200)
+                .then((res) => {
+                    expect(res.body.data.length).toBeTruthy();
+                    for (let i = 0; i < res.body.data.length; i++) {
+                        const record = res.body.data[i];
+                        expect(record.password).toBeFalsy();
+                        expect(
+                            record.posts?.[0]?.comments?.[0]?.exampleForbiddenProperty,
+                        ).toBeFalsy();
+                    }
+                });
+        });
+
+        it('GET one excludes forbiddenPaths', () => {
+            return request(app.getHttpServer())
+                .get(`/users/${dummySeedValueString}`)
+                .expect(200)
+                .then((res) => {
+                    expect(res.body?.password).toBeFalsy();
+                    expect(
+                        res.body?.posts?.[0]?.comments?.[0]?.exampleForbiddenProperty,
+                    ).toBeFalsy();
+                });
+        });
+
+        it('PATCH excludes forbiddenPaths', async () => {
+            const changedName = `${dummySeedValueString}aaa`;
+            const { posts, profile, country, ...shallowPayload } = dummySeedFullObj;
+            shallowPayload.name = changedName;
+            await request(app.getHttpServer())
+                .patch(`/users/${dummySeedValueString}`)
+                .send(shallowPayload)
+                .expect(200)
+                .then((res) => {
+                    expect(res.body?.password).toBeFalsy();
+                    expect(
+                        res.body?.posts?.[0]?.comments?.[0]?.exampleForbiddenProperty,
+                    ).toBeFalsy();
+                });
+        });
+
+        it('POST excludes forbiddenPaths ', async () => {
+            const country = await prismaService.country.findFirst();
+            const now = Date.now();
+            const stringNow = String(now);
+            return request(app.getHttpServer())
+                .post('/users')
+                .send({
+                    email: stringNow,
+                    password: 'this value should not come in response',
+                    posts: [
+                        {
+                            title: stringNow,
+                            comments: [
+                                {
+                                    title: stringNow,
+                                    exampleForbiddenProperty:
+                                        'this value should not come in response',
+                                },
+                            ],
+                        },
+                    ],
+                    profile: {
+                        fullName: stringNow,
+                    },
+                    country,
+                })
+                .expect(201)
+                .then((res) => {
+                    expect(res.body?.password).toBeFalsy();
+                    expect(
+                        res.body?.posts?.[0]?.comments?.[0]?.exampleForbiddenProperty,
+                    ).toBeFalsy();
+                });
         });
     });
 });

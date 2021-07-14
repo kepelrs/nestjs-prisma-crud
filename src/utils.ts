@@ -230,6 +230,42 @@ export function getAllJoinSubsets(allowedJoins: string[]): Set<string> {
     return joinSet;
 }
 
+export function deletePaths(
+    object: any,
+    forbiddenPaths: Array<string | RegExp>,
+    mutate: boolean = true,
+) {
+    if (!mutate) {
+        object = JSON.parse(JSON.stringify(object));
+    }
+
+    traverse(object, (context) => {
+        const { parent, key, meta } = context;
+        if (!parent || !key || !meta.currentPath) {
+            return;
+        }
+
+        for (let i = 0; i < forbiddenPaths.length; i++) {
+            const forbiddenPath = forbiddenPaths[i];
+
+            let pathMatches = false;
+            if (typeof forbiddenPath === 'string') {
+                pathMatches = meta.currentPath === forbiddenPath;
+            }
+            if (forbiddenPath instanceof RegExp) {
+                pathMatches = forbiddenPath.test(meta.currentPath);
+            }
+
+            if (pathMatches) {
+                delete parent[key];
+                break;
+            }
+        }
+    });
+
+    return object;
+}
+
 function getNestedProperty(obj: any, nestedPath: string) {
     const fragments = nestedPath.split('.');
     let value = obj;
