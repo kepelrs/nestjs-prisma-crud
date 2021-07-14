@@ -10,7 +10,7 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { AccessPolicyModule } from 'nestjs-prisma-crud';
+import { AccessPolicyModule } from '../../src';
 import { AuthenticationMiddleware } from './authentication.middleware';
 import { CommentsModule } from './comments/comments.module';
 import { PrismaService } from './prisma.service';

@@ -9,8 +9,8 @@ import {
     Patch,
     Query,
 } from '@nestjs/common';
-import { AccessPolicy, PrismaCrudService } from 'nestjs-prisma-crud';
-import { MustMatchAuthAttribute, MustMatchValue } from 'nestjs-prisma-crud';
+import { AccessPolicy, PrismaCrudService } from '../../../src';
+import { MustMatchAuthAttribute, MustMatchValue } from '../../../src';
 import { dummySeedValueString } from '../../prisma/seed';
 import { RoleID } from '../authentication.middleware';
 import { PrismaService } from '../prisma.service';

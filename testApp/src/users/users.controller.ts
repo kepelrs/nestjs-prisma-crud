@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AccessPolicy } from 'nestjs-prisma-crud';
+import { AccessPolicy } from '../../../src';
 import { RoleID } from '../authentication.middleware';
 
 @Controller('users')

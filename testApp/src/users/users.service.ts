@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaCrudService } from 'nestjs-prisma-crud';
+import { PrismaCrudService } from '../../../src';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()

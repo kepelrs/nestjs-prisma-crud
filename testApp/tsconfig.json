@@ -9,7 +9,10 @@
         "target": "es2017",
         "sourceMap": true,
         "outDir": "./dist",
-        "baseUrl": "./",
-        "incremental": true
+        "baseUrl": "../",
+        "incremental": true,
+        "paths": {
+            "nestjs-prisma-crud": ["src"] // This mapping is relative to "baseUrl"
+        }
     }
 }

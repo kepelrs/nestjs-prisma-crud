@@ -1,6 +1,6 @@
 import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { AccessPolicyInterceptorOpts, ACCESS_POLICY_OPTS } from 'nestjs-prisma-crud';
+import { AccessPolicyInterceptorOpts, ACCESS_POLICY_OPTS } from '../../src';
 
 export enum RoleID {
     ALWAYS_ACCESS = 'ALWAYS_ACCESS',
