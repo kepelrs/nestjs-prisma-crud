@@ -45,8 +45,9 @@ export const AccessPolicy = (...policyConfigs: AccessPolicyConfig) =>
 
 @Injectable()
 export class AccessPolicyInterceptor implements NestInterceptor {
+    private reflector = new Reflector();
+
     constructor(
-        private reflector: Reflector,
         @Inject(ACCESS_POLICY_OPTS)
         private opts: AccessPolicyInterceptorOpts,
     ) {}
