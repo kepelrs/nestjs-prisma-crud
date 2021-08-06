@@ -4,12 +4,12 @@
     "testEnvironment": "node",
     "testRegex": ".e2e-spec.ts$",
     "transform": {
-        "^.+\\.(t|j)s$": "ts-jest"
+        "^.+\\.(t|j)s$": "<rootDir>/testApp/node_modules/ts-jest/preprocessor.js"
     },
     "globals": {
         "ts-jest": {
             "diagnostics": false,
-            "tsConfig": "<rootDir>/testApp/tsconfig.json"
+            "tsconfig": "<rootDir>/testApp/tsconfig.json"
         }
     },
     "collectCoverageFrom": ["<rootDir>/src/**/*.ts"]
