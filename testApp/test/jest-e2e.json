@@ -12,5 +12,19 @@
             "tsconfig": "<rootDir>/testApp/tsconfig.json"
         }
     },
-    "collectCoverageFrom": ["<rootDir>/src/**/*.ts"]
+    "moduleNameMapper": {
+        "^@nestjs/common$": "<rootDir>testApp//node_modules/@nestjs/common",
+        "^@nestjs/core$": "<rootDir>/testApp/node_modules/@nestjs/core",
+        "^reflect-metadata$": "<rootDir>/testApp/node_modules/reflect-metadata",
+        "^nestjs-prisma-crud$": "<rootDir>/src"
+    },
+    "collectCoverageFrom": ["<rootDir>/src/**/*.ts"],
+    "coverageThreshold": {
+        "global": {
+            "branches": 96,
+            "functions": 96,
+            "lines": 96,
+            "statements": 96
+        }
+    }
 }

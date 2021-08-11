@@ -12,7 +12,7 @@
         "baseUrl": "./",
         "incremental": true,
         "paths": {
-            "nestjs-prisma-crud": ["src"]
+            "nestjs-prisma-crud": ["../src"]
         }
     }
 }

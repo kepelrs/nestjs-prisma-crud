@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { AccessPolicy } from 'nestjs-prisma-crud';
+import { RoleID } from '../authentication.middleware';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AccessPolicy } from '../../../src';
-import { RoleID } from '../authentication.middleware';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {

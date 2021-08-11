@@ -1,16 +1,10 @@
+import { Body, Controller, Delete, Get, Param, Patch, Query } from '@nestjs/common';
 import {
-    Body,
-    Controller,
-    Delete,
-    ForbiddenException,
-    Get,
-    NotFoundException,
-    Param,
-    Patch,
-    Query,
-} from '@nestjs/common';
-import { AccessPolicy, PrismaCrudService } from '../../../src';
-import { MustMatchAuthAttribute, MustMatchValue } from '../../../src';
+    AccessPolicy,
+    MustMatchAuthAttribute,
+    MustMatchValue,
+    PrismaCrudService,
+} from 'nestjs-prisma-crud';
 import { dummySeedValueString } from '../../prisma/seed';
 import { RoleID } from '../authentication.middleware';
 import { PrismaService } from '../prisma.service';
@@ -40,8 +34,6 @@ export class WithMustMatchAuthAttributePolicyCommentsController {
     private readonly commentsService = new PrismaCrudService({
         repo: this.prismaService.comment,
         allowedJoins: ['post.author'], // TODO: feat - mechanism to enable MustMatchAuthAttribute paths to go beyond allowed joins
-        notFoundError: new NotFoundException(),
-        forbiddenError: new ForbiddenException(),
     });
 
     constructor(private readonly prismaService: PrismaService) {}
@@ -97,8 +89,6 @@ export class WithMustMatchValuePolicyCommentsController {
     private readonly commentsService = new PrismaCrudService({
         repo: this.prismaService.comment,
         allowedJoins: ['post.author'], // TODO: feat - mechanism to enable MustMatchAuthAttribute paths to go beyond allowed joins
-        notFoundError: new NotFoundException(),
-        forbiddenError: new ForbiddenException(),
     });
 
     constructor(private readonly prismaService: PrismaService) {}

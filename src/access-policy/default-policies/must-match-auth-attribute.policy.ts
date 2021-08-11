@@ -1,6 +1,9 @@
-import { ExecutionContext } from '@nestjs/common';
+import {
+    ExecutionContext,
+    InternalServerErrorException,
+    UnauthorizedException
+} from '@nestjs/common';
 import { CrudObj } from '../..';
-import { AccessPolicyInterceptorOpts } from '../access-policy.interceptor';
 
 /** TODO: Move to some util service or use already standardized solution */
 const getAttributeValue = (authAttributePath: string, authenticationData: any) => {
@@ -37,20 +40,18 @@ const createWhereObject = (fullPath: string, targetValue: any) => {
 export const MustMatchAuthAttribute = (
     entityAttributePath: string,
     authDataAttributePath: string,
-) => (ctx: ExecutionContext, authData: any, accessPolicyOpts: AccessPolicyInterceptorOpts) => {
+) => (ctx: ExecutionContext, authData: any) => {
     const request = ctx.switchToHttp().getRequest();
     const query = request.query;
     const crudQ: string = query.crudQ;
 
     if (!authData) {
-        throw new accessPolicyOpts.unauthorizedExceptionClass(
-            'This route requires user to be logged in!',
-        );
+        throw new UnauthorizedException('This route requires user to be logged in!');
     }
 
     const targetValue = getAttributeValue(authDataAttributePath, authData);
     if (!targetValue) {
-        throw new accessPolicyOpts.internalServerErrorExceptionClass(
+        throw new InternalServerErrorException(
             `MustMatchAuthAttribute policy: authDataAttributePath led to falsy value.`, // TODO: Document that this is not allowed due to edge cases (including the filter being completely ignored when undefined)
         );
     }

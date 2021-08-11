@@ -4,11 +4,11 @@ import {
     Inject,
     Injectable,
     NestInterceptor,
+    NotImplementedException,
     SetMetadata,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { AnyClass } from '../helper-types';
 import { GetRolesFunction, RBAC, RbacParams } from './default-policies';
 
 export const ACCESS_POLICY_OPTS = 'ACCESS_POLICY_OPTS';
@@ -25,10 +25,6 @@ export interface AccessPolicyInterceptorOpts {
     authDataKey: string;
     getRolesFromAuthDataFn: GetRolesFunction;
     strictMode: boolean;
-    notImplementedExceptionClass: AnyClass;
-    unauthorizedExceptionClass: AnyClass;
-    forbiddenExceptionClass: AnyClass;
-    internalServerErrorExceptionClass: AnyClass;
 }
 
 /**
@@ -58,9 +54,7 @@ export class AccessPolicyInterceptor implements NestInterceptor {
             // Route not decorated with AccessPolicyInterceptor
             if (this.opts.strictMode) {
                 // non strictMode does not allow empty policyConfigs
-                throw new this.opts.notImplementedExceptionClass(
-                    'AccessPolicy: policies not implemented!',
-                );
+                throw new NotImplementedException('AccessPolicy: policies not implemented!');
             } else {
                 // non strict mode assumes empty policyConfigs means no need for policies!
                 return next.handle();

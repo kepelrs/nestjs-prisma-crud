@@ -5,18 +5,17 @@ import {
     MiddlewareConsumer,
     Module,
     NestModule,
-    NotImplementedException,
     UnauthorizedException,
     ValidationPipe,
 } from '@nestjs/common';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { AccessPolicyModule } from '../../src';
+import { AccessPolicyModule } from 'nestjs-prisma-crud';
 import { AuthenticationMiddleware } from './authentication.middleware';
 import { CommentsModule } from './comments/comments.module';
 import { PrismaService } from './prisma.service';
 import { UsersModule } from './users/users.module';
 
-function getModuleMetadata(opts: { strictMode: boolean }) {
+function createModuleMetadata(opts: { strictMode: boolean }) {
     return {
         imports: [
             UsersModule,
@@ -25,10 +24,6 @@ function getModuleMetadata(opts: { strictMode: boolean }) {
                 authDataKey: 'user',
                 getRolesFromAuthDataFn: (authData) => authData?.roles?.map((r) => r.name),
                 strictMode: opts.strictMode,
-                notImplementedExceptionClass: NotImplementedException, // TODO: better ways of doing this
-                unauthorizedExceptionClass: UnauthorizedException,
-                forbiddenExceptionClass: ForbiddenException,
-                internalServerErrorExceptionClass: InternalServerErrorException,
             }),
         ],
         controllers: [],
@@ -46,12 +41,12 @@ function getModuleMetadata(opts: { strictMode: boolean }) {
     };
 }
 
-@Module(getModuleMetadata({ strictMode: false }))
+@Module(createModuleMetadata({ strictMode: false }))
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(AuthenticationMiddleware).forRoutes('*');
     }
 }
 
-@Module(getModuleMetadata({ strictMode: true }))
+@Module(createModuleMetadata({ strictMode: true }))
 export class StrictModeAppModule extends AppModule {}

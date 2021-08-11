@@ -1,4 +1,4 @@
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { AccessPolicyInterceptorOpts } from '..';
 
 type AllowedRolesId = string[] | number[] | Set<string> | Set<number>;
@@ -14,17 +14,13 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
         return;
     }
 
-    const {
-        getRolesFromAuthDataFn,
-        unauthorizedExceptionClass,
-        forbiddenExceptionClass,
-    } = accessPolicyInterceptorOpts;
+    const { getRolesFromAuthDataFn } = accessPolicyInterceptorOpts;
 
     const userRoles = getRolesFromAuthDataFn(authData);
     const userRolesSet: Set<any> = new Set(userRoles || ([] as any[]));
 
-    if (!userRolesSet || !userRolesSet.size) {
-        throw new unauthorizedExceptionClass();
+    if (!userRolesSet.size) {
+        throw new UnauthorizedException();
     } else if (allowedRoles === 'anyAuthenticated') {
         // 'anyAuthenticated' and at least one userRole exists. access is granted
         return;
@@ -40,9 +36,7 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
         }
     }
 
-    throw new forbiddenExceptionClass(
-        `User's roles do not grant access to the requested resource.`,
-    );
+    throw new ForbiddenException(`User's roles do not grant access to the requested resource.`);
 };
 
 export type RbacParams<T extends AllowedRolesId = AllowedRolesId> =

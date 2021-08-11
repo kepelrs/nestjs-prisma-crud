@@ -1,3 +1,4 @@
+import { ForbiddenException } from '@nestjs/common';
 import { traverse } from 'object-traversal';
 
 /**
@@ -9,7 +10,6 @@ export function transformForNestedCreate(
     objectToPersist: any,
     currentPersistedObject: any,
     allowedJoinSet: Set<string>,
-    forbiddenError: any,
 ) {
     const copy = JSON.parse(JSON.stringify(objectToPersist));
     const keywords = new Set([
@@ -40,7 +40,7 @@ export function transformForNestedCreate(
             key = key!;
 
             if (!pathIsWithinAllowedJoins) {
-                throw forbiddenError;
+                throw new ForbiddenException();
             }
 
             if (valueIsArray) {
@@ -150,7 +150,6 @@ export function transformJoinsToInclude(joins: string[]) {
 export function validateNestedWhere(
     whereObject: any,
     allowedJoinsSet: Set<string>,
-    forbiddenError: any,
 
     // TODO: Document that bellow keywords should be forbidden in all models
     prismaBlacklistKeywords = [
@@ -205,8 +204,7 @@ export function validateNestedWhere(
 
             const isAllowed = !cleanedupString || allowedJoinsSet.has(cleanedupString);
             if (!isAllowed) {
-                forbiddenError.message = `Join relation not allowed: ${cleanedupString}`; // TODO: Improve messaging
-                throw forbiddenError;
+                throw new ForbiddenException(`Join relation not allowed: ${cleanedupString}`); // TODO: Improve message
             }
         }
     });

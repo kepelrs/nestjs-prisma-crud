@@ -1,5 +1,5 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaCrudService } from '../../../src';
+import { Injectable } from '@nestjs/common';
+import { PrismaCrudService } from 'nestjs-prisma-crud';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
@@ -9,8 +9,6 @@ export class CommentsService extends PrismaCrudService {
             repo: prismaService.comment,
             allowedJoins: ['post'],
             defaultJoins: [],
-            notFoundError: new NotFoundException(),
-            forbiddenError: new ForbiddenException(),
         });
     }
 }
@@ -23,8 +21,6 @@ export class InvalidCommentsService extends PrismaCrudService {
             repo: prismaService.comment,
             allowedJoins: ['post'],
             defaultJoins: ['post', 'post.comments'],
-            notFoundError: new NotFoundException(),
-            forbiddenError: new ForbiddenException(),
         });
     }
 }

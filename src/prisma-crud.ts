@@ -1,17 +1,20 @@
 import {
-    getAllJoinSubsets,
-    transformJoinsToInclude,
-    transformForNestedCreate,
-    validateNestedWhere,
+    ForbiddenException,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common';
+import {
     deletePaths,
+    getAllJoinSubsets,
+    transformForNestedCreate,
+    transformJoinsToInclude,
+    validateNestedWhere,
 } from './utils';
 
 export type CrudObj = any; // TODO: strong type all any's
 export type CrudWhere = any;
 
 export class PrismaCrudService {
-    private notFoundError: any;
-    private forbiddenError: any;
     private defaultIncludes: any;
     private paginationDefaults = {
         pageSize: 25,
@@ -27,8 +30,6 @@ export class PrismaCrudService {
         allowedJoins: string[];
         defaultJoins?: string[];
         forbiddenPaths?: Array<string | RegExp>; // TODO: Document that this is still fetched from the database!!
-        notFoundError: any;
-        forbiddenError: any;
     }) {
         // TODO: mechanism for checking prisma client version and ensuring it is tested/supported
         this.repo = args.repo;
@@ -37,9 +38,6 @@ export class PrismaCrudService {
         this.defaultJoins = this.getSanitizedDefaultJoins(args.defaultJoins, this.allowedJoinsSet);
 
         this.defaultIncludes = transformJoinsToInclude(this.defaultJoins);
-
-        this.notFoundError = args.notFoundError;
-        this.forbiddenError = args.forbiddenError;
 
         this.forbiddenPaths = args.forbiddenPaths || [];
     }
@@ -55,7 +53,7 @@ export class PrismaCrudService {
         for (let i = 0; i < defaultJoins.length; i++) {
             const join = defaultJoins[i];
             if (!allowedJoinsSet.has(join)) {
-                throw new Error(
+                throw new InternalServerErrorException(
                     `defaultJoins contains strings that are not preset in allowedJoins`,
                 );
             }
@@ -75,8 +73,7 @@ export class PrismaCrudService {
             if (this.allowedJoinsSet.has(reqInclude)) {
                 allowedJoins.push(reqInclude);
             } else {
-                this.forbiddenError.message = `Join relation not allowed: ${reqInclude}`;
-                throw this.forbiddenError;
+                throw new ForbiddenException(`Join relation not allowed: ${reqInclude}`);
             }
         }
 
@@ -90,7 +87,7 @@ export class PrismaCrudService {
 
     private getAndValidateWhere(crudObj: CrudObj): CrudWhere {
         const where = crudObj.where || {};
-        validateNestedWhere(where, this.allowedJoinsSet, this.forbiddenError);
+        validateNestedWhere(where, this.allowedJoinsSet);
         return where;
     }
 
@@ -120,12 +117,7 @@ export class PrismaCrudService {
 
     public async create(createDto: any) {
         const entity = await this.repo.create({
-            data: transformForNestedCreate(
-                createDto,
-                null,
-                this.allowedJoinsSet,
-                this.forbiddenError,
-            ),
+            data: transformForNestedCreate(createDto, null, this.allowedJoinsSet),
         });
         return this.findOne(entity.id);
     }
@@ -177,7 +169,7 @@ export class PrismaCrudService {
         });
 
         if (!match) {
-            throw this.notFoundError;
+            throw new NotFoundException();
         }
 
         if (excludeForbiddenPaths) {
@@ -193,12 +185,7 @@ export class PrismaCrudService {
         // update and return standard findOne
         await this.repo.update({
             where: { id: entity.id },
-            data: transformForNestedCreate(
-                updateDto,
-                entity,
-                this.allowedJoinsSet,
-                this.forbiddenError,
-            ),
+            data: transformForNestedCreate(updateDto, entity, this.allowedJoinsSet),
         });
 
         return this.findOne(id, crudQ);

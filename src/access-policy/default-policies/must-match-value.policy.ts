@@ -1,6 +1,5 @@
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { CrudObj } from '../..';
-import { AccessPolicyInterceptorOpts } from '../access-policy.interceptor';
 
 /** TODO: Dry up with other createWhereObject */
 const createWhereObject = (fullPath: string, targetValue: any) => {
@@ -22,10 +21,9 @@ const createWhereObject = (fullPath: string, targetValue: any) => {
 export const MustMatchValue = (entityAttributePath: string, targetValue: any) => (
     ctx: ExecutionContext,
     _authData: any,
-    accessPolicyOpts: AccessPolicyInterceptorOpts,
 ) => {
     if (!targetValue) {
-        throw new accessPolicyOpts.internalServerErrorExceptionClass(
+        throw new InternalServerErrorException(
             `MustMatchValue policy: targetValue may not be a falsy value.`, // TODO: Document that this is not allowed due to edge cases (including the filter being completely ignored when undefined)
         );
     }
