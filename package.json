@@ -1,5 +1,5 @@
 {
-    "version": "0.0.10",
+    "version": "0.0.11",
     "license": "MIT",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
@@ -38,19 +38,19 @@
     "author": "Kepelrs",
     "module": "dist/nestjs-prisma-crud.esm.js",
     "devDependencies": {
-        "husky": "^6.0.0",
-        "tsdx": "^0.14.1",
-        "tslib": "^2.2.0",
-        "typescript": "^4.2.4",
         "@nestjs/common": "^7.6.18",
         "@nestjs/core": "^7.6.18",
-        "reflect-metadata": "^0.1.13"
+        "husky": "^6.0.0",
+        "reflect-metadata": "^0.1.13",
+        "tsdx": "^0.14.1",
+        "tslib": "^2.2.0",
+        "typescript": "^4.2.4"
     },
     "peerDependencies": {
         "@nestjs/common": "^7.6.18",
         "@nestjs/core": "^7.6.18",
-        "reflect-metadata": "^0.1.13",
-        "@prisma/client": "^2.25.0"
+        "@prisma/client": "^2.25.0",
+        "reflect-metadata": "^0.1.13"
     },
     "dependencies": {
         "object-traversal": "^0.1.2"
