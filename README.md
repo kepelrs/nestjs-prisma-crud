@@ -13,7 +13,7 @@ CRUD utility for simple REST use cases. Builds on top of [NestJS](https://github
 
 ## Why
 
-When building REST API's there are recurrent themes that we would prefer not to implement again and again. This package offers opinionated out of the box solutions for some of those (see bellow).
+When building REST API's there is common functionality that we would prefer not to implement again and again. This package offers minimal and opinionated out of the box solutions for some of those (see [features](#features) bellow).
 
 ### Features
 
@@ -31,14 +31,25 @@ When building REST API's there are recurrent themes that we would prefer not to 
     - Supports POST/PATCH with nested objects.
     - Transaction support when extending controller functionality. _(TODO)_
 6. Schematics
-    - Modified `resource` schematic that scaffolds the entire CRUD module.
-    - TODO: Add example.
-
-For more complex scenarios you can write your own completely custom [NestJS](https://github.com/nestjs/nest)/[Prisma](https://github.com/prisma/prisma) controllers, or you can leverage the `PrismaCrudService` to retain some of the above features.
+    - `crud-resource` is a modified `resource` schematic that scaffolds the entire CRUD module for you.
+    - One-liner scaffolding: `nest g -c nestjs-prisma-crud-schematics crud-resource <YOUR-TABLE-NAME-HERE>`
+7. Plug and play
+    - No assumptions made: for more complex scenarios you can write your own completely custom [NestJS](https://github.com/nestjs/nest)/[Prisma](https://github.com/prisma/prisma) controllers.
+    - You can leverage the `PrismaCrudService` to retain some features (eg. pagination) in your custom controllers
 
 ## Quickstart
 
-TODO
+1. Follow the [standard installation steps](https://www.prisma.io/nestjs) for NestJS and Prisma. Make sure you create the `PrismaService`.
+2. Install `nestjs-prisma-crud` and schematics:
+```
+npm i nestjs-prisma-crud
+npm i -g nestjs-prisma-crud-schematics
+```
+4. Assuming you have a table called `Post` in the database, scaffold the entire crud module with:
+```
+nest g -c nestjs-prisma-crud-schematics crud-resource post # replace 'post' with your table's name
+```
+
 
 ## More examples
 
@@ -63,8 +74,8 @@ TODO example folder
     -   [x] Default utility guards
     -   [ ] Rename crudQ
     -   [ ] Examples
--   [ ] crud schematics
--   [ ] improve module configuration
+-   [x] crud schematics
+-   [x] improve module configuration
 -   [ ] additional transaction support tests and examples
 -   [x] test nested create cannot happen passed allowed joins
 
@@ -72,10 +83,12 @@ TODO example folder
 
 -   id fields are not yet configurable
     -   models must have PK called id and must be of type string
--   NO JSON support. nestjs-prisma-crud assumes an object is a relation when `typeof somePossiblyNestedProperty === 'object'`. TODO: investigate_further
+-   NO JSON support. nestjs-prisma-crud assumes an object is a relation when `typeof somePossiblyNestedProperty === 'object'`. TODO: investigate further
     -   Current workaround: use middleware for transforming into string on both frontend and backend
 -   Prisma keywords may not be used as model properties
     -   TODO: document which are those words or automate validation
+- No type safety: `PrismaCrudService` makes no effort to preserve type safety.
+    - If you really need it, you may consider using the default `PrismaService` or manually assigning types.
 
 ## Built with
 
