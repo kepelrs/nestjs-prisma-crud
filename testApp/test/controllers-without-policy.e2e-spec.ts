@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { dummySeedFullObj, dummySeedValueString, seed } from '../prisma/seed';
+import { dummySeedFullObj, dummySeedValueString, NUMBER_OF_USER_SEEDS, seed } from '../prisma/seed';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma.service';
 
@@ -244,6 +244,60 @@ describe('CRUD controllers (without policy) e2e', () => {
                         expect(
                             res.body?.data?.[0]?.posts?.[0]?.comments?.[0]?.title,
                         ).not.toBeTruthy();
+                    });
+            });
+
+            it(`correctly handles 'in' special case`, () => {
+                const crudQ = {
+                    where: {
+                        posts: {
+                            some: {
+                                comments: {
+                                    some: {
+                                        title: { in: [dummySeedValueString, 'some other string'] },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                };
+                return request(app.getHttpServer())
+                    .get('/users')
+                    .query({
+                        crudQ: JSON.stringify(crudQ),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data?.[0]?.posts?.[0]?.comments?.[0]?.title).toEqual(
+                            dummySeedValueString,
+                        );
+                    });
+            });
+
+            it(`correctly handles 'notIn' special case`, () => {
+                const crudQ = {
+                    where: {
+                        posts: {
+                            some: {
+                                comments: {
+                                    some: {
+                                        title: {
+                                            notIn: [dummySeedValueString, 'some other string'],
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                };
+                return request(app.getHttpServer())
+                    .get('/users')
+                    .query({
+                        crudQ: JSON.stringify(crudQ),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data?.length).toBe(NUMBER_OF_USER_SEEDS - 1);
                     });
             });
         });

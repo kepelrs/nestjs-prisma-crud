@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-const NUMBER_OF_USER_SEEDS = 2;
+export const NUMBER_OF_USER_SEEDS = 2;
 
 function generateSeeds(n: number) {
     const userSeeds = [];

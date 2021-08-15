@@ -185,11 +185,16 @@ export function validateNestedWhere(
     const endOperatorsRegex = new RegExp(`\\.${blackListedWordsRegex}$`, 'g');
     const startOperatorsRegex = new RegExp(`^${blackListedWordsRegex}(\\.|$)`, 'g');
     const lastFragmentRegex = /\.?[^.]+$/;
+    const leafArrayContentRegex = /\.(in|notIn)\.\d+$/;
+    const leafArrayRegex = /\.(in|notIn)$/;
 
     traverse(whereObject, (context) => {
-        const { key, value, meta } = context;
-        const isLeaf =
-            key !== 'in' && key !== 'notIn' && (typeof value !== 'object' || value === null); // nulls and non-objects are final nodes, except when using 'in' or 'notIn'
+        const { value, meta } = context;
+        const isLeafArrayContent = leafArrayContentRegex.test(meta.currentPath || '');
+        const isLeafArray = value instanceof Array && leafArrayRegex.test(meta.currentPath || '');
+        const isRegularLeafCase =
+            !isLeafArrayContent && (typeof value !== 'object' || value === null); // nulls and non-objects are final nodes, except when using 'in' or 'notIn'
+        const isLeaf = isLeafArray || isRegularLeafCase;
         if (isLeaf) {
             // leaf paths are the longest
             const leafPath = meta.currentPath!;
