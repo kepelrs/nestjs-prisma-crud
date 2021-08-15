@@ -104,7 +104,7 @@ describe('MustMatchValue e2e', () => {
 
             it('GET /must-match-value/comments/everyone/empty returns empty set when nothing matches', async () => {
                 await multiAppTest([nonStrictApp, strictApp], async (app) => {
-                    await request(app.getHttpServer()) // TODO: DRY up duplicate code for testing app/strictApp in most places
+                    await request(app.getHttpServer())
                         .get('/must-match-value/comments/everyone/empty')
                         .expect(200)
                         .then((res) => {

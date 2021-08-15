@@ -269,7 +269,7 @@ export function deletePaths(
     return object;
 }
 
-function getNestedProperty(obj: any, nestedPath: string) {
+export function getNestedProperty(obj: any, nestedPath: string) {
     const fragments = nestedPath.split('.');
     let value = obj;
     for (let i = 0; i < fragments.length; i++) {
@@ -280,6 +280,21 @@ function getNestedProperty(obj: any, nestedPath: string) {
         }
     }
     return value;
+}
+
+export function createWhereObject(fullPath: string, targetValue: any, startingObj: any = {}) {
+    const fragments = fullPath.split('.');
+    const rootObj: any = startingObj;
+    let workingWhereObj = rootObj;
+    for (let i = 0; i < fragments.length; i++) {
+        const fragment = fragments[i];
+        const isLastFragment = i === fragments.length - 1;
+
+        workingWhereObj[fragment] = isLastFragment ? targetValue : {};
+        workingWhereObj = workingWhereObj[fragment];
+    }
+
+    return rootObj;
 }
 
 function getIdsToDisconnect(stillConnected: any[], originalConnections: any[]) {

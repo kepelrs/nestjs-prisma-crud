@@ -1,38 +1,10 @@
 import {
     ExecutionContext,
     InternalServerErrorException,
-    UnauthorizedException
+    UnauthorizedException,
 } from '@nestjs/common';
 import { CrudObj } from '../..';
-
-/** TODO: Move to some util service or use already standardized solution */
-const getAttributeValue = (authAttributePath: string, authenticationData: any) => {
-    const segments = authAttributePath.split('.');
-
-    let value: any = authenticationData;
-    for (let i = 0; i < segments.length; i++) {
-        const segment = segments[i];
-        value = value?.[segment];
-    }
-
-    return value;
-};
-
-/** TODO: Dry up with other createWhereObject */
-const createWhereObject = (fullPath: string, targetValue: any) => {
-    const fragments = fullPath.split('.');
-    const rootObj: any = {};
-    let workingWhereObj = rootObj;
-    for (let i = 0; i < fragments.length; i++) {
-        const fragment = fragments[i];
-        const isLastFragment = i === fragments.length - 1;
-
-        workingWhereObj[fragment] = isLastFragment ? targetValue : {};
-        workingWhereObj = workingWhereObj[fragment];
-    }
-
-    return rootObj;
-};
+import { createWhereObject, getNestedProperty } from '../../utils';
 
 // TODO: improve naming.
 // TODO: make more generic version that allows for any prisma operator: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#filter-conditions-and-operators
@@ -49,7 +21,7 @@ export const MustMatchAuthAttribute = (
         throw new UnauthorizedException('This route requires user to be logged in!');
     }
 
-    const targetValue = getAttributeValue(authDataAttributePath, authData);
+    const targetValue = getNestedProperty(authData, authDataAttributePath);
     if (!targetValue) {
         throw new InternalServerErrorException(
             `MustMatchAuthAttribute policy: authDataAttributePath led to falsy value.`, // TODO: Document that this is not allowed due to edge cases (including the filter being completely ignored when undefined)

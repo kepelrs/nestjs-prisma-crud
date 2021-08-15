@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { dummySeedFullObj, dummySeedValueString, NUMBER_OF_USER_SEEDS, seed } from '../prisma/seed';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma.service';
+import { UsersService } from '../src/users/users.service';
 
 describe('CRUD controllers (without policy) e2e', () => {
     let app: INestApplication;
@@ -877,6 +878,60 @@ describe('CRUD controllers (without policy) e2e', () => {
                         res.body?.posts?.[0]?.comments?.[0]?.exampleForbiddenProperty,
                     ).toBeFalsy();
                 });
+        });
+
+        it('GET many forbiddenPaths can be ignored by function parameter', async () => {
+            const userService = app.get(UsersService);
+            const originalFindAll = userService.findAll;
+            const mockedFindAll = function (crudQ) {
+                return originalFindAll.bind(userService)(crudQ, false);
+            };
+            userService.findAll = mockedFindAll;
+
+            try {
+                await request(app.getHttpServer())
+                    .get('/users')
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body.data.length).toBeTruthy();
+                        for (let i = 0; i < res.body.data.length; i++) {
+                            const record = res.body.data[i];
+                            expect(record.password).not.toBeFalsy();
+                            expect(
+                                record.posts?.[0]?.comments?.[0]?.exampleForbiddenProperty,
+                            ).not.toBeFalsy();
+                        }
+                    });
+            } catch (error) {
+                throw error;
+            } finally {
+                userService.findAll = originalFindAll;
+            }
+        });
+
+        it('GET one forbiddenPaths can be ignored by function parameter', async () => {
+            const userService = app.get(UsersService);
+            const originalFindOne = userService.findOne;
+            const mockedFindOne = function (id, crudQ) {
+                return originalFindOne.bind(userService)(id, crudQ, false);
+            };
+            userService.findOne = mockedFindOne;
+
+            try {
+                await request(app.getHttpServer())
+                    .get(`/users/${dummySeedValueString}`)
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.password).not.toBeFalsy();
+                        expect(
+                            res.body?.posts?.[0]?.comments?.[0]?.exampleForbiddenProperty,
+                        ).not.toBeFalsy();
+                    });
+            } catch (error) {
+                throw error;
+            } finally {
+                userService.findOne = originalFindOne;
+            }
         });
     });
 });

@@ -1,21 +1,6 @@
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { CrudObj } from '../..';
-
-/** TODO: Dry up with other createWhereObject */
-const createWhereObject = (fullPath: string, targetValue: any) => {
-    const fragments = fullPath.split('.');
-    const rootObj: any = {};
-    let workingWhereObj = rootObj;
-    for (let i = 0; i < fragments.length; i++) {
-        const fragment = fragments[i];
-        const isLastFragment = i === fragments.length - 1;
-
-        workingWhereObj[fragment] = isLastFragment ? targetValue : {};
-        workingWhereObj = workingWhereObj[fragment];
-    }
-
-    return rootObj;
-};
+import { createWhereObject } from '../../utils';
 
 /** TODO: Document */
 export const MustMatchValue = (entityAttributePath: string, targetValue: any) => (
