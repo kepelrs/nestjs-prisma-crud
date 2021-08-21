@@ -6,3 +6,7 @@ before_script:
     - npm install -g codecov
 script:
     - npm run test:cov && codecov
+branches:
+    only:
+        - master
+        - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
