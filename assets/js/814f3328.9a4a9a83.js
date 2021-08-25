@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocumentation=self.webpackChunkdocumentation||[]).push([[535],{5641:function(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome","permalink":"/nestjs-prisma-crud/blog/welcome"},{"title":"Hello","permalink":"/nestjs-prisma-crud/blog/hello-world"},{"title":"Hola","permalink":"/nestjs-prisma-crud/blog/hola"}]}')}}]);

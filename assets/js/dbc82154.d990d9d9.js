@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocumentation=self.webpackChunkdocumentation||[]).push([[536],{9819:function(a){a.exports=JSON.parse('{"allTagsPath":"/nestjs-prisma-crud/blog/tags","slug":"facebook","name":"facebook","count":1,"permalink":"/nestjs-prisma-crud/blog/tags/facebook"}')}}]);
