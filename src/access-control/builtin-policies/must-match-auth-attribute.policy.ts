@@ -3,19 +3,18 @@ import {
     InternalServerErrorException,
     UnauthorizedException,
 } from '@nestjs/common';
-import { CrudObj } from '../..';
+import { ModuleRef } from '@nestjs/core';
+import { CrudQuery, PolicyMethod } from '../..';
 import { createWhereObject, getNestedProperty } from '../../utils';
 
-// TODO: improve naming.
 // TODO: make more generic version that allows for any prisma operator: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#filter-conditions-and-operators
-/** TODO: Document. Policy will throw if authDataAttributePath leads into a falsy value */
 export const MustMatchAuthAttribute = (
     entityAttributePath: string,
     authDataAttributePath: string,
-) => (ctx: ExecutionContext, authData: any) => {
+): PolicyMethod => (ctx: ExecutionContext, authData: any, _moduleRef: ModuleRef) => {
     const request = ctx.switchToHttp().getRequest();
     const query = request.query;
-    const crudQ: string = query.crudQ;
+    const crudQuery: string = query.crudQuery;
 
     if (!authData) {
         throw new UnauthorizedException('This route requires user to be logged in!');
@@ -28,11 +27,11 @@ export const MustMatchAuthAttribute = (
         );
     }
 
-    const parsedCrudQ: CrudObj = crudQ ? JSON.parse(crudQ) : {};
-    const originalWhere = parsedCrudQ.where || {};
-    parsedCrudQ.where = {
+    const parsedCrudQuery: CrudQuery = crudQuery ? JSON.parse(crudQuery) : {};
+    const originalWhere = parsedCrudQuery.where || {};
+    parsedCrudQuery.where = {
         AND: [createWhereObject(entityAttributePath, targetValue), originalWhere],
     };
 
-    request.query.crudQ = JSON.stringify(parsedCrudQ);
+    request.query.crudQuery = JSON.stringify(parsedCrudQuery);
 };

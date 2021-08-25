@@ -3,36 +3,72 @@ import {
     InternalServerErrorException,
     NotFoundException,
 } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 import {
-    deletePaths,
+    deleteObjectProperties,
     getAllJoinSubsets,
     transformForNestedCreate,
     transformJoinsToInclude,
     validateNestedWhere,
-} from './utils';
+} from './helpers';
 
-export type CrudObj = any; // TODO: strong type all any's
-export type CrudWhere = any;
+// TODO: create exported types file
+export type PaginationDefaults = {
+    pageSize: number;
+    orderBy: any;
+};
+
+export type PrismaTransaction = Omit<
+    PrismaClient,
+    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+>;
+
+export type CrudQuery = {
+    where?: CrudWhere;
+    joins?: string[];
+    select?: { only?: string[]; except?: string[] };
+    orderBy?: object;
+    page?: number;
+    pageSize?: number;
+};
+
+export type CrudWhere = any; // TODO: strong type all any's
+
+export type CrudMethodOpts = { // TODO: 1. move crudQuery into crudMethodOpts. 2. Update transaction support example
+    excludeForbiddenPaths?: boolean;
+    prismaTransaction?: PrismaTransaction;
+};
+
+export const defaultCrudMethodOpts: CrudMethodOpts = {
+    excludeForbiddenPaths: true,
+    prismaTransaction: undefined,
+};
+
+export interface CrudServiceOpts {
+    /** The model name as used by `prismaClient.model`. Eg: 'user' if your prisma schema contains `model User {}` */
+    model: string;
+    prismaClient: PrismaClient;
+    allowedJoins: string[];
+    defaultJoins?: string[];
+    forbiddenPaths?: Array<string | RegExp>;
+    /** The name of the id field in your prisma schema. Defaults to 'id' */
+    idPropertyName?: string;
+}
 
 export class PrismaCrudService {
     private defaultIncludes: any;
-    private paginationDefaults = {
-        pageSize: 25,
-        orderBy: [{ id: 'asc' }],
-    }; // TODO: make defaults configurable. Also Max/min for pageSize and orderBy validations/restrictions
+    private paginationDefaults: PaginationDefaults;
     private allowedJoinsSet: Set<string>;
     private defaultJoins: string[];
-    private repo: any;
+    private prismaClient: any;
+    private model: string;
     private forbiddenPaths: Array<string | RegExp>;
+    private idPropertyName: string;
 
-    constructor(args: {
-        repo: any;
-        allowedJoins: string[];
-        defaultJoins?: string[];
-        forbiddenPaths?: Array<string | RegExp>; // TODO: Document that this is still fetched from the database!!
-    }) {
-        // TODO: mechanism for checking prisma client version and ensuring it is tested/supported
-        this.repo = args.repo;
+    constructor(args: CrudServiceOpts) {
+        this.model = args.model;
+        this.prismaClient = args.prismaClient;
+        this.idPropertyName = args.idPropertyName || 'id';
 
         this.allowedJoinsSet = getAllJoinSubsets(args.allowedJoins);
         this.defaultJoins = this.getSanitizedDefaultJoins(args.defaultJoins, this.allowedJoinsSet);
@@ -40,6 +76,11 @@ export class PrismaCrudService {
         this.defaultIncludes = transformJoinsToInclude(this.defaultJoins);
 
         this.forbiddenPaths = args.forbiddenPaths || [];
+
+        this.paginationDefaults = {
+            pageSize: 25,
+            orderBy: [{ [this.idPropertyName]: 'asc' }],
+        }; // TODO: make defaults configurable. Also Max/min for pageSize and orderBy validations/restrictions
     }
 
     private getSanitizedDefaultJoins(
@@ -80,19 +121,32 @@ export class PrismaCrudService {
         return transformJoinsToInclude(Array.from(new Set(allowedJoins)));
     }
 
-    private parseCrudQ(crudQ: undefined | null | string): CrudObj {
-        // TODO: Add return type and rough validation
-        return crudQ ? JSON.parse(crudQ) : {};
+    private parseCrudQuery(crudQuery: undefined | null | string | CrudQuery): CrudQuery {
+        if (crudQuery instanceof Object) {
+            return crudQuery;
+        }
+
+        if (typeof crudQuery === 'string') {
+            return JSON.parse(crudQuery);
+        }
+
+        return {
+            where: {},
+            joins: this.defaultJoins,
+            orderBy: this.paginationDefaults.orderBy,
+            page: 1,
+            pageSize: this.paginationDefaults.pageSize,
+        };
     }
 
-    private getAndValidateWhere(crudObj: CrudObj): CrudWhere {
-        const where = crudObj.where || {};
+    private getAndValidateWhere(crudQuery: CrudQuery): CrudWhere {
+        const where = crudQuery.where || {};
         validateNestedWhere(where, this.allowedJoinsSet);
         return where;
     }
 
     private getAndValidatePagination(
-        crudObj: CrudObj,
+        crudQuery: CrudQuery,
     ): {
         skip: number;
         take: number;
@@ -101,13 +155,14 @@ export class PrismaCrudService {
         pageSize: number;
     } {
         // TODO: Validate user inputs!!
-        let { page, pageSize, orderBy } = crudObj;
-        page = +page || 1;
-        pageSize = +pageSize || this.paginationDefaults.pageSize;
+        let { page, pageSize, orderBy } = crudQuery;
+        page = +page! > 0 ? +page! : 1;
+        pageSize = +pageSize! > 0 ? +pageSize! : this.paginationDefaults.pageSize;
+        orderBy = orderBy instanceof Object ? orderBy : this.paginationDefaults.orderBy;
         const paginationObj = {
             skip: (page - 1) * pageSize,
             take: pageSize,
-            orderBy: orderBy instanceof Object || this.paginationDefaults.orderBy,
+            orderBy,
             page,
             pageSize,
         };
@@ -115,37 +170,67 @@ export class PrismaCrudService {
         return paginationObj;
     }
 
-    public async create(createDto: any) {
-        const entity = await this.repo.create({
-            data: transformForNestedCreate(createDto, null, this.allowedJoinsSet),
-        });
-        return this.findOne(entity.id);
+    private getRepo(opts: CrudMethodOpts) {
+        const prismaTransaction = opts.prismaTransaction || this.prismaClient;
+        return prismaTransaction[this.model];
     }
 
-    public async findAll(crudQ?: string, excludeForbiddenPaths: boolean = true) {
-        const crudObj = this.parseCrudQ(crudQ);
-        const where = this.getAndValidateWhere(crudObj);
-        const { skip, take, orderBy, page, pageSize } = this.getAndValidatePagination(crudObj);
+    public async create(createDto: any, crudQuery: string | CrudQuery, opts: CrudMethodOpts = {}) {
+        opts = Object.assign({}, defaultCrudMethodOpts, opts);
+        const repo = this.getRepo(opts);
 
-        const summary = await this.repo.aggregate({
-            where,
-            _count: { id: true },
+        const entity = await repo.create({
+            data: transformForNestedCreate(
+                createDto,
+                null,
+                this.allowedJoinsSet,
+                this.idPropertyName,
+            ),
         });
-        const count = summary._count.id;
+        return this.findOne(entity[this.idPropertyName], crudQuery, opts);
+    }
+
+    public async findMany(crudQuery: string | CrudQuery, opts: CrudMethodOpts = {}) {
+        opts = Object.assign({}, defaultCrudMethodOpts, opts);
+        const repo = this.getRepo(opts);
+
+        const parsedCrudQuery = this.parseCrudQuery(crudQuery);
+        const where = this.getAndValidateWhere(parsedCrudQuery);
+        const { skip, take, orderBy, page, pageSize } = this.getAndValidatePagination(
+            parsedCrudQuery,
+        );
+
+        const summary = await repo.aggregate({
+            where,
+            _count: { [this.idPropertyName]: true },
+        });
+        const count = summary._count[this.idPropertyName];
         const recordsPerPage = take;
         const pageCount = Math.ceil(count / recordsPerPage);
 
-        let matches = await this.repo.findMany({
+        let matches = await repo.findMany({
             where: { ...where },
-            ...this.getIncludes(crudObj.joins),
+            ...this.getIncludes(parsedCrudQuery.joins),
             skip,
             take,
         });
 
-        if (excludeForbiddenPaths) {
+        if (opts.excludeForbiddenPaths) {
             for (let i = 0; i < matches.length; i++) {
                 const match = matches[i];
-                deletePaths(match, this.forbiddenPaths, true);
+                deleteObjectProperties(match, this.forbiddenPaths);
+            }
+        }
+
+        if (parsedCrudQuery.select) {
+            for (let i = 0; i < matches.length; i++) {
+                const match = matches[i];
+                deleteObjectProperties(
+                    match,
+                    parsedCrudQuery.select.except,
+                    parsedCrudQuery.select.only,
+                    true,
+                );
             }
         }
 
@@ -159,43 +244,79 @@ export class PrismaCrudService {
         };
     }
 
-    public async findOne(id: string, crudQ?: string, excludeForbiddenPaths: boolean = true) {
-        const crudObj = this.parseCrudQ(crudQ);
-        const where = this.getAndValidateWhere(crudObj);
+    public async findOne(
+        id: string | number,
+        crudQuery: string | CrudQuery,
+        opts: CrudMethodOpts = {},
+    ) {
+        opts = Object.assign({}, defaultCrudMethodOpts, opts);
+        const repo = this.getRepo(opts);
 
-        let match = await this.repo.findFirst({
-            where: { ...where, id },
-            ...this.getIncludes(crudObj.joins),
+        const parsedCrudQuery = this.parseCrudQuery(crudQuery);
+        const where = this.getAndValidateWhere(parsedCrudQuery);
+
+        let match = await repo.findFirst({
+            where: { ...where, [this.idPropertyName]: id },
+            ...this.getIncludes(parsedCrudQuery.joins),
         });
 
         if (!match) {
             throw new NotFoundException();
         }
 
-        if (excludeForbiddenPaths) {
-            match = deletePaths(match, this.forbiddenPaths, true);
+        if (opts.excludeForbiddenPaths) {
+            deleteObjectProperties(match, this.forbiddenPaths);
+        }
+
+        if (parsedCrudQuery.select) {
+            deleteObjectProperties(
+                match,
+                parsedCrudQuery.select.except,
+                parsedCrudQuery.select.only,
+                true,
+            );
         }
         return match;
     }
 
-    public async update(id: string, updateDto: any, crudQ?: string) {
-        // Check that entity is accessible when considering id and crudQ restrictions
-        const entity = await this.findOne(id, crudQ);
+    public async update(
+        id: string | number,
+        updateDto: any,
+        crudQuery: string | CrudQuery,
+        opts: CrudMethodOpts = {},
+    ) {
+        opts = Object.assign({}, defaultCrudMethodOpts, opts);
+        const repo = this.getRepo(opts);
+
+        // Check that entity is accessible considering id and crudQuery restrictions
+        const entity = await this.findOne(id, crudQuery, opts);
 
         // update and return standard findOne
-        await this.repo.update({
-            where: { id: entity.id },
-            data: transformForNestedCreate(updateDto, entity, this.allowedJoinsSet),
+        await repo.update({
+            where: { [this.idPropertyName]: entity[this.idPropertyName] },
+            data: transformForNestedCreate(
+                updateDto,
+                entity,
+                this.allowedJoinsSet,
+                this.idPropertyName,
+            ),
         });
 
-        return this.findOne(id, crudQ);
+        return this.findOne(id, crudQuery, opts);
     }
 
-    public async remove(id: string, crudQ?: string) {
-        // Check that entity is accessible when considering id and crudQ restrictions
-        const entity = await this.findOne(id, crudQ);
+    public async remove(
+        id: string | number,
+        crudQuery: string | CrudQuery,
+        opts: CrudMethodOpts = {},
+    ) {
+        opts = Object.assign({}, defaultCrudMethodOpts, opts);
+        const repo = this.getRepo(opts);
 
-        await this.repo.delete({ where: { id: entity.id } });
+        // Check that entity is accessible considering id and crudQuery restrictions
+        const entity = await this.findOne(id, crudQuery, opts);
+
+        await repo.delete({ where: { [this.idPropertyName]: entity[this.idPropertyName] } });
 
         return null;
     }

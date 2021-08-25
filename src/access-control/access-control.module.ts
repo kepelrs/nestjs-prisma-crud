@@ -2,19 +2,19 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import {
     AccessPolicyInterceptor,
-    ACCESS_POLICY_OPTS,
+    ACCESS_POLICY_OPTS_KEY,
     AccessPolicyInterceptorOpts,
 } from './access-policy.interceptor';
 
 @Module({})
-export class AccessPolicyModule {
+export class AccessControlModule {
     static register(opts: AccessPolicyInterceptorOpts): DynamicModule {
         return {
             global: true,
-            module: AccessPolicyModule,
+            module: AccessControlModule,
             providers: [
                 {
-                    provide: ACCESS_POLICY_OPTS,
+                    provide: ACCESS_POLICY_OPTS_KEY,
                     useValue: opts,
                 },
                 AccessPolicyInterceptor,
@@ -23,7 +23,7 @@ export class AccessPolicyModule {
                     useClass: AccessPolicyInterceptor,
                 },
             ],
-            exports: [AccessPolicyInterceptor, ACCESS_POLICY_OPTS],
+            exports: [AccessPolicyInterceptor, ACCESS_POLICY_OPTS_KEY],
         };
     }
 }

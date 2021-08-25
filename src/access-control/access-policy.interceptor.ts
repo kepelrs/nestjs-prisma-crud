@@ -7,19 +7,19 @@ import {
     NotImplementedException,
     SetMetadata,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { ModuleRef, Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { GetRolesFunction, RBAC, RbacParams } from './default-policies';
+import { AllowedRoles, GetRolesFunction, RBAC } from './builtin-policies';
 
-export const ACCESS_POLICY_OPTS = 'ACCESS_POLICY_OPTS';
-const POLICY_KEY = 'ACCESS_POLICY_METADATA_KEY';
+export const ACCESS_POLICY_OPTS_KEY = 'ACCESS_POLICY_OPTS_KEY';
+export const POLICY_KEY = 'ACCESS_POLICY_METADATA_KEY';
 
-type PolicyMethod = (
+export type PolicyMethod = (
     ctx: ExecutionContext,
     authData: any,
-    opts: AccessPolicyInterceptorOpts,
+    moduleRef: ModuleRef,
 ) => void | any;
-type AccessPolicyConfig = [RbacParams, ...PolicyMethod[]];
+type AccessPolicyConfig = [AllowedRoles, ...PolicyMethod[]];
 
 export interface AccessPolicyInterceptorOpts {
     authDataKey: string;
@@ -33,7 +33,7 @@ export interface AccessPolicyInterceptorOpts {
  * ```
  * > @AccessPolicy(config)
  * > @Controller('my-route')
- * > export class HabitController {}
+ * > export class MyController {}
  * ```
  */
 export const AccessPolicy = (...policyConfigs: AccessPolicyConfig) =>
@@ -44,12 +44,16 @@ export class AccessPolicyInterceptor implements NestInterceptor {
     private reflector = new Reflector();
 
     constructor(
-        @Inject(ACCESS_POLICY_OPTS)
+        @Inject(ACCESS_POLICY_OPTS_KEY)
         private opts: AccessPolicyInterceptorOpts,
+        private moduleRef: ModuleRef,
     ) {}
 
-    intercept(ctx: ExecutionContext, next: CallHandler): Observable<any> {
-        const policyConfigs = this.reflector.get<AccessPolicyConfig>(POLICY_KEY, ctx.getHandler()); // ctx.getClass(): https://github.com/nestjs/nest/issues/2027#issuecomment-484430871
+    async intercept(ctx: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+        const policyConfigs = this.reflector.getAllAndOverride<AccessPolicyConfig>(POLICY_KEY, [
+            ctx.getHandler(),
+            ctx.getClass(),
+        ]);
         if (!policyConfigs?.length) {
             // Route not decorated with AccessPolicyInterceptor
             if (this.opts.strictMode) {
@@ -65,14 +69,14 @@ export class AccessPolicyInterceptor implements NestInterceptor {
         const request = ctx.switchToHttp().getRequest();
         const authData = request[this.opts.authDataKey];
         const policies: PolicyMethod[] = [
-            RBAC(policyConfigs[0], authData, this.opts),
+            RBAC(policyConfigs[0], authData, this.moduleRef),
             ...(policyConfigs.slice(1) as PolicyMethod[]),
         ];
 
         // Apply policies
         for (let i = 0; i < policies.length; i++) {
             const policy = policies[i];
-            policy(ctx, authData, this.opts);
+            await policy(ctx, authData, this.moduleRef);
         }
 
         return next.handle();

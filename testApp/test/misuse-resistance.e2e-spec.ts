@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { dummySeedFullObj, dummySeedValueString, seed } from '../prisma/seed';
+import { needleStrings, seed, TestSeed } from '../prisma/seed';
 import { StrictModeAppModule } from '../src/app.module';
 import { CommentsModule, InvalidCommentsModule } from '../src/comments/comments.module';
 
@@ -10,6 +10,9 @@ import { CommentsModule, InvalidCommentsModule } from '../src/comments/comments.
  */
 describe('Misuse resistance', () => {
     let app: INestApplication;
+    let userSeeds: TestSeed[];
+    let [seededUser0] = [] as TestSeed[];
+    const [needleString0] = needleStrings;
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -22,7 +25,8 @@ describe('Misuse resistance', () => {
 
     beforeEach(async () => {
         try {
-            await seed(true);
+            userSeeds = await seed(true);
+            [seededUser0] = userSeeds;
         } catch (e) {
             console.log(`Error during beforeEach: ${e.message || e}`);
         }
@@ -32,65 +36,69 @@ describe('Misuse resistance', () => {
         app.close();
     });
 
-    it('POST /users throws 501 when no policies provided and strictMode: true', () => {
-        const now = Date.now();
-        const stringNow = String(now);
-        return request(app.getHttpServer())
-            .post('/users')
-            .send({
-                email: stringNow,
-                posts: [
-                    {
-                        title: stringNow,
-                        comments: [
-                            {
-                                title: stringNow,
-                            },
-                        ],
+    describe('when no policies provided and strictMode: true', () => {
+        it('POST /users throws 501', () => {
+            const now = Date.now();
+            const stringNow = String(now);
+            return request(app.getHttpServer())
+                .post('/users')
+                .send({
+                    email: stringNow,
+                    posts: [
+                        {
+                            title: stringNow,
+                            comments: [
+                                {
+                                    title: stringNow,
+                                },
+                            ],
+                        },
+                    ],
+                    profile: {
+                        fullName: stringNow,
                     },
-                ],
-                profile: {
-                    fullName: stringNow,
-                },
-            })
-            .expect(501);
+                })
+                .expect(501);
+        });
+
+        it('GET /users throws 501', () => {
+            return request(app.getHttpServer()).get('/users').expect(501);
+        });
+
+        it('GET /users/id throws 501', () => {
+            return request(app.getHttpServer()).get(`/users/${needleString0}`).expect(501);
+        });
+
+        it('PATCH /users/id throws 501', async () => {
+            const changedName = `${needleString0}aaa`;
+            const { posts, profile, ...shallowPayload } = seededUser0;
+            shallowPayload.name = changedName;
+            await request(app.getHttpServer())
+                .patch(`/users/${needleString0}`)
+                .send(shallowPayload)
+                .expect(501);
+        });
+
+        it('DELETE /comments/id throws 501', async () => {
+            await request(app.getHttpServer()).delete(`/comments/${needleString0}`).expect(501);
+        });
     });
 
-    it('GET /users throws 501 when no policies provided and strictMode: true', () => {
-        return request(app.getHttpServer()).get('/users').expect(501);
-    });
+    describe('defaultJoins', () => {
+        it('Developers receive error messages when misusing defaultJoins', async () => {
+            await expect(async () => {
+                const validModuleFixture: TestingModule = await Test.createTestingModule({
+                    imports: [CommentsModule],
+                }).compile();
+                validModuleFixture.createNestApplication();
+            }).resolves;
 
-    it('GET /users/id throws 501 when no policies provided and strictMode: true', () => {
-        return request(app.getHttpServer()).get(`/users/${dummySeedValueString}`).expect(501);
-    });
-
-    it('PATCH /users/id throws 501 when no policies provided and strictMode: true', async () => {
-        const changedName = `${dummySeedValueString}aaa`;
-        const { posts, profile, ...shallowPayload } = dummySeedFullObj;
-        shallowPayload.name = changedName;
-        await request(app.getHttpServer())
-            .patch(`/users/${dummySeedValueString}`)
-            .send(shallowPayload)
-            .expect(501);
-    });
-
-    it('DELETE /comments/id throws 501 when no policies provided and strictMode: true', async () => {
-        await request(app.getHttpServer()).delete(`/comments/${dummySeedValueString}`).expect(501);
-    });
-
-    it('Developers receive error messages when misusing defaultJoins', async () => {
-        await expect(async () => {
-            const validModuleFixture: TestingModule = await Test.createTestingModule({
-                imports: [CommentsModule],
-            }).compile();
-            validModuleFixture.createNestApplication();
-        }).resolves;
-
-        await expect(async () => {
-            const invalidModuleFixture: TestingModule = await Test.createTestingModule({
-                imports: [InvalidCommentsModule],
-            }).compile();
-            invalidModuleFixture.createNestApplication();
-        }).rejects.toBeTruthy();
+            await expect(async () => {
+                const invalidModuleFixture: TestingModule = await Test.createTestingModule({
+                    imports: [InvalidCommentsModule],
+                }).compile();
+                invalidModuleFixture.createNestApplication();
+            }).rejects.toBeTruthy();
+        });
     });
 });

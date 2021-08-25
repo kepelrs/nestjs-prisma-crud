@@ -8,6 +8,9 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  // TODO: Document bellow is mandatory for transaction support
+  previewFeatures = ["interactiveTransactions"]
+
 }
 
 model User {
@@ -16,11 +19,12 @@ model User {
   name     String?
   password String
 
-  posts     Post[]
+  posts             Post[]
+  entitiesWithIntId EntityWithIntId[]
   // comments Comment[]
-  profile   Profile?
-  country   Country? @relation(fields: [countryId], references: [id])
-  countryId String?
+  profile           Profile?
+  country           Country?          @relation(fields: [countryId], references: [id])
+  countryId         String?
 }
 
 model Country {
@@ -69,4 +73,16 @@ model Category {
   id    String @id @default(uuid())
   title String
   posts Post[]
+}
+
+model EntityWithIntId {
+  exampleDifferentIdName Int     @id @default(autoincrement())
+  exampleProperty        String
+  user                   User?   @relation(fields: [userId], references: [id])
+  userId                 String?
+}
+
+model AuditLog {
+  id      String @id @default(uuid())
+  content String
 }

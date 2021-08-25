@@ -15,80 +15,83 @@ CRUD utility for simple REST use cases. Builds on top of [NestJS](https://github
 
 When building REST API's there is common functionality that we would prefer not to implement again and again. This package offers minimal and opinionated out of the box solutions for some of those (see [features](#features) bellow).
 
-### Features
+## ✔ Features
 
-1. Pagination.
-2. Advanced querying (filtering) by frontend.
+An overview of the provided functionality:
+
+1. Advanced client side **joining**, **sorting**, **filtering** and **pagination** via query parameters
     - Any valid prisma `.where` can be sent by the frontend.
-    - Backend offers validation to safeguard against arbitrarily deep `.where` clauses by clients.
+    - Server side validation to safeguard against arbitrarily deep `.join` or `.where` clauses by clients.
     - Support for including only specific properties in the response. _(TODO)_
-3. Access control.
-    - `@AccessPolicy` decorator with default utilities that provide [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)/[ABAC](https://en.wikipedia.org/wiki/Attribute-based_access_control) like functionalities.
-4. Easy joins.
-    - Load nested relations with a single http request.
-    - Define `allowedJoins`/`defaultJoins` in your backend.
-5. Atomic operations
+2. Access control
+    - `@AccessPolicy` decorator with default utilities that support functionalities similar to [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)/[ABAC](https://en.wikipedia.org/wiki/Attribute-based_access_control).
+    - Custom policy support
+3. Atomic operations
     - Supports POST/PATCH with nested objects.
     - Transaction support when extending controller functionality. _(TODO)_
-6. Schematics
-    - `crud-resource` is a modified `resource` schematic that scaffolds the entire CRUD module for you.
-    - One-liner scaffolding: `nest g -c nestjs-prisma-crud-schematics crud-resource <YOUR-TABLE-NAME-HERE>`
-7. Plug and play
-    - No assumptions made: for more complex scenarios you can write your own completely custom [NestJS](https://github.com/nestjs/nest)/[Prisma](https://github.com/prisma/prisma) controllers.
-    - You can leverage the `PrismaCrudService` to retain some features (eg. pagination) in your custom controllers
+4. Schematics
+    - `crud-resource`: a modified NestJS `resource` schematic that scaffolds the entire CRUD module for you.<br/> One-line scaffolding with: _`nest g -c nestjs-prisma-crud-schematics crud-resource <YOUR-TABLE-NAME-HERE>`_
+5. Plug and play
+    - Can be used alongside your other non `nestjs-prisma-crud` controllers.
+    - You can use `PrismaCrudService` and `@AccessPolicy` in your custom controllers if you want to retain some of `nestjs-prisma-crud`'s functionalities.
 
 ## Quickstart
 
-1. Follow the [standard installation steps](https://www.prisma.io/nestjs) for NestJS and Prisma. Make sure you create the `PrismaService`.
-2. Install `nestjs-prisma-crud` and schematics:
-```
-npm i nestjs-prisma-crud
-npm i -g nestjs-prisma-crud-schematics
-```
-4. Assuming you have a table called `Post` in the database, scaffold the entire crud module with:
-```
-nest g -c nestjs-prisma-crud-schematics crud-resource post # replace 'post' with your table's name
-```
+1. Setup NestJS and Prisma by following the [standard installation steps](https://www.prisma.io/nestjs). Make sure you created the `PrismaService`.
+2. Install `nestjs-prisma-crud` and `nestjs-prisma-crud-schematics`:
 
+    ```
+    npm i nestjs-prisma-crud
+    npm i -g nestjs-prisma-crud-schematics
+    ```
 
-## More examples
+3. Generate the entire crud module with a single command (replace **post** with your entity name):
 
-TODO example folder
+    ```
+    nest g -c nestjs-prisma-crud-schematics crud-resource post
+    ```
 
-1. Creating Custom policies
-2. ...
+4. Configure your service
 
-## Roadmap
+    ```ts
+    // post.service.ts
+    import { PrismaCrudService } from 'nestjs-prisma-crud';
+    import { PrismaService } from '../prisma.service';
 
--   [x] Backend nested create
--   [x] Backend nested update
--   [x] Simple GET read one/many
--   [x] Delete
--   [x] Complex GET Frontend QueryBuilding
-    -   [x] Allow specifying joins from frontend (as long as allowed on backend)
-    -   [ ] Allow specifying select fields. TBD
-        -   some mechanism to blacklist/whitelist specific properties in response
-    -   [x] Pagination
-    -   [x] Allow complex where (TODO: test further)
--   [x] Access control policy strategy
-    -   [x] Default utility guards
-    -   [ ] Rename crudQ
-    -   [ ] Examples
--   [x] crud schematics
--   [x] improve module configuration
--   [ ] additional transaction support tests and examples
--   [x] test nested create cannot happen passed allowed joins
+    @Injectable()
+    export class PostService extends PrismaCrudService {
+        constructor(public prismaService: PrismaService) {
+            super({
+                prismaClient: prismaService,
+                model: 'post',
+                allowedJoins: ['comments.likes'],
+                defaultJoins: [],
+            });
+        }
+    }
 
-## Current limitations & known issues
+    // post.controller.ts
+    import { PostService } from './post.service';
 
--   id fields are not yet configurable
-    -   models must have PK called id and must be of type string
--   NO JSON support. nestjs-prisma-crud assumes an object is a relation when `typeof somePossiblyNestedProperty === 'object'`. TODO: investigate further
-    -   Current workaround: use middleware for transforming into string on both frontend and backend
--   Prisma keywords may not be used as model properties
-    -   TODO: document which are those words or automate validation
-- No type safety: `PrismaCrudService` makes no effort to preserve type safety.
-    - If you really need it, you may consider using the default `PrismaService` or manually assigning types.
+    @Controller('post')
+    export class PostController {
+        constructor(private readonly postService: PostService) {}
+
+        @Get()
+        async findMany(@Query('crudQuery') crudQuery: string) {
+            const matches = await this.postService.findMany(crudQuery);
+            return matches;
+        }
+    }
+    ```
+
+## Documentation
+
+Go [here](docs) for documentation, or see the [example](example) folder for a working NestJS application.
+
+## License
+
+[MIT licensed](LICENSE)
 
 ## Built with
 

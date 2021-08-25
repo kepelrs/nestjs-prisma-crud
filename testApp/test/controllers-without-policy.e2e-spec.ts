@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { dummySeedFullObj, dummySeedValueString, NUMBER_OF_USER_SEEDS, seed } from '../prisma/seed';
+import { needleStrings, NUMBER_OF_TEST_USER_SEEDS, seed, TestSeed } from '../prisma/seed';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma.service';
 import { UsersService } from '../src/users/users.service';
@@ -9,6 +9,10 @@ import { UsersService } from '../src/users/users.service';
 describe('CRUD controllers (without policy) e2e', () => {
     let app: INestApplication;
     let prismaService: PrismaService;
+    let userSeeds: TestSeed[];
+    let [seededUser0] = [] as TestSeed[];
+    const [needleString0] = needleStrings;
+    let countries;
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -22,10 +26,14 @@ describe('CRUD controllers (without policy) e2e', () => {
 
     beforeEach(async () => {
         try {
-            await seed(true);
+            userSeeds = await seed(true);
+            [seededUser0] = userSeeds;
         } catch (e) {
             console.log(`Error during beforeEach: ${e.message || e}`);
         }
+
+        const prismaService = app.get(PrismaService);
+        countries = await prismaService.country.findMany();
     });
 
     afterAll(async () => {
@@ -33,13 +41,6 @@ describe('CRUD controllers (without policy) e2e', () => {
     });
 
     describe('POST /users', () => {
-        let countries;
-
-        beforeEach(async () => {
-            const prismaService = app.get(PrismaService);
-            countries = await prismaService.country.findMany();
-        });
-
         it('creates nested posts, comments and profile', () => {
             const now = Date.now();
             const stringNow = String(now);
@@ -138,15 +139,15 @@ describe('CRUD controllers (without policy) e2e', () => {
             });
 
             it('works with shallow filter', () => {
-                const crudQ = {
+                const crudQuery = {
                     where: {
-                        name: dummySeedValueString,
+                        name: needleString0,
                     },
                 };
                 return request(app.getHttpServer())
                     .get('/users')
                     .query({
-                        crudQ: JSON.stringify(crudQ),
+                        crudQuery: JSON.stringify(crudQuery),
                     })
                     .expect(200)
                     .then((res) => {
@@ -155,11 +156,11 @@ describe('CRUD controllers (without policy) e2e', () => {
             });
 
             it('works with nested filter', () => {
-                const crudQ = {
+                const crudQuery = {
                     where: {
                         posts: {
                             some: {
-                                title: dummySeedValueString,
+                                title: needleString0,
                             },
                         },
                     },
@@ -167,7 +168,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                 return request(app.getHttpServer())
                     .get('/users')
                     .query({
-                        crudQ: JSON.stringify(crudQ),
+                        crudQuery: JSON.stringify(crudQuery),
                     })
                     .expect(200)
                     .then((res) => {
@@ -176,11 +177,11 @@ describe('CRUD controllers (without policy) e2e', () => {
             });
 
             it('works with deep nested filter', () => {
-                const crudQ = {
+                const crudQuery = {
                     where: {
                         posts: {
                             some: {
-                                comments: { some: { title: { contains: dummySeedValueString } } },
+                                comments: { some: { title: { contains: needleString0 } } },
                             },
                         },
                     },
@@ -188,25 +189,25 @@ describe('CRUD controllers (without policy) e2e', () => {
                 return request(app.getHttpServer())
                     .get('/users')
                     .query({
-                        crudQ: JSON.stringify(crudQ),
+                        crudQuery: JSON.stringify(crudQuery),
                     })
                     .expect(200)
                     .then((res) => {
                         expect(res.body?.data?.[0]?.posts?.[0]?.comments?.[0]?.title).toEqual(
-                            dummySeedValueString,
+                            needleString0,
                         );
                     });
             });
 
             it('works with mixed shallow and deep nested filters', () => {
-                const crudQ = {
+                const crudQuery = {
                     where: {
-                        name: dummySeedValueString,
+                        name: needleString0,
                         posts: {
                             some: {
-                                title: dummySeedValueString,
+                                title: needleString0,
                                 comments: {
-                                    some: { title: { contains: dummySeedValueString[0] } },
+                                    some: { title: { contains: needleString0[0] } },
                                 },
                             },
                         },
@@ -215,7 +216,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                 return request(app.getHttpServer())
                     .get('/users')
                     .query({
-                        crudQ: JSON.stringify(crudQ),
+                        crudQuery: JSON.stringify(crudQuery),
                     })
                     .expect(200)
                     .then((res) => {
@@ -224,12 +225,12 @@ describe('CRUD controllers (without policy) e2e', () => {
             });
 
             it('denies resources when deep nested filter is not in .allowedJoin', () => {
-                const crudQ = {
+                const crudQuery = {
                     where: {
                         posts: {
                             some: {
                                 comments: {
-                                    some: { post: { author: { id: dummySeedValueString } } },
+                                    some: { post: { author: { id: needleString0 } } },
                                 },
                             },
                         },
@@ -238,7 +239,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                 return request(app.getHttpServer())
                     .get('/users')
                     .query({
-                        crudQ: JSON.stringify(crudQ),
+                        crudQuery: JSON.stringify(crudQuery),
                     })
                     .expect(403)
                     .then((res) => {
@@ -249,13 +250,13 @@ describe('CRUD controllers (without policy) e2e', () => {
             });
 
             it(`correctly handles 'in' special case`, () => {
-                const crudQ = {
+                const crudQuery = {
                     where: {
                         posts: {
                             some: {
                                 comments: {
                                     some: {
-                                        title: { in: [dummySeedValueString, 'some other string'] },
+                                        title: { in: [needleString0, 'some other string'] },
                                     },
                                 },
                             },
@@ -265,25 +266,25 @@ describe('CRUD controllers (without policy) e2e', () => {
                 return request(app.getHttpServer())
                     .get('/users')
                     .query({
-                        crudQ: JSON.stringify(crudQ),
+                        crudQuery: JSON.stringify(crudQuery),
                     })
                     .expect(200)
                     .then((res) => {
                         expect(res.body?.data?.[0]?.posts?.[0]?.comments?.[0]?.title).toEqual(
-                            dummySeedValueString,
+                            needleString0,
                         );
                     });
             });
 
             it(`correctly handles 'notIn' special case`, () => {
-                const crudQ = {
+                const crudQuery = {
                     where: {
                         posts: {
                             some: {
                                 comments: {
                                     some: {
                                         title: {
-                                            notIn: [dummySeedValueString, 'some other string'],
+                                            notIn: [needleString0, 'some other string'],
                                         },
                                     },
                                 },
@@ -294,67 +295,83 @@ describe('CRUD controllers (without policy) e2e', () => {
                 return request(app.getHttpServer())
                     .get('/users')
                     .query({
-                        crudQ: JSON.stringify(crudQ),
+                        crudQuery: JSON.stringify(crudQuery),
                     })
                     .expect(200)
                     .then((res) => {
-                        expect(res.body?.data?.length).toBe(NUMBER_OF_USER_SEEDS - 1);
+                        expect(res.body?.data?.length).toBe(NUMBER_OF_TEST_USER_SEEDS - 1);
+                    });
+            });
+
+            it('works with parsed crudQuery', () => {
+                const crudQuery = {
+                    where: {
+                        name: needleString0,
+                    },
+                };
+                return request(app.getHttpServer())
+                    .get('/users/parsedCrudQuery')
+                    .query({
+                        crudQuery: JSON.stringify(crudQuery),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data?.[0]?.posts?.[0]?.comments?.[0]?.title).toBeTruthy();
                     });
             });
         });
 
         describe('pagination', () => {
             it('pagination is always on', async () => {
-                // !NOTE: pagination tests must be adjusted if NUMBER_OF_USER_SEEDS is changed
                 await request(app.getHttpServer())
                     .get(`/users`)
                     .expect(200)
                     .then((res) => {
-                        expect(res.body?.data.length).toEqual(2);
-                        expect(res.body?.totalRecords).toEqual(2);
+                        expect(res.body?.data.length).toEqual(NUMBER_OF_TEST_USER_SEEDS);
+                        expect(res.body?.totalRecords).toEqual(NUMBER_OF_TEST_USER_SEEDS);
                         expect(res.body?.page).toEqual(1);
                         expect(res.body?.pageSize).toEqual(25);
-                        expect(res.body?.pageCount).toEqual(1);
-                        expect(res.body?.orderBy).toEqual([{ id: 'asc' }]);
+                        expect(res.body?.pageCount).toEqual(
+                            Math.ceil(NUMBER_OF_TEST_USER_SEEDS / 25),
+                        );
+                        expect(res.body?.orderBy).toEqual([{ id: 'asc' }]); // TODO: Review if server validation is needed/possible
                     });
             });
 
             it('pagination .page and .pageSize work', async () => {
-                // !NOTE: pagination tests must be adjusted if NUMBER_OF_USER_SEEDS is changed
                 let user1;
                 await request(app.getHttpServer())
                     .get(`/users`)
-                    .query({ crudQ: JSON.stringify({ page: 1, pageSize: 1 }) })
+                    .query({ crudQuery: JSON.stringify({ page: 1, pageSize: 1 }) })
                     .expect(200)
                     .then((res) => {
                         expect(res.body?.data.length).toEqual(1);
-                        expect(res.body?.totalRecords).toEqual(2);
+                        expect(res.body?.totalRecords).toEqual(NUMBER_OF_TEST_USER_SEEDS);
                         expect(res.body?.page).toEqual(1);
                         expect(res.body?.pageSize).toEqual(1);
-                        expect(res.body?.pageCount).toEqual(2);
+                        expect(res.body?.pageCount).toEqual(NUMBER_OF_TEST_USER_SEEDS); // NUMBER_OF_TEST_USER_SEEDS since page size is 1
                         user1 = res.body?.data[0];
                     });
 
                 await request(app.getHttpServer())
                     .get(`/users`)
-                    .query({ crudQ: JSON.stringify({ page: 2, pageSize: 1 }) })
+                    .query({ crudQuery: JSON.stringify({ page: 2, pageSize: 1 }) })
                     .expect(200)
                     .then((res) => {
                         expect(res.body?.data.length).toEqual(1);
-                        expect(res.body?.totalRecords).toEqual(2);
+                        expect(res.body?.totalRecords).toEqual(NUMBER_OF_TEST_USER_SEEDS);
                         expect(res.body?.page).toEqual(2);
                         expect(res.body?.pageSize).toEqual(1);
-                        expect(res.body?.pageCount).toEqual(2);
+                        expect(res.body?.pageCount).toEqual(NUMBER_OF_TEST_USER_SEEDS); // NUMBER_OF_TEST_USER_SEEDS since page size is 1
                         expect(res.body?.data[0].id).not.toEqual(user1.id);
                     });
             });
 
             it('pagination works when result set is empty', async () => {
-                // !NOTE: pagination tests must be adjusted if NUMBER_OF_USER_SEEDS is changed
                 await request(app.getHttpServer())
                     .get(`/users`)
                     .query({
-                        crudQ: JSON.stringify({ where: { id: `${Date.now()}` }, pageSize: 1 }),
+                        crudQuery: JSON.stringify({ where: { id: `${Date.now()}` }, pageSize: 1 }),
                     })
                     .expect(200)
                     .then((res) => {
@@ -372,12 +389,14 @@ describe('CRUD controllers (without policy) e2e', () => {
                 await request(app.getHttpServer())
                     .get(`/users`)
                     .query({
-                        crudQ: JSON.stringify({ joins: ['posts'] }),
+                        crudQuery: JSON.stringify({ joins: ['posts', 'profile'] }),
                     })
                     .expect(200)
                     .then((res) => {
+                        expect(res.body?.data[0]?.profile).toBeTruthy();
                         expect(res.body?.data[0]?.posts).toBeTruthy();
                         expect(res.body?.data[0]?.posts[0].comments).not.toBeTruthy();
+                        expect(res.body?.data[0]?.country).not.toBeTruthy();
                     });
             });
 
@@ -385,7 +404,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                 await request(app.getHttpServer())
                     .get(`/users`)
                     .query({
-                        crudQ: JSON.stringify({ joins: [] }),
+                        crudQuery: JSON.stringify({ joins: [] }),
                     })
                     .expect(200)
                     .then((res) => {
@@ -397,7 +416,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                 await request(app.getHttpServer())
                     .get(`/users`)
                     .query({
-                        crudQ: JSON.stringify({ joins: ['posts.comments.post'] }),
+                        crudQuery: JSON.stringify({ joins: ['posts.comments.post'] }),
                     })
                     .expect(403)
                     .then((res) => {
@@ -407,10 +426,190 @@ describe('CRUD controllers (without policy) e2e', () => {
         });
     });
 
+    describe('crudQuery .select option:', () => {
+        describe('frontend can specify shallow .only property', () => {
+            it('on GET many', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({
+                        crudQuery: JSON.stringify({ select: { only: ['email'] } }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        const firstObject = res.body?.data[0];
+                        const keys = Object.keys(firstObject);
+                        expect(keys).toEqual(['email']);
+                    });
+            });
+
+            it('on GET one', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users/${needleString0}`)
+                    .query({
+                        crudQuery: JSON.stringify({ select: { only: ['email'] } }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        const keys = Object.keys(res.body);
+                        expect(keys).toEqual(['email']);
+                    });
+            });
+        });
+
+        describe('frontend can specify nested .only property', () => {
+            it('on GET many', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({
+                        crudQuery: JSON.stringify({
+                            select: { only: ['posts.id'] }, // TODO: Document that this is different than forbidden paths (no regexp, no array indexes)
+                            joins: ['posts'],
+                        }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        const firstObject = res.body?.data[0];
+                        const rootKeys = Object.keys(firstObject);
+                        expect(rootKeys).toEqual(['posts']);
+
+                        const post = firstObject.posts[0];
+                        const postKeys = Object.keys(post);
+                        expect(postKeys).toEqual(['id']);
+                    });
+            });
+
+            it('on GET one', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users/${needleString0}`)
+                    .query({
+                        crudQuery: JSON.stringify({
+                            select: { only: ['posts.id'] },
+                            joins: ['posts'],
+                        }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        const rootKeys = Object.keys(res.body);
+                        expect(rootKeys).toEqual(['posts']);
+
+                        const post = res.body.posts[0];
+                        const postKeys = Object.keys(post);
+                        expect(postKeys).toEqual(['id']);
+                    });
+            });
+        });
+
+        describe('frontend can specify shallow .except property', () => {
+            it('on GET many', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({
+                        crudQuery: JSON.stringify({ select: { except: ['email'] } }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data[0].email).toBeFalsy();
+                    });
+            });
+
+            it('on GET one', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users/${needleString0}`)
+                    .query({
+                        crudQuery: JSON.stringify({ select: { except: ['email'] } }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.email).toBeFalsy();
+                    });
+            });
+        });
+
+        describe('frontend can specify nested .expect property', () => {
+            it('on GET many', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({
+                        crudQuery: JSON.stringify({
+                            select: { except: ['posts.id'] }, // TODO: Document that this is different than forbidden paths (no regexp, no array indexes)
+                            joins: ['posts'],
+                        }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        const user = res.body?.data[0];
+                        expect(user?.posts).toBeTruthy();
+                        expect(user?.posts?.[0]).toBeTruthy();
+                        expect(user?.posts?.[0].title).toBeTruthy();
+                        expect(user?.posts?.[0].id).toBeFalsy();
+                    });
+            });
+
+            it('on GET one', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users/${needleString0}`)
+                    .query({
+                        crudQuery: JSON.stringify({
+                            select: { except: ['posts.id'] },
+                            joins: ['posts'],
+                        }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.posts).toBeTruthy();
+                        expect(res.body?.posts[0]).toBeTruthy();
+                        expect(res.body?.posts[0].title).toBeTruthy();
+                        expect(res.body?.posts[0].id).toBeFalsy();
+                    });
+            });
+        });
+
+        describe('does not interfere with server side configured `forbiddenPaths`', () => {
+            it('when using .except', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({
+                        crudQuery: JSON.stringify({ select: { except: ['email'] } }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        const user = res.body?.data[0];
+                        expect(user?.password).toBeFalsy();
+                    });
+            });
+
+            it('when using .only', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({
+                        crudQuery: JSON.stringify({ select: { only: ['email'] } }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        const user = res.body?.data[0];
+                        expect(user?.password).toBeFalsy();
+                    });
+            });
+
+            it('when using both .only and .except', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({
+                        crudQuery: JSON.stringify({ select: { only: ['email'], except: ['id'] } }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        const user = res.body?.data[0];
+                        expect(user?.password).toBeFalsy();
+                    });
+            });
+        });
+    });
+
     describe('GET one /users/id', () => {
         it('works without filters', () => {
             return request(app.getHttpServer())
-                .get(`/users/${dummySeedValueString}`)
+                .get(`/users/${needleString0}`)
                 .expect(200)
                 .then((res) => {
                     expect(res.body?.posts?.[0]?.comments?.[0]?.title).toBeTruthy();
@@ -418,23 +617,23 @@ describe('CRUD controllers (without policy) e2e', () => {
         });
 
         it('works with filters (success)', () => {
-            const crudQ = {
+            const crudQuery = {
                 where: {
-                    name: dummySeedValueString,
+                    name: needleString0,
                     posts: {
                         some: {
-                            title: dummySeedValueString,
+                            title: needleString0,
                             comments: {
-                                some: { title: { contains: dummySeedValueString[0] } },
+                                some: { title: { contains: needleString0[0] } },
                             },
                         },
                     },
                 },
             };
             return request(app.getHttpServer())
-                .get(`/users/${dummySeedValueString}`)
+                .get(`/users/${needleString0}`)
                 .query({
-                    crudQ: JSON.stringify(crudQ),
+                    crudQuery: JSON.stringify(crudQuery),
                 })
                 .expect(200)
                 .then((res) => {
@@ -443,17 +642,17 @@ describe('CRUD controllers (without policy) e2e', () => {
         });
 
         it('works with filters (fail)', () => {
-            const crudQ = {
+            const crudQuery = {
                 where: {
-                    name: dummySeedValueString,
+                    name: needleString0,
                     posts: {
                         some: {
-                            title: dummySeedValueString,
+                            title: needleString0,
                             comments: {
                                 some: {
                                     title: {
                                         contains:
-                                            dummySeedValueString +
+                                            needleString0 +
                                             'a' /* + 'a' is what makes the object not be found */,
                                     },
                                 },
@@ -463,9 +662,9 @@ describe('CRUD controllers (without policy) e2e', () => {
                 },
             };
             return request(app.getHttpServer())
-                .get(`/users/${dummySeedValueString}`)
+                .get(`/users/${needleString0}`)
                 .query({
-                    crudQ: JSON.stringify(crudQ),
+                    crudQuery: JSON.stringify(crudQuery),
                 })
                 .expect(404)
                 .then((res) => {
@@ -476,11 +675,11 @@ describe('CRUD controllers (without policy) e2e', () => {
 
     describe('PATCH /users/id', () => {
         it('shallow property update works', async () => {
-            const changedName = `${dummySeedValueString}aaa`;
-            const { posts, profile, country, ...shallowPayload } = dummySeedFullObj;
+            const changedName = `${needleString0}aaa`;
+            const { posts, profile, country, ...shallowPayload } = seededUser0;
             shallowPayload.name = changedName;
             await request(app.getHttpServer())
-                .patch(`/users/${dummySeedValueString}`)
+                .patch(`/users/${needleString0}`)
                 .send(shallowPayload)
                 .expect(200)
                 .then((res) => {
@@ -616,7 +815,7 @@ describe('CRUD controllers (without policy) e2e', () => {
             let users;
             await request(app.getHttpServer())
                 .get(`/users`)
-                .expect(200) // TODO: We likely want to throw exception here
+                .expect(200) // TODO: We may want to throw exception here
                 .then((res) => {
                     users = res.body.data;
                 });
@@ -629,7 +828,7 @@ describe('CRUD controllers (without policy) e2e', () => {
             await request(app.getHttpServer())
                 .patch(`/users/${user1.id}`)
                 .send(user1)
-                .expect(200) // TODO: We likely want to throw exception here
+                .expect(200) // TODO: We may want to throw exception here
                 .then((res) => {
                     expect(res?.body?.posts[0].comments.length).toBe(commentCount);
                 });
@@ -775,7 +974,7 @@ describe('CRUD controllers (without policy) e2e', () => {
         it('deleting single record works', async () => {
             let commentId: string;
             await request(app.getHttpServer())
-                .get(`/users/${dummySeedValueString}`)
+                .get(`/users/${needleString0}`)
                 .expect(200)
                 .then((res) => {
                     commentId = res.body?.posts?.[0]?.comments?.[0]?.id;
@@ -819,7 +1018,7 @@ describe('CRUD controllers (without policy) e2e', () => {
 
         it('GET one excludes forbiddenPaths', () => {
             return request(app.getHttpServer())
-                .get(`/users/${dummySeedValueString}`)
+                .get(`/users/${needleString0}`)
                 .expect(200)
                 .then((res) => {
                     expect(res.body?.password).toBeFalsy();
@@ -830,11 +1029,11 @@ describe('CRUD controllers (without policy) e2e', () => {
         });
 
         it('PATCH excludes forbiddenPaths', async () => {
-            const changedName = `${dummySeedValueString}aaa`;
-            const { posts, profile, country, ...shallowPayload } = dummySeedFullObj;
+            const changedName = `${needleString0}aaa`;
+            const { posts, profile, country, ...shallowPayload } = seededUser0;
             shallowPayload.name = changedName;
             await request(app.getHttpServer())
-                .patch(`/users/${dummySeedValueString}`)
+                .patch(`/users/${needleString0}`)
                 .send(shallowPayload)
                 .expect(200)
                 .then((res) => {
@@ -882,11 +1081,13 @@ describe('CRUD controllers (without policy) e2e', () => {
 
         it('GET many forbiddenPaths can be ignored by function parameter', async () => {
             const userService = app.get(UsersService);
-            const originalFindAll = userService.findAll;
-            const mockedFindAll = function (crudQ) {
-                return originalFindAll.bind(userService)(crudQ, false);
+            const originalFindMany = userService.findMany;
+            const mockedFindMany = function (crudQuery) {
+                return originalFindMany.bind(userService)(crudQuery, {
+                    excludeForbiddenPaths: false,
+                });
             };
-            userService.findAll = mockedFindAll;
+            userService.findMany = mockedFindMany;
 
             try {
                 await request(app.getHttpServer())
@@ -905,21 +1106,23 @@ describe('CRUD controllers (without policy) e2e', () => {
             } catch (error) {
                 throw error;
             } finally {
-                userService.findAll = originalFindAll;
+                userService.findMany = originalFindMany;
             }
         });
 
         it('GET one forbiddenPaths can be ignored by function parameter', async () => {
             const userService = app.get(UsersService);
             const originalFindOne = userService.findOne;
-            const mockedFindOne = function (id, crudQ) {
-                return originalFindOne.bind(userService)(id, crudQ, false);
+            const mockedFindOne = function (id, crudQuery) {
+                return originalFindOne.bind(userService)(id, crudQuery, {
+                    excludeForbiddenPaths: false,
+                });
             };
             userService.findOne = mockedFindOne;
 
             try {
                 await request(app.getHttpServer())
-                    .get(`/users/${dummySeedValueString}`)
+                    .get(`/users/${needleString0}`)
                     .expect(200)
                     .then((res) => {
                         expect(res.body?.password).not.toBeFalsy();
@@ -932,6 +1135,142 @@ describe('CRUD controllers (without policy) e2e', () => {
             } finally {
                 userService.findOne = originalFindOne;
             }
+        });
+    });
+
+    describe('controller with non-default id', () => {
+        describe('crud operation', () => {
+            it('GET many works', async () => {
+                await request(app.getHttpServer())
+                    .get(`/entity-with-int-id`)
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data.length).toEqual(NUMBER_OF_TEST_USER_SEEDS);
+                        expect(typeof res.body?.data[0].exampleDifferentIdName).toEqual('number');
+                    });
+            });
+
+            it('GET one works', async () => {
+                await request(app.getHttpServer())
+                    .get(`/entity-with-int-id/1`)
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.exampleDifferentIdName).toEqual(1);
+                    });
+            });
+
+            it('POST works', () => {
+                const testString = `${Math.random()}`;
+                return request(app.getHttpServer())
+                    .post('/entity-with-int-id')
+                    .send({
+                        exampleProperty: testString,
+                    })
+                    .expect(201)
+                    .then((res) => {
+                        expect(res.body?.exampleProperty).toEqual(testString);
+                    });
+            });
+
+            it('PATCH works', () => {
+                const testString = `${Math.random()}`;
+                return request(app.getHttpServer())
+                    .patch('/entity-with-int-id/1')
+                    .send({
+                        exampleProperty: testString,
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.exampleDifferentIdName).toEqual(1);
+                        expect(res.body?.exampleProperty).toEqual(testString);
+                    });
+            });
+
+            it('DELETE works', async () => {
+                await request(app.getHttpServer()).delete('/entity-with-int-id/1').expect(200);
+
+                await request(app.getHttpServer())
+                    .get(`/entity-with-int-id`)
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data.length).toEqual(NUMBER_OF_TEST_USER_SEEDS - 1);
+                    });
+            });
+        });
+
+        describe('relations work', () => {
+            it('when customized id is the base entity', async () => {
+                await request(app.getHttpServer())
+                    .get(`/entity-with-int-id`)
+                    .query({ crudQuery: JSON.stringify({ joins: ['user'] }) })
+                    .expect(200)
+                    .then((res) => {
+                        expect(typeof res.body?.data[0].user).toBeTruthy();
+                    });
+            });
+
+            it('when customized id is the joined entity', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({ crudQuery: JSON.stringify({ joins: ['entitiesWithIntId'] }) })
+                    .expect(200)
+                    .then((res) => {
+                        expect(typeof res.body?.data[0].entityWithIntId).toBeTruthy();
+                    });
+            });
+        });
+    });
+
+    describe('transaction support', () => {
+        it('auditLog creation fails when second query fails', async () => {
+            const logsCountBefore = await prismaService.auditLog.count();
+            const stringNow = String(Date.now());
+            await request(app.getHttpServer())
+                .post(`/transaction-support/users/fail`)
+                .send({
+                    email: stringNow,
+                    password: 'this value should not come in response',
+                    country: countries[0],
+                })
+                .expect(500)
+                .then(async (_res) => {
+                    const logsCountAfter = await prismaService.auditLog.count();
+                    expect(logsCountAfter).toEqual(logsCountBefore);
+                });
+        });
+
+        it('auditLog creation succeeds when second query succeeds', async () => {
+            const logsCountBefore = await prismaService.auditLog.count();
+            const stringNow = String(Date.now());
+            await request(app.getHttpServer())
+                .post(`/transaction-support/users/success`)
+                .send({
+                    email: stringNow,
+                    password: 'this value should not come in response',
+                    country: countries[0],
+                })
+                .expect(201)
+                .then(async (_res) => {
+                    const logsCountAfter = await prismaService.auditLog.count();
+                    expect(logsCountAfter).toEqual(logsCountBefore + 2);
+                });
+        });
+
+        it('auditLog creation succeeds when second query fails but transaction was not used', async () => {
+            const logsCountBefore = await prismaService.auditLog.count();
+            const stringNow = String(Date.now());
+            await request(app.getHttpServer())
+                .post(`/transaction-support/users/no-transaction`)
+                .send({
+                    email: stringNow,
+                    password: 'this value should not come in response',
+                    country: countries[0],
+                })
+                .expect(500) // TODO: use prisma validator, throw 400 instead of 500
+                .then(async (_res) => {
+                    const logsCountAfter = await prismaService.auditLog.count();
+                    expect(logsCountAfter).toEqual(logsCountBefore + 1);
+                });
         });
     });
 });

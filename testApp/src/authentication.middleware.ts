@@ -1,6 +1,6 @@
 import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { AccessPolicyInterceptorOpts, ACCESS_POLICY_OPTS } from 'nestjs-prisma-crud';
+import { AccessPolicyInterceptorOpts, ACCESS_POLICY_OPTS_KEY } from 'nestjs-prisma-crud';
 
 export enum RoleID {
     ALWAYS_ACCESS = 'ALWAYS_ACCESS',
@@ -8,7 +8,7 @@ export enum RoleID {
 }
 
 /**
- * Dummy helper authentication middleware for testing purposes (AccessPolicyModule)
+ * Dummy helper authentication middleware for testing purposes (AccessControlModule)
  * Attaches user to the request under .user property.
  * UserId and roles will be whatever was passed as query parameters. Roles may be comma separated values
  */
@@ -17,7 +17,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
     private authDataKey = this.accessPolicyOpts.authDataKey;
 
     constructor(
-        @Inject(ACCESS_POLICY_OPTS)
+        @Inject(ACCESS_POLICY_OPTS_KEY)
         private accessPolicyOpts: AccessPolicyInterceptorOpts,
     ) {}
 

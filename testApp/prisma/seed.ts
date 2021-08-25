@@ -1,78 +1,111 @@
-import { PrismaClient } from '@prisma/client';
+import { Post, PrismaClient, User, Comment, Country, Profile } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export const NUMBER_OF_USER_SEEDS = 2;
+export const NUMBER_OF_TEST_USER_SEEDS = 2;
+/** seedEntityIds are used as db record ids and as some of their string properties as well */
+export const seedEntityIds = [];
+/** Alias for seedEntityIds */
+export const needleStrings = seedEntityIds;
 
-function generateSeeds(n: number) {
-    const userSeeds = [];
-    const random = Math.random();
-    for (let i = 0; i < n; i++) {
-        const unique = `${random}${i}`;
-        userSeeds.push({
-            id: unique,
-            email: unique,
-            name: unique,
-            password: 'some hashed password',
-            posts: {
-                create: [
-                    {
-                        title: unique,
-                        content: unique,
-                        published: false,
-                        comments: {
-                            create: [
-                                {
-                                    published: false,
-                                    title: unique,
-                                    content: unique,
-                                    exampleForbiddenProperty:
-                                        'some property that will not be present in responses',
-                                },
-                            ],
-                        },
+export type TestSeed = User & {
+    posts: (Post & {
+        comments: Comment[];
+    })[];
+    profile: Profile;
+    country: Country;
+};
+
+const prismaCreateObjects = [];
+for (let i = 0; i < NUMBER_OF_TEST_USER_SEEDS; i++) {
+    const uniqueNeedleString = `${Math.random()}${i}`;
+
+    seedEntityIds.push(uniqueNeedleString);
+
+    prismaCreateObjects.push({
+        id: uniqueNeedleString,
+        email: uniqueNeedleString,
+        name: uniqueNeedleString,
+        password: 'some hashed password',
+        posts: {
+            create: [
+                {
+                    id: uniqueNeedleString,
+                    title: uniqueNeedleString,
+                    content: uniqueNeedleString,
+                    published: false,
+                    comments: {
+                        create: [
+                            {
+                                id: uniqueNeedleString,
+                                published: false,
+                                title: uniqueNeedleString,
+                                content: uniqueNeedleString,
+                                exampleForbiddenProperty:
+                                    'some property that will not be present in responses',
+                            },
+                        ],
                     },
-                ],
-            },
-            profile: {
-                create: {
-                    fullName: unique,
                 },
+            ],
+        },
+        profile: {
+            create: {
+                id: uniqueNeedleString,
+                fullName: uniqueNeedleString,
             },
-            country: {
-                create: {
-                    name: `country${i}`,
-                    someNullableValue: `someNullableValue${i}`,
+        },
+        country: {
+            create: {
+                id: uniqueNeedleString,
+                name: `country${i}`,
+                someNullableValue: `someNullableValue${i}`,
+            },
+        },
+        entitiesWithIntId: {
+            create: [
+                {
+                    exampleDifferentIdName: i + 1,
+                    exampleProperty: uniqueNeedleString,
                 },
-            },
-        });
-    }
-
-    return userSeeds;
+            ],
+        },
+    });
 }
 
-const userSeeds: any[] = generateSeeds(NUMBER_OF_USER_SEEDS);
-
-export const dummySeedFullObj = userSeeds[0];
-export const dummySeedValueString = dummySeedFullObj.id;
-
-export async function seed(deleteFirst = false) {
-    if (deleteFirst === true) {
+export async function seed(deleteAll = false) {
+    if (deleteAll === true) {
         await prisma.$queryRaw(`Delete from Category`);
         await prisma.$queryRaw(`Delete from Comment`);
         await prisma.$queryRaw(`Delete from Country`);
         await prisma.$queryRaw(`Delete from Post`);
         await prisma.$queryRaw(`Delete from Profile`);
         await prisma.$queryRaw(`Delete from User`);
+        await prisma.$queryRaw(`Delete from EntityWithIntId`);
     }
 
-    for (const userSeed of userSeeds) {
+    const userSeeds: TestSeed[] = [];
+    for (const prismaCreateObject of prismaCreateObjects) {
         await prisma.user
             .create({
-                data: userSeed,
+                data: prismaCreateObject,
+                include: {
+                    posts: {
+                        include: {
+                            comments: true,
+                        },
+                    },
+                    profile: true,
+                    country: true,
+                    entitiesWithIntId: true,
+                },
             })
+            .then((v) => userSeeds.push(v))
             .catch((e) => {
                 console.log(e);
             });
     }
+
     await prisma.$disconnect();
+
+    return userSeeds;
 }

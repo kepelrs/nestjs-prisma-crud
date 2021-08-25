@@ -6,8 +6,9 @@ import { PrismaService } from '../prisma.service';
 export class UsersService extends PrismaCrudService {
     constructor(public prismaService: PrismaService) {
         super({
-            repo: prismaService.user,
-            allowedJoins: ['posts.comments', 'profile', 'country'],
+            prismaClient: prismaService,
+            model: 'user',
+            allowedJoins: ['posts.comments', 'profile', 'country', 'entitiesWithIntId'],
             forbiddenPaths: ['password', /comments\.\d+\.exampleForbiddenProperty$/],
         });
     }

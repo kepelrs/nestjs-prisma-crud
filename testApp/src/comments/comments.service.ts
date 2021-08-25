@@ -6,7 +6,8 @@ import { PrismaService } from '../prisma.service';
 export class CommentsService extends PrismaCrudService {
     constructor(public prismaService: PrismaService) {
         super({
-            repo: prismaService.comment,
+            prismaClient: prismaService,
+            model: 'comment',
             allowedJoins: ['post'],
             defaultJoins: [],
         });
@@ -18,7 +19,8 @@ export class CommentsService extends PrismaCrudService {
 export class InvalidCommentsService extends PrismaCrudService {
     constructor(public prismaService: PrismaService) {
         super({
-            repo: prismaService.comment,
+            prismaClient: prismaService,
+            model: 'comment',
             allowedJoins: ['post'],
             defaultJoins: ['post', 'post.comments'],
         });

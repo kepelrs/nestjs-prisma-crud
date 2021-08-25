@@ -1,2 +1,3 @@
 export * from './prisma-crud';
-export * from './access-policy';
+export * from './access-control';
+export * from './utils';

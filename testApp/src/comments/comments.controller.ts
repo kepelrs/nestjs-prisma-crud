@@ -5,7 +5,7 @@ import {
     MustMatchValue,
     PrismaCrudService,
 } from 'nestjs-prisma-crud';
-import { dummySeedValueString } from '../../prisma/seed';
+import { seedEntityIds } from '../../prisma/seed';
 import { RoleID } from '../authentication.middleware';
 import { PrismaService } from '../prisma.service';
 import { CommentsService } from './comments.service';
@@ -15,14 +15,14 @@ export class CommentsController {
     constructor(private readonly commentsService: CommentsService) {}
 
     @Get(':id')
-    async findOne(@Param('id') id: string, @Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findOne(id, crudQ);
+    async findOne(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findOne(id, crudQuery);
         return match;
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: string, @Query('crudQ') crudQ?: string) {
-        return this.commentsService.remove(id, crudQ);
+    async remove(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
+        return this.commentsService.remove(id, crudQuery);
     }
 }
 
@@ -30,9 +30,11 @@ export class CommentsController {
  * For testing MustMatchAuthAttribute
  */
 @Controller('must-match-auth-attribute/comments')
+@AccessPolicy(['invalid-fc59d9f9']) // fc59d9f9 TODO: document and add separate tests for this .getAllAndOverride functionality
 export class WithMustMatchAuthAttributePolicyCommentsController {
     private readonly commentsService = new PrismaCrudService({
-        repo: this.prismaService.comment,
+        prismaClient: this.prismaService,
+        model: 'comment',
         allowedJoins: ['post.author'], // TODO: feat - mechanism to enable MustMatchAuthAttribute paths to go beyond allowed joins
     });
 
@@ -42,23 +44,23 @@ export class WithMustMatchAuthAttributePolicyCommentsController {
      * GET
      */
     @Get('everyone')
-    @AccessPolicy('everyone', MustMatchAuthAttribute('post.author.id', 'id'))
-    async getEveryone(@Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findAll(crudQ);
+    @AccessPolicy('everyone', MustMatchAuthAttribute('post.author.id', 'id')) // fc59d9f9 TODO: document and add separate tests for this .getAllAndOverride functionality
+    async getEveryone(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
     @Get('anyAuthenticated')
     @AccessPolicy('anyAuthenticated', MustMatchAuthAttribute('post.author.id', 'id'))
-    async getAnyAuthenticated(@Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findAll(crudQ);
+    async getAnyAuthenticated(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
     @Get('specificRoles')
     @AccessPolicy([RoleID.ALWAYS_ACCESS], MustMatchAuthAttribute('post.author.id', 'id'))
-    async getspecificRoles(@Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findAll(crudQ);
+    async getspecificRoles(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
@@ -67,16 +69,16 @@ export class WithMustMatchAuthAttributePolicyCommentsController {
     async patchEveryone(
         @Param('id') id: string,
         @Body() body: any,
-        @Query('crudQ') crudQ?: string,
+        @Query('crudQuery') crudQuery: string,
     ) {
-        const updated = await this.commentsService.update(id, body, crudQ);
+        const updated = await this.commentsService.update(id, body, crudQuery);
         return updated;
     }
 
     @Delete('everyone/:id')
     @AccessPolicy('everyone', MustMatchAuthAttribute('post.author.id', 'id'))
-    async deleteEveryone(@Param('id') id: string, @Query('crudQ') crudQ?: string) {
-        const deleted = await this.commentsService.remove(id, crudQ);
+    async deleteEveryone(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
+        const deleted = await this.commentsService.remove(id, crudQuery);
         return deleted;
     }
 }
@@ -87,7 +89,8 @@ export class WithMustMatchAuthAttributePolicyCommentsController {
 @Controller('must-match-value/comments')
 export class WithMustMatchValuePolicyCommentsController {
     private readonly commentsService = new PrismaCrudService({
-        repo: this.prismaService.comment,
+        prismaClient: this.prismaService,
+        model: 'comment',
         allowedJoins: ['post.author'], // TODO: feat - mechanism to enable MustMatchAuthAttribute paths to go beyond allowed joins
     });
 
@@ -97,9 +100,9 @@ export class WithMustMatchValuePolicyCommentsController {
      * GET
      */
     @Get('everyone')
-    @AccessPolicy('everyone', MustMatchValue('post.author.id', dummySeedValueString))
-    async getEveryone(@Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findAll(crudQ);
+    @AccessPolicy('everyone', MustMatchValue('post.author.id', seedEntityIds[0]))
+    async getEveryone(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
@@ -108,22 +111,22 @@ export class WithMustMatchValuePolicyCommentsController {
         'everyone',
         MustMatchValue('post.author.id', 'this string makes this route always return empty set'),
     )
-    async getEveryoneEmpty(@Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findAll(crudQ);
+    async getEveryoneEmpty(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
     @Get('everyone/null')
     @AccessPolicy('everyone', MustMatchValue('post.author.id', null))
-    async getEveryoneUndefined(@Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findAll(crudQ);
+    async getEveryoneUndefined(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
     @Get('anyAuthenticated')
-    @AccessPolicy('anyAuthenticated', MustMatchValue('post.author.id', dummySeedValueString))
-    async getAnyAuthenticated(@Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findAll(crudQ);
+    @AccessPolicy('anyAuthenticated', MustMatchValue('post.author.id', seedEntityIds[0]))
+    async getAnyAuthenticated(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
@@ -132,33 +135,33 @@ export class WithMustMatchValuePolicyCommentsController {
         'anyAuthenticated',
         MustMatchValue('post.author.id', 'this string makes this route always return empty set'),
     )
-    async getAnyAuthenticatedEmpty(@Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findAll(crudQ);
+    async getAnyAuthenticatedEmpty(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
     @Get('specificRoles')
-    @AccessPolicy([RoleID.ALWAYS_ACCESS], MustMatchValue('post.author.id', dummySeedValueString))
-    async getspecificRoles(@Query('crudQ') crudQ?: string) {
-        const match = await this.commentsService.findAll(crudQ);
+    @AccessPolicy([RoleID.ALWAYS_ACCESS], MustMatchValue('post.author.id', seedEntityIds[0]))
+    async getspecificRoles(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
     @Patch('everyone/:id')
-    @AccessPolicy('everyone', MustMatchValue('post.author.id', dummySeedValueString))
+    @AccessPolicy('everyone', MustMatchValue('post.author.id', seedEntityIds[0]))
     async patchEveryone(
         @Param('id') id: string,
         @Body() body: any,
-        @Query('crudQ') crudQ?: string,
+        @Query('crudQuery') crudQuery: string,
     ) {
-        const updated = await this.commentsService.update(id, body, crudQ);
+        const updated = await this.commentsService.update(id, body, crudQuery);
         return updated;
     }
 
     @Delete('everyone/:id')
-    @AccessPolicy('everyone', MustMatchValue('post.author.id', dummySeedValueString))
-    async deleteEveryone(@Param('id') id: string, @Query('crudQ') crudQ?: string) {
-        const deleted = await this.commentsService.remove(id, crudQ);
+    @AccessPolicy('everyone', MustMatchValue('post.author.id', seedEntityIds[0]))
+    async deleteEveryone(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
+        const deleted = await this.commentsService.remove(id, crudQuery);
         return deleted;
     }
 }
