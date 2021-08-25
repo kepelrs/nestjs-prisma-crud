@@ -5,12 +5,12 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 module.exports = {
   title: 'nestjs-prisma-crud',
   tagline: 'Quick crud apps with NestJS and Prisma',
-  url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  url: 'https://kepelrs.github.io',
+  baseUrl: '/nestjs-prisma-crud/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   // favicon: 'img/favicon.ico',
-  organizationName: 'facebook', // Usually your GitHub org/user name.
+  organizationName: 'kepelrs', // Usually your GitHub org/user name.
   projectName: 'nestjs-prisma-crud', // Usually your repo name.
   themeConfig: {
     navbar: {
