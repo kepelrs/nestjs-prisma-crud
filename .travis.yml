@@ -2,9 +2,9 @@ language: node_js
 node_js:
     - 14.15
 before_script:
-    - cd testApp && npm i && cp .env-example .env
+    - cd testApp && npm i && cp .env-example .env && cd ..
     - npm install -g codecov
-    - cd docs && npm i && npm run build
+    - cd docs && npm i && npm run build && cd ..
 script:
     - npm run test:cov && codecov
 branches:
