@@ -9,7 +9,7 @@ sidebar_position: 6
 :::info
 All examples and schematics in this documentation demonstrate passing `crudQuery` as a `JSON.stringified` string in your query parameter.
 
-You can chose to adjust your controllers and retrieve the `crudQuery` object from `POST` bodies or any other method you prefer. If you choose to do so, remember to also adapt any [built in](../access-control-module/builtin-policies) or [custom policies](../access-control-module/custom-policy) that were previously relying on `request.query`.
+You can chose to adjust your controllers and retrieve the `crudQuery` object from `POST` bodies or any other method you prefer. If you choose to do so, remember to also adapt any [built in](./access-control-module/builtin-policies) or [custom policies](./access-control-module/custom-policy) that were previously relying on `request.query`.
 
 :::
 
