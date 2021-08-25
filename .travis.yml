@@ -4,6 +4,7 @@ node_js:
 before_script:
     - cd testApp && npm i && cp .env-example .env
     - npm install -g codecov
+    - cd docs && npm i && npm run build
 script:
     - npm run test:cov && codecov
 branches:

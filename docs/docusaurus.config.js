@@ -11,6 +11,7 @@ module.exports = {
   onBrokenMarkdownLinks: 'warn',
   // favicon: 'img/favicon.ico',
   organizationName: 'kepelrs', // Usually your GitHub org/user name.
+  trailingSlash: false,
   projectName: 'nestjs-prisma-crud', // Usually your repo name.
   themeConfig: {
     navbar: {
@@ -110,4 +111,26 @@ module.exports = {
       },
     ],
   ],
+  plugins: [
+    function (context, options) {
+      return {
+        name: 'plausible',
+        injectHtmlTags({content}) {
+          return {
+            headTags: [
+              {
+                tagName: 'script',
+                attributes: {
+                  async: true,
+                  defer: true,
+                  'data-domain': 'kepelrs.github.io',
+                  src: 'https://stats.arockhub.com/js/plausible.js',
+                },
+              },
+            ],
+          };
+        },
+      };
+    }
+  ]
 };
