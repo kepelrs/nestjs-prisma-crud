@@ -531,7 +531,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     .get(`/users`)
                     .query({
                         crudQuery: JSON.stringify({
-                            select: { except: ['posts.id'] }, // TODO: Document that this is different than forbidden paths (no regexp, no array indexes)
+                            select: { except: ['posts.id'] }, // TODO: Document .except and .only
                             joins: ['posts'],
                         }),
                     })

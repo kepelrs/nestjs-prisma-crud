@@ -90,7 +90,7 @@ cd my-project
     npm run start:dev
     ```
 
-4. Verify installation by navigating to [http://localhost:3000/post](http://localhost:3000/post).
+4. Verify installation by navigating to [http://localhost:3000/post](http://localhost:3000/post)
 
 ## Whats next?
 

@@ -8,7 +8,7 @@ sidebar_position: 1
 
 -   You want to restrict certain endpoints to be accessible only by users with certain roles <br/> _eg. a "/report" endpoint that is only available for admin users_
 -   You want to grant scoped access based on some user attributes <br/>_eg. a "/messages" endpoint that must respond only with the messages owned by the requesting user_
--   You want to write your own more complex [custom policies](./custom-policy), without breaking **pagination/sorting/filtering**.
+-   You want to write your own more complex [custom policies](./custom-policy), without breaking or re-implementing pagination/sorting/filtering.
 
 ## Quickstart
 

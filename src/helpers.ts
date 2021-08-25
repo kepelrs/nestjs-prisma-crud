@@ -149,7 +149,7 @@ export function transformJoinsToInclude(joins: string[]) {
 
 /**
  * TODO!! describe what it does
- * TODO: Make more reliable
+ * TODO: Make regex more reliable
  */
 export function validateNestedWhere(
     whereObject: any,

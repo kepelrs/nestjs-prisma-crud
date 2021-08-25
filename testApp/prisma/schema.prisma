@@ -8,7 +8,6 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  // TODO: Document bellow is mandatory for transaction support
   previewFeatures = ["interactiveTransactions"]
 
 }

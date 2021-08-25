@@ -94,9 +94,8 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo. TODO!
           editUrl:
-            'https://github.com/kepelrs/nestjs-prisma-crud/edit/master/website/',
+            'https://github.com/kepelrs/nestjs-prisma-crud/edit/master/docs/',
             routeBasePath: '/',
         },
         // blog: {

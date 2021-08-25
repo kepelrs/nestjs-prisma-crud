@@ -52,8 +52,8 @@ export class PostController {
     constructor(private readonly postService: PostService) {}
 
     @Post()
-    async create(@Body() createPostDto: CreatePostDto) {
-        const created = await this.postService.create(createPostDto);
+    async create(@Body() createPostDto: CreatePostDto, @Query('crudQuery') crudQuery: string) {
+        const created = await this.postService.create(createPostDto, crudQuery);
         return created;
     }
 

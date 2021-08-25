@@ -7,7 +7,6 @@ import { ModuleRef } from '@nestjs/core';
 import { CrudQuery, PolicyMethod } from '../..';
 import { createWhereObject, getNestedProperty } from '../../utils';
 
-// TODO: make more generic version that allows for any prisma operator: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#filter-conditions-and-operators
 export const MustMatchAuthAttribute = (
     entityAttributePath: string,
     authDataAttributePath: string,

@@ -35,7 +35,7 @@ export class WithMustMatchAuthAttributePolicyCommentsController {
     private readonly commentsService = new PrismaCrudService({
         prismaClient: this.prismaService,
         model: 'comment',
-        allowedJoins: ['post.author'], // TODO: feat - mechanism to enable MustMatchAuthAttribute paths to go beyond allowed joins
+        allowedJoins: ['post.author'],
     });
 
     constructor(private readonly prismaService: PrismaService) {}
@@ -91,7 +91,7 @@ export class WithMustMatchValuePolicyCommentsController {
     private readonly commentsService = new PrismaCrudService({
         prismaClient: this.prismaService,
         model: 'comment',
-        allowedJoins: ['post.author'], // TODO: feat - mechanism to enable MustMatchAuthAttribute paths to go beyond allowed joins
+        allowedJoins: ['post.author'],
     });
 
     constructor(private readonly prismaService: PrismaService) {}

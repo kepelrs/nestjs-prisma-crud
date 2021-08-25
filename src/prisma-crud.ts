@@ -32,7 +32,7 @@ export type CrudQuery = {
     pageSize?: number;
 };
 
-export type CrudWhere = any; // TODO: strong type all any's
+export type CrudWhere = any;
 
 export type CrudMethodOpts = { // TODO: 1. move crudQuery into crudMethodOpts. 2. Update transaction support example
     excludeForbiddenPaths?: boolean;
@@ -80,7 +80,7 @@ export class PrismaCrudService {
         this.paginationDefaults = {
             pageSize: 25,
             orderBy: [{ [this.idPropertyName]: 'asc' }],
-        }; // TODO: make defaults configurable. Also Max/min for pageSize and orderBy validations/restrictions
+        };
     }
 
     private getSanitizedDefaultJoins(

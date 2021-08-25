@@ -23,4 +23,4 @@ This guide assumes you have already setup **NestJS** and **Prisma**. See [Gettin
     nest g -c nestjs-prisma-crud-schematics crud-resource post
     ```
 
-3. Visit http://localhost:3000/post
+3. Verify installation by navigating to [http://localhost:3000/post](http://localhost:3000/post)
