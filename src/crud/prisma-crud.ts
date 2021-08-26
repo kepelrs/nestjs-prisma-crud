@@ -13,6 +13,7 @@ import {
 import { CrudMethodOpts, PaginationDefaults, CrudServiceOpts, CrudQuery, CrudWhere } from './types';
 
 export const defaultCrudMethodOpts: CrudMethodOpts = {
+    crudQuery: {},
     excludeForbiddenPaths: true,
     prismaTransaction: undefined,
 };
@@ -95,6 +96,7 @@ export class PrismaCrudService {
         return {
             where: {},
             joins: this.defaultJoins,
+            select: {},
             orderBy: this.paginationDefaults.orderBy,
             page: 1,
             pageSize: this.paginationDefaults.pageSize,
@@ -137,7 +139,7 @@ export class PrismaCrudService {
         return prismaTransaction[this.model];
     }
 
-    public async create(createDto: any, crudQuery: string | CrudQuery, opts: CrudMethodOpts = {}) {
+    public async create(createDto: any, opts: CrudMethodOpts) {
         opts = Object.assign({}, defaultCrudMethodOpts, opts);
         const repo = this.getRepo(opts);
 
@@ -149,14 +151,14 @@ export class PrismaCrudService {
                 this.idPropertyName,
             ),
         });
-        return this.findOne(entity[this.idPropertyName], crudQuery, opts);
+        return this.findOne(entity[this.idPropertyName], opts);
     }
 
-    public async findMany(crudQuery: string | CrudQuery, opts: CrudMethodOpts = {}) {
+    public async findMany(opts: CrudMethodOpts) {
         opts = Object.assign({}, defaultCrudMethodOpts, opts);
         const repo = this.getRepo(opts);
 
-        const parsedCrudQuery = this.parseCrudQuery(crudQuery);
+        const parsedCrudQuery = this.parseCrudQuery(opts.crudQuery);
         const where = this.getAndValidateWhere(parsedCrudQuery);
         const { skip, take, orderBy, page, pageSize } = this.getAndValidatePagination(
             parsedCrudQuery,
@@ -206,15 +208,11 @@ export class PrismaCrudService {
         };
     }
 
-    public async findOne(
-        id: string | number,
-        crudQuery: string | CrudQuery,
-        opts: CrudMethodOpts = {},
-    ) {
+    public async findOne(id: string | number, opts: CrudMethodOpts) {
         opts = Object.assign({}, defaultCrudMethodOpts, opts);
         const repo = this.getRepo(opts);
 
-        const parsedCrudQuery = this.parseCrudQuery(crudQuery);
+        const parsedCrudQuery = this.parseCrudQuery(opts.crudQuery);
         const where = this.getAndValidateWhere(parsedCrudQuery);
 
         let match = await repo.findFirst({
@@ -241,17 +239,12 @@ export class PrismaCrudService {
         return match;
     }
 
-    public async update(
-        id: string | number,
-        updateDto: any,
-        crudQuery: string | CrudQuery,
-        opts: CrudMethodOpts = {},
-    ) {
+    public async update(id: string | number, updateDto: any, opts: CrudMethodOpts) {
         opts = Object.assign({}, defaultCrudMethodOpts, opts);
         const repo = this.getRepo(opts);
 
         // Check that entity is accessible considering id and crudQuery restrictions
-        const entity = await this.findOne(id, crudQuery, opts);
+        const entity = await this.findOne(id, opts);
 
         // update and return standard findOne
         await repo.update({
@@ -264,19 +257,15 @@ export class PrismaCrudService {
             ),
         });
 
-        return this.findOne(id, crudQuery, opts);
+        return this.findOne(id, opts);
     }
 
-    public async remove(
-        id: string | number,
-        crudQuery: string | CrudQuery,
-        opts: CrudMethodOpts = {},
-    ) {
+    public async remove(id: string | number, opts: CrudMethodOpts) {
         opts = Object.assign({}, defaultCrudMethodOpts, opts);
         const repo = this.getRepo(opts);
 
         // Check that entity is accessible considering id and crudQuery restrictions
-        const entity = await this.findOne(id, crudQuery, opts);
+        const entity = await this.findOne(id, opts);
 
         await repo.delete({ where: { [this.idPropertyName]: entity[this.idPropertyName] } });
 

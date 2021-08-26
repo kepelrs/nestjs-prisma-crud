@@ -1106,8 +1106,9 @@ describe('CRUD controllers (without policy) e2e', () => {
         it('GET many forbiddenPaths can be ignored by function parameter', async () => {
             const userService = app.get(UsersService);
             const originalFindMany = userService.findMany;
-            const mockedFindMany = function (crudQuery) {
-                return originalFindMany.bind(userService)(crudQuery, {
+            const mockedFindMany = function ({ ...opts }) {
+                return originalFindMany.bind(userService)({
+                    ...opts,
                     excludeForbiddenPaths: false,
                 });
             };
@@ -1137,8 +1138,9 @@ describe('CRUD controllers (without policy) e2e', () => {
         it('GET one forbiddenPaths can be ignored by function parameter', async () => {
             const userService = app.get(UsersService);
             const originalFindOne = userService.findOne;
-            const mockedFindOne = function (id, crudQuery) {
-                return originalFindOne.bind(userService)(id, crudQuery, {
+            const mockedFindOne = function (id, { ...opts }) {
+                return originalFindOne.bind(userService)(id, {
+                    ...opts,
                     excludeForbiddenPaths: false,
                 });
             };

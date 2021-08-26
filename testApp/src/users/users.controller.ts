@@ -22,13 +22,13 @@ export class UsersController {
 
     @Post()
     async create(@Body() createUserDto: CreateUserDto, @Query('crudQuery') crudQuery: string) {
-        const created = await this.usersService.create(createUserDto, crudQuery);
+        const created = await this.usersService.create(createUserDto, { crudQuery });
         return created;
     }
 
     @Get()
     async findMany(@Query('crudQuery') crudQuery: string) {
-        const matches = await this.usersService.findMany(crudQuery);
+        const matches = await this.usersService.findMany({ crudQuery });
         return matches;
     }
 
@@ -40,7 +40,7 @@ export class UsersController {
 
     @Get(':id')
     async findOne(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
-        const match = await this.usersService.findOne(id, crudQuery);
+        const match = await this.usersService.findOne(id, { crudQuery });
         return match;
     }
 
@@ -50,13 +50,13 @@ export class UsersController {
         @Body() updateUserDto: UpdateUserDto,
         @Query('crudQuery') crudQuery: string,
     ) {
-        const updated = await this.usersService.update(id, updateUserDto, crudQuery);
+        const updated = await this.usersService.update(id, updateUserDto, { crudQuery });
         return updated;
     }
 
     @Delete(':id')
     async remove(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
-        return this.usersService.remove(id, crudQuery);
+        return this.usersService.remove(id, { crudQuery });
     }
 }
 
@@ -67,21 +67,21 @@ export class WithRBACUsersController {
     @Get('everyone')
     @AccessPolicy('everyone')
     async findMany(@Query('crudQuery') crudQuery: string) {
-        const matches = await this.usersService.findMany(crudQuery);
+        const matches = await this.usersService.findMany({ crudQuery });
         return matches;
     }
 
     @Get('anyRole')
     @AccessPolicy('anyRole')
     async findManyAuthententicated(@Query('crudQuery') crudQuery: string) {
-        const matches = await this.usersService.findMany(crudQuery);
+        const matches = await this.usersService.findMany({ crudQuery });
         return matches;
     }
 
     @Get('specificRoles')
     @AccessPolicy([RoleID.ALWAYS_ACCESS])
     async findManySpecificRoles(@Query('crudQuery') crudQuery: string) {
-        const matches = await this.usersService.findMany(crudQuery);
+        const matches = await this.usersService.findMany({ crudQuery });
         return matches;
     }
 }
@@ -111,7 +111,7 @@ export class TransactionUsersController {
             await this.createLog('example');
             const created = await this.usersService.create(
                 { ...createUserDto, someInvalidProp: true }, // someInvalidProp causes this line to throw
-                crudQuery,
+                { crudQuery },
             );
             await this.createLog('example');
             return created;
@@ -131,8 +131,10 @@ export class TransactionUsersController {
                 await this.createLog('example', prismaTransaction);
                 createdUser = await this.usersService.create(
                     { ...createUserDto, someInvalidProp: true }, // someInvalidProp causes this line to throw
-                    crudQuery,
-                    { prismaTransaction },
+                    {
+                        crudQuery,
+                        prismaTransaction,
+                    },
                 );
                 await this.createLog('example', prismaTransaction);
             });
@@ -151,9 +153,13 @@ export class TransactionUsersController {
         let createdUser;
         await this.prismaService.$transaction(async (prismaTransaction) => {
             await this.createLog('example', prismaTransaction);
-            createdUser = await this.usersService.create({ ...createUserDto }, crudQuery, {
-                prismaTransaction,
-            });
+            createdUser = await this.usersService.create(
+                { ...createUserDto },
+                {
+                    crudQuery,
+                    prismaTransaction,
+                },
+            );
             await this.createLog('example', prismaTransaction);
         });
 

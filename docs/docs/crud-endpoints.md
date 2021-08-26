@@ -53,19 +53,19 @@ export class PostController {
 
     @Post()
     async create(@Body() createPostDto: CreatePostDto, @Query('crudQuery') crudQuery: string) {
-        const created = await this.postService.create(createPostDto, crudQuery);
+        const created = await this.postService.create(createPostDto, { crudQuery });
         return created;
     }
 
     @Get()
     async findMany(@Query('crudQuery') crudQuery: string) {
-        const matches = await this.postService.findMany(crudQuery);
+        const matches = await this.postService.findMany({ crudQuery });
         return matches;
     }
 
     @Get(':id')
     async findOne(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
-        const match = await this.postService.findOne(id, crudQuery);
+        const match = await this.postService.findOne(id, { crudQuery });
         return match;
     }
 
@@ -75,13 +75,13 @@ export class PostController {
         @Body() updatePostDto: UpdatePostDto,
         @Query('crudQuery') crudQuery: string,
     ) {
-        const updated = await this.postService.update(id, updatePostDto, crudQuery);
+        const updated = await this.postService.update(id, updatePostDto, { crudQuery });
         return updated;
     }
 
     @Delete(':id')
     async remove(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
-        return this.postService.remove(id, crudQuery);
+        return this.postService.remove(id, { crudQuery });
     }
 }
 ```
@@ -266,7 +266,8 @@ export class SalesController {
         // 0. Start the interactive transaction
         await this.prismaService.$transaction(async (prismaTransaction) => {
             // 1. create the sale record
-            createdSale = await this.salesService.create(createSaleDto, crudQuery, {
+            createdSale = await this.salesService.create(createSaleDto, {
+                crudQuery,
                 prismaTransaction, //  pass prisma transaction into PrismaCrudService
             });
 

@@ -22,7 +22,14 @@ export type CrudQuery = {
 export type CrudWhere = any;
 
 export type CrudMethodOpts = {
-    // TODO: 1. move crudQuery into crudMethodOpts. 2. Update transaction support example
+    /**
+     * crudQuery: CrudQuery or its `JSON.stringified` form.
+     *
+     * Opinionated: although it accepts falsy values, it is not an optional property (ie. must be explicitly set to undefined).
+     *
+     * This helps with codebase intuition about `nestjs-prisma-crud`'s inner workings, as well as prevents serious accidental mistakes related to access control (ie. forgetting to pass crudQuery).
+     */
+    crudQuery: CrudQuery | string | null | undefined;
     excludeForbiddenPaths?: boolean;
     prismaTransaction?: PrismaTransaction;
 };

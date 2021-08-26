@@ -12,22 +12,21 @@ export class EntityWithIntIdController {
         @Body() createEntityWithIntIdDto: CreateEntityWithIntIdDto,
         @Query('crudQuery') crudQuery: string,
     ) {
-        const created = await this.entityWithIntIdService.create(
-            createEntityWithIntIdDto,
+        const created = await this.entityWithIntIdService.create(createEntityWithIntIdDto, {
             crudQuery,
-        );
+        });
         return created;
     }
 
     @Get()
     async findAll(@Query('crudQuery') crudQuery: string) {
-        const matches = await this.entityWithIntIdService.findMany(crudQuery);
+        const matches = await this.entityWithIntIdService.findMany({ crudQuery });
         return matches;
     }
 
     @Get(':id')
     async findOne(@Param('id') id: number, @Query('crudQuery') crudQuery: string) {
-        const match = await this.entityWithIntIdService.findOne(+id, crudQuery);
+        const match = await this.entityWithIntIdService.findOne(+id, { crudQuery });
         return match;
     }
 
@@ -37,16 +36,14 @@ export class EntityWithIntIdController {
         @Body() updateEntityWithIntIdDto: UpdateEntityWithIntIdDto,
         @Query('crudQuery') crudQuery: string,
     ) {
-        const updated = await this.entityWithIntIdService.update(
-            +id,
-            updateEntityWithIntIdDto,
+        const updated = await this.entityWithIntIdService.update(+id, updateEntityWithIntIdDto, {
             crudQuery,
-        );
+        });
         return updated;
     }
 
     @Delete(':id')
     async remove(@Param('id') id: number, @Query('crudQuery') crudQuery: string) {
-        return this.entityWithIntIdService.remove(+id, crudQuery);
+        return this.entityWithIntIdService.remove(+id, { crudQuery });
     }
 }
