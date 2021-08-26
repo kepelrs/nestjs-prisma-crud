@@ -77,12 +77,12 @@ describe('AccessPolicy RBAC e2e', () => {
         });
     });
 
-    describe(`'anyAuthenticated' setting`, () => {
+    describe(`'anyRole' setting`, () => {
         describe('denies access', () => {
             it('when client is unauthenticated', async () => {
                 await multiAppTest([nonStrictApp, strictApp], async (app) => {
                     await request(app.getHttpServer())
-                        .get('/rbac/users/anyAuthenticated')
+                        .get('/rbac/users/anyRole')
                         .expect(401);
                 });
             });
@@ -90,7 +90,7 @@ describe('AccessPolicy RBAC e2e', () => {
             it('when authenticated but no roles are present', async () => {
                 await multiAppTest([nonStrictApp, strictApp], async (app) => {
                     await request(app.getHttpServer())
-                        .get('/rbac/users/anyAuthenticated')
+                        .get('/rbac/users/anyRole')
                         .query({ _testingRoles: ``, _userId: needleString0 })
                         .expect(403);
                 });
@@ -101,7 +101,7 @@ describe('AccessPolicy RBAC e2e', () => {
             it('when any role is present (1)', async () => {
                 await multiAppTest([nonStrictApp, strictApp], async (app) => {
                     await request(app.getHttpServer())
-                        .get('/rbac/users/anyAuthenticated')
+                        .get('/rbac/users/anyRole')
                         .query({ _testingRoles: `${RoleID.ALWAYS_ACCESS}` })
                         .expect(200)
                         .then((res) => {
@@ -113,7 +113,7 @@ describe('AccessPolicy RBAC e2e', () => {
             it('when any role is present (2)', async () => {
                 await multiAppTest([nonStrictApp, strictApp], async (app) => {
                     await request(app.getHttpServer())
-                        .get('/rbac/users/anyAuthenticated')
+                        .get('/rbac/users/anyRole')
                         .query({ _testingRoles: `${RoleID.LIMITED_ACCESS}` })
                         .expect(200)
                         .then((res) => {

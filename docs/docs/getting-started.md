@@ -71,14 +71,14 @@ cd my-project
 
 ## 3. Setup `nestjs-prisma-crud`
 
-1. Install `nestjs-prisma-crud` and schematics:
+1. Install `nestjs-prisma-crud` and `nestjs-prisma-crud-schematics`:
 
     ```
     npm i nestjs-prisma-crud --save
     npm i -g nestjs-prisma-crud-schematics
     ```
 
-2. Create CRUD endpoints (**Note:** _'post'_ here is the entity's name)
+2. Generate the entire crud module with the following command (replace **post** with some your table's name from your Prisma schema):
 
     ```
     nest g -c nestjs-prisma-crud-schematics crud-resource post
@@ -94,5 +94,5 @@ cd my-project
 
 ## Whats next?
 
--   Learn more about the [crud endpoints](./crud-endpoints)
--   Browse the [access control](./access-control-module/overview) documentation
+-   Learn more about the [crud endpoints](./crud-endpoints).
+-   Browse the [access control](./access-control-module/overview) documentation.

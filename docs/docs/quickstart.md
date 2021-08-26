@@ -17,10 +17,15 @@ This guide assumes you have already setup **NestJS** and **Prisma**. See [Gettin
     npm i -g nestjs-prisma-crud-schematics
     ```
 
-2. Generate the entire crud module with a single command (replace **post** with some your table's name from your Prisma schema):
+2. Generate the entire crud module with the following command (replace **post** with some your table's name from your Prisma schema):
 
     ```
     nest g -c nestjs-prisma-crud-schematics crud-resource post
     ```
 
-3. Verify installation by navigating to [http://localhost:3000/post](http://localhost:3000/post)
+3. Start the server:
+    ```
+    npm run start:dev
+    ```
+
+4. Verify installation by navigating to [http://localhost:3000/post](http://localhost:3000/post)

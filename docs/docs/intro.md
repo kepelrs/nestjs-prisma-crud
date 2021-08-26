@@ -17,7 +17,7 @@ An overview of the provided functionality:
     - Support for including only specific properties in the response.
 2. Access control
     - `@AccessPolicy` decorator with default utilities that support functionalities similar to [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)/[ABAC](https://en.wikipedia.org/wiki/Attribute-based_access_control).
-    - Custom policy support
+    - Custom policy support.
 3. Atomic operations
     - Supports POST/PATCH with nested objects.
     - Transaction support when extending controller functionality.

@@ -12,7 +12,7 @@ sidebar_position: 1
 
 ## Quickstart
 
-To start using the access control utilities simply register the `AccessControlModule` to your `app.module.ts`:
+To start using the access control utilities you must first register the `AccessControlModule` in your `app.module.ts`:
 
 ```ts title=app.module.ts
 @Module({
@@ -30,9 +30,9 @@ To start using the access control utilities simply register the `AccessControlMo
 export class AppModule {}
 ```
 
-Then all you need to do is add the `@AccessPolicy()` decorator into your controller like so:
+Then add the `@AccessPolicy()` decorator to your controllers like so:
 
-```ts title=post.controller.ts
+```ts title=post.controller.ts {5}
 @Controller('post')
 export class PostController {
     // ...
@@ -45,4 +45,4 @@ export class PostController {
 }
 ```
 
-Keep reading for more details on the [AccessControlModule](./access-control-module) and [AccessPolicy](./access-policy) configuration.
+See the next sessions for more details on the [AccessControlModule](./access-control-module) and [AccessPolicy](./access-policy) configuration.

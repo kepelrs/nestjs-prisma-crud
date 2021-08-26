@@ -50,9 +50,9 @@ export class WithMustMatchAuthAttributePolicyCommentsController {
         return match;
     }
 
-    @Get('anyAuthenticated')
-    @AccessPolicy('anyAuthenticated', MustMatchAuthAttribute('post.author.id', 'id'))
-    async getAnyAuthenticated(@Query('crudQuery') crudQuery: string) {
+    @Get('anyRole')
+    @AccessPolicy('anyRole', MustMatchAuthAttribute('post.author.id', 'id'))
+    async getAnyRole(@Query('crudQuery') crudQuery: string) {
         const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
@@ -123,19 +123,19 @@ export class WithMustMatchValuePolicyCommentsController {
         return match;
     }
 
-    @Get('anyAuthenticated')
-    @AccessPolicy('anyAuthenticated', MustMatchValue('post.author.id', seedEntityIds[0]))
-    async getAnyAuthenticated(@Query('crudQuery') crudQuery: string) {
+    @Get('anyRole')
+    @AccessPolicy('anyRole', MustMatchValue('post.author.id', seedEntityIds[0]))
+    async getAnyRole(@Query('crudQuery') crudQuery: string) {
         const match = await this.commentsService.findMany(crudQuery);
         return match;
     }
 
-    @Get('anyAuthenticated/empty')
+    @Get('anyRole/empty')
     @AccessPolicy(
-        'anyAuthenticated',
+        'anyRole',
         MustMatchValue('post.author.id', 'this string makes this route always return empty set'),
     )
-    async getAnyAuthenticatedEmpty(@Query('crudQuery') crudQuery: string) {
+    async getAnyRoleEmpty(@Query('crudQuery') crudQuery: string) {
         const match = await this.commentsService.findMany(crudQuery);
         return match;
     }

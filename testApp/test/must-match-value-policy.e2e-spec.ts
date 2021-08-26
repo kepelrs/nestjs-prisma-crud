@@ -105,11 +105,11 @@ describe('MustMatchValue e2e', () => {
             });
         });
 
-        describe('anyAuthenticated', () => {
-            it('GET /must-match-value/comments/anyAuthenticated returns only matching set', async () => {
+        describe('anyRole', () => {
+            it('GET /must-match-value/comments/anyRole returns only matching set', async () => {
                 await multiAppTest([nonStrictApp, strictApp], async (app) => {
                     await request(app.getHttpServer())
-                        .get('/must-match-value/comments/anyAuthenticated')
+                        .get('/must-match-value/comments/anyRole')
                         .query({
                             _userId: `${needleString0}`,
                             _testingRoles: [RoleID.LIMITED_ACCESS],
@@ -122,10 +122,10 @@ describe('MustMatchValue e2e', () => {
                 });
             });
 
-            it('GET /must-match-value/comments/anyAuthenticated/empty returns empty set when nothing matches', async () => {
+            it('GET /must-match-value/comments/anyRole/empty returns empty set when nothing matches', async () => {
                 await multiAppTest([nonStrictApp, strictApp], async (app) => {
                     await request(app.getHttpServer())
-                        .get('/must-match-value/comments/anyAuthenticated/empty')
+                        .get('/must-match-value/comments/anyRole/empty')
                         .query({
                             _userId: `${needleString0}`,
                             _testingRoles: [RoleID.LIMITED_ACCESS],

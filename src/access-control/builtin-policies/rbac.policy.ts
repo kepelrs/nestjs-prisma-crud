@@ -38,8 +38,8 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
     }
 
     // if this code is reached, user is authenticated and has at least one role
-    if (allowedRoles === 'anyAuthenticated') {
-        // 'anyAuthenticated' and at least one userRole exists, access is granted
+    if (allowedRoles === 'anyRole') {
+        // 'anyRole' and at least one userRole exists, access is granted
         return;
     }
 
@@ -58,5 +58,5 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
 
 export type AllowedRoles<T extends AllowedRolesId = AllowedRolesId> =
     | 'everyone'
-    | 'anyAuthenticated'
+    | 'anyRole'
     | T;

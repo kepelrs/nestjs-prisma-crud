@@ -71,10 +71,10 @@ describe('MustMatchAuthAttributePolicy e2e', () => {
         });
     });
 
-    it('GET /must-match-auth-attribute/comments/anyAuthenticated returns matching set when user attribute matches', async () => {
+    it('GET /must-match-auth-attribute/comments/anyRole returns matching set when user attribute matches', async () => {
         await multiAppTest([nonStrictApp, strictApp], async (app) => {
             await request(app.getHttpServer())
-                .get('/must-match-auth-attribute/comments/anyAuthenticated')
+                .get('/must-match-auth-attribute/comments/anyRole')
                 .query({
                     _userId: `${needleString0}`,
                     _testingRoles: [RoleID.LIMITED_ACCESS],

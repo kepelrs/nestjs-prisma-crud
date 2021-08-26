@@ -16,7 +16,7 @@ We recommend using the schematics package to quickly scaffold your CRUD modules:
 1. Install `nestjs-prisma-crud-schematics` globally:
 
     ```
-    npm i -g `nestjs-prisma-crud-schematics`
+    npm i -g nestjs-prisma-crud-schematics
     ```
 
 2. Scaffold the entire module and CRUD endpoints (replace **post** with your entity name):
@@ -27,8 +27,8 @@ We recommend using the schematics package to quickly scaffold your CRUD modules:
 
 The above will scaffold the entire CRUD module for you, most notably:
 
--   `post.controller.ts` where you can add, remove or extend your controllers' functionality
--   `post.service.ts` where you can configure your crud endpoints
+-   `post.controller.ts` where you can add, remove or extend your controllers' functionality.
+-   `post.service.ts` where you can configure your crud endpoints.
 
 ## CRUD Controller
 
@@ -126,7 +126,7 @@ Bellow you can find a description of each option.
 
 ### opts.model
 
-**Type:** string <br/>
+**Type:** `string` <br/>
 **Mandatory:** Yes<br/>
 **Description:**
 
@@ -138,7 +138,7 @@ The `prismaClient.model` on which you wish to perform the CRUD operations.
 
 ### opts.prismaClient
 
-**Type:** PrismaClient | PrismaService <br/>
+**Type:** `PrismaClient | PrismaService` <br/>
 **Mandatory:** Yes<br/>
 **Description:**
 
@@ -150,7 +150,7 @@ The `PrismaClient` instance. You can also user your `PrismaService` if it extend
 
 ### opts.allowedJoins
 
-**Type:** Array&ltstring&gt <br/>
+**Type:** `Array<string>` <br/>
 **Mandatory:** No<br/>
 **Description:**
 
@@ -164,11 +164,11 @@ Supports dot notation.
 
 ### opts.defaultJoins
 
-**Type:** Array&ltstring&gt <br/>
+**Type:** `Array<string>` <br/>
 **Mandatory:** No<br/>
 **Description:**
 
-The default relations to be included in responses. . <br/>
+The default relations to be included in responses. <br/>
 _Note:_ Paths must be shallower or same depth as provided in `allowedJoins`
 
 **Example:** `['comments.author']` or `[]`;<br/>
@@ -178,7 +178,7 @@ _Note:_ Paths must be shallower or same depth as provided in `allowedJoins`
 
 ### opts.forbiddenPaths
 
-**Type:** Array&ltstring \| RegExp&gt <br/>
+**Type:** `Array<string | RegExp>` <br/>
 **Mandatory:** No<br/>
 **Description:**
 
@@ -205,7 +205,7 @@ The paths you wish to omit in the returned objects. <br/>
 
 ### opts.idPropertyName
 
-**Type:** string <br/>
+**Type:** `string` <br/>
 **Mandatory:** No<br/>
 **Description:**
 
@@ -224,7 +224,7 @@ which are currently a preview feature.
 
 In order to use this example, you must add the following to your prisma schema:
 
-```js title=schema.prisma
+```js title=schema.prisma {3}
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
@@ -233,17 +233,17 @@ generator client {
 
 :::
 
-There are times when we want to extend a CRUD controller's functionality by performing additional database operations. In those cases we usually want all database operations to happen [atomically](<https://en.wikipedia.org/wiki/Atomicity_(database_systems)>) (_ie. if one database operation fail, revert all other operations, leaving the database unchanged_).
+There are times when we want to extend a CRUD controller's functionality and perform additional database operations. In those cases we usually want all database operations to happen [atomically](<https://en.wikipedia.org/wiki/Atomicity_(database_systems)>) (_ie. if one database operation fails, cancel all other operations and leave the database unchanged_).
+
+### Example
 
 Suppose you have a `SalesController` where, aside from the CRUD `sale` operations, you also wish to increment and decrement the balance of the users involved.
 
-Doing so is easy:
+The example bellow achieves atomicity by following the following steps:
 
-1. Start a [prisma interactive transaction](https://www.prisma.io/docs/concepts/components/prisma-client/transactions#interactive-transactions-in-preview)
-2. Use the `prismaTransaction` instead of `prismaClient` for performing your database operations
-3. Pass `prismaTransaction` into the `PrismaCrudService` methods
-
-### Example
+1. Start a [prisma interactive transaction](https://www.prisma.io/docs/concepts/components/prisma-client/transactions#interactive-transactions-in-preview).
+2. Pass `prismaTransaction` into the `PrismaCrudService` methods.
+3. Use the `prismaTransaction` instead of `prismaClient` for performing your database operations.
 
 ```ts title=sales.controller.ts
 interface CreateSaleDTO {
@@ -263,6 +263,7 @@ export class SalesController {
     @Post()
     async createSale(@Body() createSaleDto: CreateSaleDTO, @Query('crudQuery') crudQuery: string) {
         let createdSale;
+        // 0. Start the interactive transaction
         await this.prismaService.$transaction(async (prismaTransaction) => {
             // 1. create the sale record
             createdSale = await this.salesService.create(createSaleDto, crudQuery, {

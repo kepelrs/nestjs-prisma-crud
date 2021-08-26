@@ -497,6 +497,30 @@ describe('CRUD controllers (without policy) e2e', () => {
                         expect(postKeys).toEqual(['id']);
                     });
             });
+
+            it('deep nested also works', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users/${needleString0}`)
+                    .query({
+                        crudQuery: JSON.stringify({
+                            select: { only: ['posts.comments.content'] },
+                            joins: ['posts', 'posts.comments'],
+                        }),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        const rootKeys = Object.keys(res.body);
+                        expect(rootKeys).toEqual(['posts']);
+
+                        const post = res.body.posts[0];
+                        const postKeys = Object.keys(post);
+                        expect(postKeys).toEqual(['comments']);
+
+                        const comment = post.comments[0];
+                        const commentKeys = Object.keys(comment);
+                        expect(commentKeys).toEqual(['content']);
+                    });
+            });
         });
 
         describe('frontend can specify shallow .except property', () => {

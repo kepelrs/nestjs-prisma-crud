@@ -71,8 +71,8 @@ export class WithRBACUsersController {
         return matches;
     }
 
-    @Get('anyAuthenticated')
-    @AccessPolicy('anyAuthenticated')
+    @Get('anyRole')
+    @AccessPolicy('anyRole')
     async findManyAuthententicated(@Query('crudQuery') crudQuery: string) {
         const matches = await this.usersService.findMany(crudQuery);
         return matches;
@@ -148,19 +148,15 @@ export class TransactionUsersController {
         @Body() createUserDto: CreateUserDto,
         @Query('crudQuery') crudQuery: string,
     ) {
-        try {
-            let createdUser;
-            await this.prismaService.$transaction(async (prismaTransaction) => {
-                await this.createLog('example', prismaTransaction);
-                createdUser = await this.usersService.create({ ...createUserDto }, crudQuery, {
-                    prismaTransaction,
-                });
-                await this.createLog('example', prismaTransaction);
+        let createdUser;
+        await this.prismaService.$transaction(async (prismaTransaction) => {
+            await this.createLog('example', prismaTransaction);
+            createdUser = await this.usersService.create({ ...createUserDto }, crudQuery, {
+                prismaTransaction,
             });
+            await this.createLog('example', prismaTransaction);
+        });
 
-            return createdUser;
-        } catch (error) {
-            throw new InternalServerErrorException();
-        }
+        return createdUser;
     }
 }

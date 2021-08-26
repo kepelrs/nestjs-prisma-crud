@@ -8,7 +8,7 @@ The `AccessControlModule` registers interceptors and the necessary business logi
 
 ## Usage
 
-```ts title=app.module.ts
+```ts title=app.module.ts {5}
 @Module({
     // ...
     imports: [
@@ -36,7 +36,7 @@ Bellow you can find the documentation for each option.
 
 ### opts.authDataKey
 
-**Type:** string <br/>
+**Type:** `string` <br/>
 **Mandatory:** Yes<br/>
 **Description:**
 
@@ -48,13 +48,13 @@ The property of the `request` where your authentication middleware stores the in
 
 ### opts.getRolesFromAuthDataFn
 
-**Type:** (authData) => string[] | number[] | Set&ltstring> | Set&ltnumber> | null | undefined <br/>
+**Type:** `(authData) => string[] | number[] | Set<string> | Set<number> | null | undefined` <br/>
 **Mandatory:** Yes<br/>
 **Description:**
 
 Method which takes the `request[opts.authDataKey]` and returns a `Set` or `Array` containing the user roles ids.
 
-These ids will be compared with the ones passed to `@AccessPolicy`
+These ids will later be compared with the ones passed to `@AccessPolicy`.
 
 **Example:** `(user) => user?.roles.map(role => role.id)`
 
@@ -62,12 +62,12 @@ These ids will be compared with the ones passed to `@AccessPolicy`
 
 ### opts.strictMode
 
-**Type:** boolean <br/>
+**Type:** `boolean` <br/>
 **Mandatory:** Yes<br/>
 **Description:**
 
 Strict mode helps you prevent accidentally forgetting to implement access control on sensitive routes. If set to `true`, routes that were not decorated with `@AccessPolicy` will throw `501 Not Implemented` errors.
 
-If your app has custom endpoints, you can decorate them with `@AccessPolicy('everyone')` or set `strictMode` to `false` if you wish to turn it off altogether.
+If your app has non-CRUD endpoints, you can decorate them with `@AccessPolicy('everyone')` or set `strictMode` to `false` if you wish to turn it off altogether.
 
 **Recommended:** `true`

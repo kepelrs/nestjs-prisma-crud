@@ -7,13 +7,15 @@ sidebar_position: 6
 ## Overview
 
 :::info
-All examples and schematics in this documentation demonstrate passing `crudQuery` as a `JSON.stringified` string in your query parameter.
+Although all examples and schematics in this documentation demonstrate passing `crudQuery` as a `JSON.stringified` string in your query parameters, that is not mandatorily the only way to do it.
 
-You can chose to adjust your controllers and retrieve the `crudQuery` object from `POST` bodies or any other method you prefer. If you choose to do so, remember to also adapt any [built in](./access-control-module/builtin-policies) or [custom policies](./access-control-module/custom-policy) that were previously relying on `request.query`.
+You can chose to adjust your controllers and retrieve the `crudQuery` object from `POST` bodies or any other method you prefer.
+
+If you choose to do so, remember to also adapt any [built in](./access-control-module/builtin-policies) or [custom policies](./access-control-module/custom-policy) that were previously relying on `request.query`.
 
 :::
 
-Every public method of `PrismaCrudService` used in your [CRUD endpoints](./crud-endpoints) accept an optional parameter `crudQuery`.
+Every public method of `PrismaCrudService` used in your [CRUD endpoints](./crud-endpoints) accept a parameter `crudQuery`.
 
 `crudQuery` must be an object (or JSON string) with the following shape:
 
@@ -21,6 +23,7 @@ Every public method of `PrismaCrudService` used in your [CRUD endpoints](./crud-
 export type CrudQuery = {
     where?: object;
     joins?: string[];
+    select?: { only?: string[]; except?: string[] };
     orderBy?: object;
     page?: number;
     pageSize?: number;
@@ -30,6 +33,7 @@ export type CrudQuery = {
 ## TLDR Usage
 
 ```ts
+// "/users" endpoint
 const crudQuery = {
     where: {
         posts: {
@@ -38,6 +42,7 @@ const crudQuery = {
             },
         },
     },
+    select: { only: ['id', 'profile.fullName', 'posts.title', 'posts.comments.content'] },
     joins: ['profile', 'posts.comments'],
     orderBy: [{ age: 'asc' }],
     page: 2,
@@ -51,7 +56,7 @@ fetch('http://localhost:3000?' + new URLSearchParams({ crudQuery: JSON.stringify
 
 ### CrudQuery.where
 
-**Type:** object<br/>
+**Type:** `object`<br/>
 **Mandatory:** No<br/>
 **Description:**
 
@@ -84,7 +89,7 @@ For more information on the `.where` object, see the [prisma API reference](http
 
 ### CrudQuery.joins
 
-**Type:** string[]<br/>
+**Type:** `string[]`<br/>
 **Mandatory:** No<br/>
 **Description:**
 
@@ -113,7 +118,7 @@ const crudQuery = {
 
 ### CrudQuery.orderBy
 
-**Type:** Array&lt{[string]: 'asc' | 'desc'}&gt<br/>
+**Type:** `Array<{ [string]: 'asc' | 'desc' }>`<br/>
 **Mandatory:** No<br/>
 **Description:**
 
@@ -132,7 +137,7 @@ const crudQuery = {
 
 ### CrudQuery.page
 
-**Type:** number <br/>
+**Type:** `number` <br/>
 **Mandatory:** No<br/>
 **Description:**
 
@@ -153,11 +158,11 @@ const crudQuery = {
 
 ### CrudQuery.pageSize
 
-**Type:** number <br/>
+**Type:** `number` <br/>
 **Mandatory:** No<br/>
 **Description:**
 
-The pageSize property is used to control the pagination in the `prismaCrudService.findMany` responses. It be `1` or greater and will get overriden if passed a larger value than [configured in the service](./crud-endpoints#configuration).
+The pageSize property is used to control the pagination in the `prismaCrudService.findMany` responses. It be `1` or greater and will get overriden if passed a larger value than [configured in the service](./crud-endpoints#crud-service).
 
 **Example:**
 
