@@ -500,7 +500,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     .get(`/users`)
                     .query({
                         crudQuery: JSON.stringify({
-                            select: { only: ['posts.id'] }, // TODO: Document that this is different than forbidden paths (no regexp, no array indexes)
+                            select: { only: ['posts.id'] },
                             joins: ['posts'],
                         }),
                     })
@@ -593,7 +593,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     .get(`/users`)
                     .query({
                         crudQuery: JSON.stringify({
-                            select: { except: ['posts.id'] }, // TODO: Document .except and .only
+                            select: { except: ['posts.id'] },
                             joins: ['posts'],
                         }),
                     })

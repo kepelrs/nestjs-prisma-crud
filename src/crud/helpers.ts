@@ -281,7 +281,7 @@ export function deleteObjectProperties(
 
         let currentPath = meta.currentPath!;
         if (ignoreArrayIndexes) {
-            currentPath = currentPath.replace(/\.\d+\./g, '.'); // TODO: improve repeated replaces
+            currentPath = currentPath.replace(/\.\d+\./g, '.');
             currentPath = currentPath.replace(/\.\d+$/, '');
         }
 

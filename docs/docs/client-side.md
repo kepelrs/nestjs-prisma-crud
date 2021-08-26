@@ -42,8 +42,8 @@ const crudQuery = {
             },
         },
     },
-    select: { only: ['id', 'profile.fullName', 'posts.title', 'posts.comments.content'] },
     joins: ['profile', 'posts.comments'],
+    select: { only: ['id', 'profile.fullName', 'posts.title', 'posts.comments.content'] },
     orderBy: [{ age: 'asc' }],
     page: 2,
     pageSize: 100,
@@ -112,6 +112,46 @@ const crudQuery = {
     // ...
     joins: ['profile', 'posts.comments'],
 };
+```
+
+<hr/>
+
+### CrudQuery.select
+
+**Type:** `{ only?: string[]; except?: string[] }`<br/>
+**Mandatory:** No<br/>
+**Description:**
+
+The properties which you wish to incude in the responses.
+
+:::tip
+Both `.only` and `.except` support a **special dot notation** that goes through arrays without needing to specify the array's indexes.
+
+Example:<br />
+✅ `{ only: ['user.posts.title'] }`<br/>
+❌ `{ only: ['user.posts.0.title', 'user.posts.1.title', 'user.posts.2.title', ...] }`
+
+This syntax is different than the [**forbiddenPaths**](./crud-endpoints#optsforbiddenpaths) syntax, since there we can use `RegExp`s for targetting the array indexes.
+:::
+
+Use `.except` when you want to provide an array of properties that you wish **to omit**.
+
+Use `.only` when you want to provide an array of properties that you wish **to include** in the response, **excluding everything else**.<br/>
+
+> **Note:** These properties are omitted from the HTTP responses, however they still get fetched from the database!!
+
+**Example:**
+
+```ts
+/*
+Send the following crudQuery to the "/users" endpoint to get only their username and post titles:
+*/
+const crudQuery = {
+    // ...
+    select: { only: ['username', 'posts.title'] },
+};
+
+// response: { username: 'john', posts: [{ title: 'My Title 1' }, { title: 'My Title 2' }] };
 ```
 
 <hr/>

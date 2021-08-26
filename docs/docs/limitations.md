@@ -23,10 +23,10 @@ hide_title: true
 -   [x] Delete
 -   [x] Complex GET Frontend QueryBuilding
     -   [x] Allow specifying joins from frontend (as long as allowed on backend)
-    -   [x] Allow clients to specify select fields (only, except). TODO: Document that these still get fetched from db.
+    -   [x] Allow clients to specify select fields (only, except).
     -   [x] Pagination
         -   [ ] Configurable pagination defaults (pageSize min/max)
-        -   [ ] OrderBy validation
+        -   [x] OrderBy validation
     -   [x] Allow complex where
 -   [x] Access control policy strategy
     -   [x] Default utility guards
