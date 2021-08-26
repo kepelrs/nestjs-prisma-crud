@@ -1,7 +1,6 @@
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { CrudQuery, PolicyMethod } from '../..';
-import { createWhereObject } from '../../utils';
+import { createWhereObject, CrudQuery, PolicyMethod } from '../..';
 
 export const MustMatchValue = (entityAttributePath: string, targetValue: any): PolicyMethod => (
     ctx: ExecutionContext,
