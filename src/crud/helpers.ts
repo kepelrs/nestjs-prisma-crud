@@ -148,8 +148,8 @@ export function transformJoinsToInclude(joins: string[]) {
 // );
 
 /**
- * TODO!! describe what it does
- * TODO: Make regex more reliable
+ * Takes an arbitrarily deep nested `whereObject` and compares if the path to the deepest nested object (excluding its properties)
+ * is present in the provided `allowedJoinsSet`.
  */
 export function validateNestedWhere(
     whereObject: any,
@@ -197,9 +197,8 @@ export function validateNestedWhere(
         const isLeafArrayContent = leafArrayContentRegex.test(meta.currentPath || '');
         const isLeafArray =
             meta.currentPath && value instanceof Array && leafArrayRegex.test(meta.currentPath);
-        const isRegularLeafCase =
-            !isLeafArrayContent && (typeof value !== 'object' || value === null); // nulls and non-objects are final nodes, except when using 'in' or 'notIn'
-        const isLeaf = isLeafArray || isRegularLeafCase;
+        const isLeafNonArray = !isLeafArrayContent && !(value instanceof Object); // when value is non-objects it means parent are final nodes (except when isLeafArrayContent)
+        const isLeaf = isLeafArray || isLeafNonArray;
         if (isLeaf) {
             // leaf paths are the longest
             const leafPath = meta.currentPath!;
@@ -218,6 +217,33 @@ export function validateNestedWhere(
             }
         }
     });
+}
+
+/**
+ * Takes an array of arbitrarily deep nested `orderByObjects` and compares if the path to the deepest nested objects (excluding their properties)
+ * are present in the provided `allowedJoinsSet`.
+ */
+export function validateNestedOrderBy(orderByObjects: any[], allowedJoinsSet: Set<string>) {
+    const lastFragmentRegex = /\.?[^.]+$/;
+    for (let i = 0; i < orderByObjects.length; i++) {
+        traverse(orderByObjects[i], (context) => {
+            const { value, meta } = context;
+            const isLeaf = !(value instanceof Object); // nulls and non-objects are final nodes, except when using 'in' or 'notIn'
+            if (isLeaf) {
+                // leaf paths are the longest
+                const leafPath = meta.currentPath!;
+                const pathWithoutLastFragment = leafPath.replace(lastFragmentRegex, '');
+
+                const isAllowed =
+                    !pathWithoutLastFragment || allowedJoinsSet.has(pathWithoutLastFragment);
+                if (!isAllowed) {
+                    throw new ForbiddenException(
+                        `Join relation not allowed: ${pathWithoutLastFragment}`,
+                    );
+                }
+            }
+        });
+    }
 }
 
 /**

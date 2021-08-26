@@ -100,7 +100,7 @@ module.exports = {
         },
         // blog: {
         //   showReadingTime: true,
-        //   // Please change this to your repo. TODO!
+        //   // Please change this to your repo.
         //   editUrl:
         //     'https://github.com/kepelrs/nestjs-prisma-crud/edit/master/website/blog/',
         // },

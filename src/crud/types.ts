@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 export type PaginationDefaults = {
     pageSize: number;
-    orderBy: any;
+    orderBy: any[];
 };
 
 export type PrismaTransaction = Omit<
@@ -14,7 +14,7 @@ export type CrudQuery = {
     where?: CrudWhere;
     joins?: string[];
     select?: { only?: string[]; except?: string[] };
-    orderBy?: object;
+    orderBy?: any[];
     page?: number;
     pageSize?: number;
 };

@@ -8,6 +8,7 @@ import {
     getAllJoinSubsets,
     transformForNestedCreate,
     transformJoinsToInclude,
+    validateNestedOrderBy,
     validateNestedWhere,
 } from './helpers';
 import { CrudMethodOpts, PaginationDefaults, CrudServiceOpts, CrudQuery, CrudWhere } from './types';
@@ -109,12 +110,13 @@ export class PrismaCrudService {
         return where;
     }
 
+    // TODO: refactor: move all parsing and validation logic into separate classes
     private getAndValidatePagination(
         crudQuery: CrudQuery,
     ): {
         skip: number;
         take: number;
-        orderBy: any;
+        orderBy: any[];
         page: number;
         pageSize: number;
     } {
@@ -122,7 +124,9 @@ export class PrismaCrudService {
         let { page, pageSize, orderBy } = crudQuery;
         page = +page! > 0 ? +page! : 1;
         pageSize = +pageSize! > 0 ? +pageSize! : this.paginationDefaults.pageSize;
-        orderBy = orderBy instanceof Object ? orderBy : this.paginationDefaults.orderBy;
+        orderBy = orderBy instanceof Array ? orderBy : this.paginationDefaults.orderBy;
+        validateNestedOrderBy(orderBy, this.allowedJoinsSet);
+
         const paginationObj = {
             skip: (page - 1) * pageSize,
             take: pageSize,
@@ -175,6 +179,7 @@ export class PrismaCrudService {
         let matches = await repo.findMany({
             where: { ...where },
             ...this.getIncludes(parsedCrudQuery.joins),
+            orderBy,
             skip,
             take,
         });

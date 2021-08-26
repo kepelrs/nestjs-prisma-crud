@@ -14,6 +14,12 @@ import { CommentsService } from './comments.service';
 export class CommentsController {
     constructor(private readonly commentsService: CommentsService) {}
 
+    @Get()
+    async getEveryone(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany({ crudQuery });
+        return match;
+    }
+
     @Get(':id')
     async findOne(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
         const match = await this.commentsService.findOne(id, { crudQuery });

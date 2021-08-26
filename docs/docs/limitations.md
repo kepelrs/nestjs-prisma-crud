@@ -28,7 +28,6 @@ hide_title: true
         -   [ ] Configurable pagination defaults (pageSize min/max)
         -   [ ] OrderBy validation
     -   [x] Allow complex where
-        -   [ ] throw 400 instead of 500 for invalid .where
 -   [x] Access control policy strategy
     -   [x] Default utility guards
     -   [x] Rename crudQ

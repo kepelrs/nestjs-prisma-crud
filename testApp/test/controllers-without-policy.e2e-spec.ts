@@ -334,7 +334,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                         expect(res.body?.pageCount).toEqual(
                             Math.ceil(NUMBER_OF_TEST_USER_SEEDS / 25),
                         );
-                        expect(res.body?.orderBy).toEqual([{ id: 'asc' }]); // TODO: Review if server validation is needed/possible
+                        expect(res.body?.orderBy).toEqual([{ id: 'asc' }]);
                     });
             });
 
@@ -381,6 +381,44 @@ describe('CRUD controllers (without policy) e2e', () => {
                         expect(res.body?.pageSize).toEqual(1);
                         expect(res.body?.pageCount).toEqual(0);
                     });
+            });
+
+            describe('orderBy', () => {
+                it('asc works', async () => {
+                    const orderBy = [{ id: 'asc' }];
+                    await request(app.getHttpServer())
+                        .get(`/comments`)
+                        .query({ crudQuery: JSON.stringify({ orderBy }) })
+                        .expect(200)
+                        .then((res) => {
+                            expect(res.body?.data.length).toEqual(NUMBER_OF_TEST_USER_SEEDS);
+                            expect(res.body?.orderBy).toEqual(orderBy);
+                            const [result1, result2] = res?.body?.data;
+                            expect(result1.id < result2.id).toEqual(true);
+                        });
+                });
+
+                it('desc works', async () => {
+                    const orderBy = [{ id: 'desc' }];
+                    await request(app.getHttpServer())
+                        .get(`/comments`)
+                        .query({ crudQuery: JSON.stringify({ orderBy }) })
+                        .expect(200)
+                        .then((res) => {
+                            expect(res.body?.data.length).toEqual(NUMBER_OF_TEST_USER_SEEDS);
+                            expect(res.body?.orderBy).toEqual(orderBy);
+                            const [result1, result2] = res?.body?.data;
+                            expect(result1.id > result2.id).toEqual(true);
+                        });
+                });
+
+                it('throws if orderBy is deeper than allowedJoins', async () => {
+                    const orderBy = [{ post: { author: { id: 'desc' } } }];
+                    await request(app.getHttpServer())
+                        .get(`/comments`)
+                        .query({ crudQuery: JSON.stringify({ orderBy }) })
+                        .expect(403);
+                });
             });
         });
 
@@ -839,7 +877,7 @@ describe('CRUD controllers (without policy) e2e', () => {
             let users;
             await request(app.getHttpServer())
                 .get(`/users`)
-                .expect(200) // TODO: We may want to throw exception here
+                .expect(200) // TODO: We may want to throw exception here or document
                 .then((res) => {
                     users = res.body.data;
                 });
@@ -852,7 +890,7 @@ describe('CRUD controllers (without policy) e2e', () => {
             await request(app.getHttpServer())
                 .patch(`/users/${user1.id}`)
                 .send(user1)
-                .expect(200) // TODO: We may want to throw exception here
+                .expect(200) // TODO: We may want to throw exception here or document
                 .then((res) => {
                     expect(res?.body?.posts[0].comments.length).toBe(commentCount);
                 });
@@ -1292,7 +1330,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     password: 'this value should not come in response',
                     country: countries[0],
                 })
-                .expect(500) // TODO: use prisma validator, throw 400 instead of 500
+                .expect(500)
                 .then(async (_res) => {
                     const logsCountAfter = await prismaService.auditLog.count();
                     expect(logsCountAfter).toEqual(logsCountBefore + 1);
