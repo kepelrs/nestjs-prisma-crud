@@ -126,6 +126,13 @@ module.exports = {
                   src: 'https://stats.arockhub.com/js/plausible.js',
                 },
               },
+              {
+                tagName: 'meta',
+                attributes: {
+                  name: 'google-site-verification',
+                  content: 'kEP1DLqvGgE4HgyhXdvoOyfnVsXlNef1BRLCYecLDms',
+                },
+              },
             ],
           };
         },

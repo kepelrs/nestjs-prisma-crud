@@ -1,5 +1,7 @@
 {
     "version": "0.1.1",
+    "description": "CRUD package for NestJS and Prisma2",
+    "homepage": "https://kepelrs.github.io/nestjs-prisma-crud",
     "license": "MIT",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
