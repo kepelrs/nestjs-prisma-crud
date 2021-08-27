@@ -5,39 +5,12 @@ import {
     Injectable,
     NestInterceptor,
     NotImplementedException,
-    SetMetadata,
 } from '@nestjs/common';
 import { ModuleRef, Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { AllowedRoles, GetRolesFunction, RBAC } from './builtin-policies';
-
-export const ACCESS_POLICY_OPTS_KEY = 'ACCESS_POLICY_OPTS_KEY';
-export const POLICY_KEY = 'ACCESS_POLICY_METADATA_KEY';
-
-export type PolicyMethod = (
-    ctx: ExecutionContext,
-    authData: any,
-    moduleRef: ModuleRef,
-) => void | any;
-type AccessPolicyConfig = [AllowedRoles, ...PolicyMethod[]];
-
-export interface AccessPolicyInterceptorOpts {
-    authDataKey: string;
-    getRolesFromAuthDataFn: GetRolesFunction;
-    strictMode: boolean;
-}
-
-/**
- * Example usage:
- *
- * ```
- * > @AccessPolicy(config)
- * > @Controller('my-route')
- * > export class MyController {}
- * ```
- */
-export const AccessPolicy = (...policyConfigs: AccessPolicyConfig) =>
-    SetMetadata(POLICY_KEY, policyConfigs);
+import { RBAC } from './builtin-policies';
+import { ACCESS_POLICY_OPTS_KEY, POLICY_KEY } from './constants';
+import { AccessPolicyConfig, AccessPolicyInterceptorOpts, PolicyMethod } from './types';
 
 @Injectable()
 export class AccessPolicyInterceptor implements NestInterceptor {

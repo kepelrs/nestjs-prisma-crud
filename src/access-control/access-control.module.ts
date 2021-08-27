@@ -1,10 +1,8 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import {
-    AccessPolicyInterceptor,
-    ACCESS_POLICY_OPTS_KEY,
-    AccessPolicyInterceptorOpts,
-} from './access-policy.interceptor';
+import { AccessPolicyInterceptorOpts } from './types';
+import { ACCESS_POLICY_OPTS_KEY } from './constants';
+import { AccessPolicyInterceptor } from './access-policy.interceptor';
 
 @Module({})
 export class AccessControlModule {

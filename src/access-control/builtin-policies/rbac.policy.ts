@@ -1,14 +1,7 @@
 import { ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import {
-    AccessPolicyInterceptorOpts,
-    ACCESS_POLICY_OPTS_KEY,
-    PolicyMethod,
-} from '../access-policy.interceptor';
-
-type AllowedRolesId = string[] | number[] | Set<string> | Set<number>;
-export type GetRolesReturnType = string[] | number[] | Set<string> | Set<number> | null | undefined;
-export type GetRolesFunction = (request: any) => GetRolesReturnType;
+import { ACCESS_POLICY_OPTS_KEY } from '../constants';
+import { AccessPolicyInterceptorOpts, AllowedRoles, AllowedRolesId, PolicyMethod } from '../types';
 
 export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
     allowedRoles: AllowedRoles<T>,
@@ -55,8 +48,3 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
 
     throw new ForbiddenException(`User's roles do not grant access to the requested resource.`);
 };
-
-export type AllowedRoles<T extends AllowedRolesId = AllowedRolesId> =
-    | 'everyone'
-    | 'anyRole'
-    | T;

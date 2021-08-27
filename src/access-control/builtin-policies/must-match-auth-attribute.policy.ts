@@ -4,7 +4,9 @@ import {
     UnauthorizedException,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { createWhereObject, CrudQuery, getNestedProperty, PolicyMethod } from '../..';
+import { PolicyMethod } from '../';
+import { CrudQuery } from '../../crud/types';
+import { createWhereObject, getNestedProperty } from '../../crud/utils';
 
 export const MustMatchAuthAttribute = (
     entityAttributePath: string,
