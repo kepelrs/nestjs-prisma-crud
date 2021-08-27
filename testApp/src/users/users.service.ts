@@ -10,6 +10,7 @@ export class UsersService extends PrismaCrudService {
             model: 'user',
             allowedJoins: ['posts.comments', 'profile', 'country', 'entitiesWithIntId'],
             forbiddenPaths: ['password', /comments\.\d+\.exampleForbiddenProperty$/],
+            paginationConfig: { maxPageSize: 3 },
         });
     }
 }

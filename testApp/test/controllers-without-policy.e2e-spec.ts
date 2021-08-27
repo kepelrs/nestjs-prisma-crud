@@ -327,12 +327,12 @@ describe('CRUD controllers (without policy) e2e', () => {
                     .get(`/users`)
                     .expect(200)
                     .then((res) => {
-                        expect(res.body?.data.length).toEqual(NUMBER_OF_TEST_USER_SEEDS);
+                        expect(res.body?.data.length).toEqual(3);
                         expect(res.body?.totalRecords).toEqual(NUMBER_OF_TEST_USER_SEEDS);
                         expect(res.body?.page).toEqual(1);
-                        expect(res.body?.pageSize).toEqual(25);
+                        expect(res.body?.pageSize).toEqual(3);
                         expect(res.body?.pageCount).toEqual(
-                            Math.ceil(NUMBER_OF_TEST_USER_SEEDS / 25),
+                            Math.ceil(NUMBER_OF_TEST_USER_SEEDS / 3),
                         );
                         expect(res.body?.orderBy).toEqual([{ id: 'asc' }]);
                     });
@@ -364,6 +364,22 @@ describe('CRUD controllers (without policy) e2e', () => {
                         expect(res.body?.pageSize).toEqual(1);
                         expect(res.body?.pageCount).toEqual(NUMBER_OF_TEST_USER_SEEDS); // NUMBER_OF_TEST_USER_SEEDS since page size is 1
                         expect(res.body?.data[0].id).not.toEqual(user1.id);
+                    });
+            });
+
+            it('pagination .pageSize cannot go beyond maxPageSize', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({ crudQuery: JSON.stringify({ page: 1, pageSize: 25 }) })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data.length).toEqual(3);
+                        expect(res.body?.totalRecords).toEqual(NUMBER_OF_TEST_USER_SEEDS);
+                        expect(res.body?.page).toEqual(1);
+                        expect(res.body?.pageSize).toEqual(3);
+                        expect(res.body?.pageCount).toEqual(
+                            Math.ceil(NUMBER_OF_TEST_USER_SEEDS / 3),
+                        );
                     });
             });
 

@@ -11,9 +11,9 @@ import {
     validateNestedOrderBy,
     validateNestedWhere,
 } from './helpers';
-import { CrudMethodOpts, PaginationDefaults, CrudServiceOpts, CrudQuery, CrudWhere } from './types';
+import { CrudMethodOpts, CrudQuery, CrudServiceOpts, CrudWhere, PaginationConfig } from './types';
 
-export const defaultCrudMethodOpts: CrudMethodOpts = {
+const defaultCrudMethodOpts: CrudMethodOpts = {
     crudQuery: {},
     excludeForbiddenPaths: true,
     prismaTransaction: undefined,
@@ -21,7 +21,7 @@ export const defaultCrudMethodOpts: CrudMethodOpts = {
 
 export class PrismaCrudService {
     private defaultIncludes: any;
-    private paginationDefaults: PaginationDefaults;
+    private paginationConfig: Required<PaginationConfig>;
     private allowedJoinsSet: Set<string>;
     private defaultJoins: string[];
     private prismaClient: any;
@@ -35,19 +35,19 @@ export class PrismaCrudService {
         this.idPropertyName = args.idPropertyName || 'id';
 
         this.allowedJoinsSet = getAllJoinSubsets(args.allowedJoins);
-        this.defaultJoins = this.getSanitizedDefaultJoins(args.defaultJoins, this.allowedJoinsSet);
+        this.defaultJoins = this.createSanitizedDefaultJoins(
+            args.defaultJoins,
+            this.allowedJoinsSet,
+        );
 
         this.defaultIncludes = transformJoinsToInclude(this.defaultJoins);
 
         this.forbiddenPaths = args.forbiddenPaths || [];
 
-        this.paginationDefaults = {
-            pageSize: 25,
-            orderBy: [{ [this.idPropertyName]: 'asc' }],
-        };
+        this.paginationConfig = this.createPaginationConfig(args.paginationConfig);
     }
 
-    private getSanitizedDefaultJoins(
+    private createSanitizedDefaultJoins(
         defaultJoins: string[] | undefined | null,
         allowedJoinsSet: Set<string>,
     ): string[] {
@@ -65,6 +65,18 @@ export class PrismaCrudService {
         }
 
         return Array.from(new Set(defaultJoins));
+    }
+
+    private createPaginationConfig(userConfig?: PaginationConfig): Required<PaginationConfig> {
+        const PAGINATION_DEFAULTS: Required<PaginationConfig> = {
+            defaultPageSize: 25,
+            maxPageSize: 100,
+            defaultOrderBy: [{ [this.idPropertyName]: 'asc' }],
+        };
+
+        // TODO: Validate values are not bellow 1 and etc
+        const paginationConfig = Object.assign({}, PAGINATION_DEFAULTS, userConfig);
+        return paginationConfig;
     }
 
     private getIncludes(requestSpecificIncludes: string[] | undefined | null) {
@@ -98,9 +110,9 @@ export class PrismaCrudService {
             where: {},
             joins: this.defaultJoins,
             select: {},
-            orderBy: this.paginationDefaults.orderBy,
+            orderBy: this.paginationConfig.defaultOrderBy,
             page: 1,
-            pageSize: this.paginationDefaults.pageSize,
+            pageSize: this.paginationConfig.defaultPageSize,
         };
     }
 
@@ -123,8 +135,12 @@ export class PrismaCrudService {
         // TODO: Validate user inputs!!
         let { page, pageSize, orderBy } = crudQuery;
         page = +page! > 0 ? +page! : 1;
-        pageSize = +pageSize! > 0 ? +pageSize! : this.paginationDefaults.pageSize;
-        orderBy = orderBy instanceof Array ? orderBy : this.paginationDefaults.orderBy;
+        pageSize = +pageSize! > 0 ? +pageSize! : this.paginationConfig.defaultPageSize;
+        pageSize =
+            pageSize > this.paginationConfig.maxPageSize
+                ? this.paginationConfig.maxPageSize
+                : pageSize;
+        orderBy = orderBy instanceof Array ? orderBy : this.paginationConfig.defaultOrderBy;
         validateNestedOrderBy(orderBy, this.allowedJoinsSet);
 
         const paginationObj = {

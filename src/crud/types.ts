@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 
-export type PaginationDefaults = {
-    pageSize: number;
-    orderBy: any[];
+export type PaginationConfig = {
+    defaultPageSize?: number;
+    maxPageSize?: number;
+    defaultOrderBy?: { [key: string]: 'asc' | 'desc' }[];
 };
 
 export type PrismaTransaction = Omit<
@@ -43,4 +44,5 @@ export interface CrudServiceOpts {
     forbiddenPaths?: Array<string | RegExp>;
     /** The name of the id field in your prisma schema. Defaults to 'id' */
     idPropertyName?: string;
+    paginationConfig?: PaginationConfig;
 }

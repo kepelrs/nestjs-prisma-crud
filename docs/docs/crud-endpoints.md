@@ -119,6 +119,7 @@ export interface CrudServiceOpts {
     defaultJoins?: string[];
     forbiddenPaths?: Array<string | RegExp>;
     idPropertyName?: string;
+    paginationConfig?: PaginationConfig;
 }
 ```
 
@@ -213,6 +214,39 @@ The name of the model's primary key.
 
 **Example:** `uuid`<br/>
 **Default:** `id`
+
+<hr/>
+
+### opts.paginationConfig
+
+**Type:** `PaginationConfig`
+
+```ts
+export type PaginationConfig = {
+    defaultPageSize?: number;
+    maxPageSize?: number;
+    defaultOrderBy?: { [key: string]: 'asc' | 'desc' }[];
+};
+```
+
+<br/>
+
+**Mandatory:** No<br/>
+**Description:**
+
+**`defaultPageSize`**: when clients do not specify a [pageSize](./client-side#crudquerypagesize), this option will be used.<br/>
+**`maxPageSize`**: client's [pageSize](./client-side#crudquerypagesize) option will be capped at this value.<br/>
+**`defaultOrderBy`**: when clients do not specify a [sorting field](./client-side#crudqueryorderby), this option will be used by default. <br/>
+
+**Default:**
+
+```ts
+const PAGINATION_DEFAULTS: PaginationConfig = {
+    defaultPageSize: 25,
+    maxPageSize: 100,
+    defaultOrderBy: [{ [this.idPropertyName]: 'asc' }],
+};
+```
 
 <hr/>
 

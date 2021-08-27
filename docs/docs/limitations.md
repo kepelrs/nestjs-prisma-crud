@@ -25,7 +25,7 @@ hide_title: true
     -   [x] Allow specifying joins from frontend (as long as allowed on backend)
     -   [x] Allow clients to specify select fields (only, except).
     -   [x] Pagination
-        -   [ ] Configurable pagination defaults (pageSize min/max)
+        -   [x] Configurable pagination defaults (pageSize min/max)
         -   [x] OrderBy validation
     -   [x] Allow complex where
 -   [x] Access control policy strategy

@@ -1,7 +1,7 @@
 import { Post, PrismaClient, User, Comment, Country, Profile } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export const NUMBER_OF_TEST_USER_SEEDS = 2;
+export const NUMBER_OF_TEST_USER_SEEDS = 4;
 /** seedEntityIds are used as db record ids and as some of their string properties as well */
 export const seedEntityIds = [];
 /** Alias for seedEntityIds */
