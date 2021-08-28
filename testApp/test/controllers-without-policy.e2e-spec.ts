@@ -338,7 +338,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     });
             });
 
-            it('pagination .page and .pageSize work', async () => {
+            it('.page and .pageSize work', async () => {
                 let user1;
                 await request(app.getHttpServer())
                     .get(`/users`)
@@ -367,7 +367,21 @@ describe('CRUD controllers (without policy) e2e', () => {
                     });
             });
 
-            it('pagination .pageSize cannot go beyond maxPageSize', async () => {
+            it('.pageSize cannot be negative', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({ crudQuery: JSON.stringify({ page: 1, pageSize: -25 }) })
+                    .expect(400);
+            });
+
+            it('.page cannot be negative', async () => {
+                await request(app.getHttpServer())
+                    .get(`/users`)
+                    .query({ crudQuery: JSON.stringify({ page: -1, pageSize: 25 }) })
+                    .expect(400);
+            });
+
+            it('.pageSize cannot go beyond maxPageSize', async () => {
                 await request(app.getHttpServer())
                     .get(`/users`)
                     .query({ crudQuery: JSON.stringify({ page: 1, pageSize: 25 }) })
@@ -383,7 +397,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     });
             });
 
-            it('pagination works when result set is empty', async () => {
+            it('works when result set is empty', async () => {
                 await request(app.getHttpServer())
                     .get(`/users`)
                     .query({

@@ -57,6 +57,7 @@
         "reflect-metadata": "^0.1.13"
     },
     "dependencies": {
+        "joi": "^17.4.2",
         "object-traversal": "^0.1.2"
     },
     "np": {

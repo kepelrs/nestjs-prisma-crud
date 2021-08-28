@@ -65,7 +65,6 @@ export class PrismaCrudService {
             defaultOrderBy: [{ [this.idPropertyName]: 'asc' }],
         };
 
-        // TODO: Validate values are not bellow 1 and etc
         const paginationConfig = Object.assign({}, PAGINATION_DEFAULTS, userConfig);
         return paginationConfig;
     }

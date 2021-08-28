@@ -1,10 +1,4 @@
-import { ForbiddenException } from '@nestjs/common';
-import {
-    plainToPrismaNestedQuery,
-    transformJoinsToInclude,
-    validateNestedOrderBy,
-    validateNestedWhere,
-} from './helpers';
+import { plainToPrismaNestedQuery, transformJoinsToInclude } from './helpers';
 import {
     CrudQuery,
     CrudQueryFull,
@@ -13,6 +7,12 @@ import {
     PaginationConfig,
     PaginationData,
 } from './types';
+import {
+    validateCrudQueryFull,
+    validateJoins,
+    validateNestedOrderBy,
+    validateNestedWhere,
+} from './validations';
 
 export class PrismaQueryBuilder {
     private DEFAULT_CRUD_QUERY: CrudQueryFull = {
@@ -34,19 +34,12 @@ export class PrismaQueryBuilder {
     ) {}
 
     private buildPagination(parsedCrudQuery: CrudQueryFull): PaginationData {
-        // TODO: Validate user inputs!!
         let { page, pageSize, orderBy } = parsedCrudQuery;
-        page = +page! > 0 ? +page! : 1;
-        pageSize =
-            +pageSize! > 0 ? +pageSize! : this.crudServiceOpts.paginationConfig.defaultPageSize;
         pageSize =
             pageSize > this.crudServiceOpts.paginationConfig.maxPageSize
                 ? this.crudServiceOpts.paginationConfig.maxPageSize
                 : pageSize;
-        orderBy =
-            orderBy instanceof Array
-                ? orderBy
-                : this.crudServiceOpts.paginationConfig.defaultOrderBy;
+
         validateNestedOrderBy(orderBy, this.crudServiceOpts.allowedJoinsSet);
 
         const paginationObj = {
@@ -67,14 +60,14 @@ export class PrismaQueryBuilder {
     private buildFindQuery(parsedCrudQuery: CrudQueryFull): FindOneQuery;
     private buildFindQuery(parsedCrudQuery: CrudQueryFull, pagination?: PaginationData) {
         validateNestedWhere(parsedCrudQuery.where, this.crudServiceOpts.allowedJoinsSet);
-        // TODO: split buildIncludes into validate and build functions
-        const includes = this.buildIncludes(parsedCrudQuery.joins);
+        validateJoins(parsedCrudQuery.joins, this.crudServiceOpts.allowedJoinsSet);
+        const includes = transformJoinsToInclude(Array.from(new Set(parsedCrudQuery.joins)));
 
         const prismaFindOneQuery: FindOneQuery = {
             ...includes,
             where: parsedCrudQuery.where,
         };
-        let prismaFindManyQuery: FindManyQuery = null as FindManyQuery;
+        let prismaFindManyQuery: FindManyQuery = (null as unknown) as FindManyQuery;
         if (pagination) {
             prismaFindManyQuery = { ...prismaFindOneQuery } as FindManyQuery;
             prismaFindManyQuery.orderBy = pagination.orderBy;
@@ -85,28 +78,20 @@ export class PrismaQueryBuilder {
         return prismaFindManyQuery || prismaFindOneQuery;
     }
 
-    private buildIncludes(requestSpecificIncludes: string[]) {
-        const allowedJoins = [];
-        for (let i = 0; i < requestSpecificIncludes.length; i++) {
-            const reqInclude = requestSpecificIncludes[i];
-            if (this.crudServiceOpts.allowedJoinsSet.has(reqInclude)) {
-                allowedJoins.push(reqInclude);
-            } else {
-                throw new ForbiddenException(`Join relation not allowed: ${reqInclude}`);
-            }
-        }
-
-        return transformJoinsToInclude(Array.from(new Set(allowedJoins)));
-    }
-
     public parseCrudQuery(crudQuery: CrudQuery): CrudQueryFull {
         if (typeof crudQuery === 'string') {
             crudQuery = JSON.parse(crudQuery);
         }
 
-        crudQuery = Object.assign({}, this.DEFAULT_CRUD_QUERY, crudQuery);
+        const crudQueryFull = Object.assign(
+            {},
+            this.DEFAULT_CRUD_QUERY,
+            crudQuery,
+        ) as CrudQueryFull;
 
-        return crudQuery as CrudQueryFull;
+        validateCrudQueryFull(crudQueryFull);
+
+        return crudQueryFull;
     }
 
     public buildFindManyQuery(parsedCrudQuery: CrudQueryFull) {
