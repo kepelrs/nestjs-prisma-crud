@@ -123,7 +123,7 @@ export interface CrudServiceOpts {
 }
 ```
 
-Bellow you can find a description of each option.
+Below you can find a description of each option.
 
 ### opts.model
 
@@ -273,7 +273,7 @@ There are times when we want to extend a CRUD controller's functionality and per
 
 Suppose you have a `SalesController` where, aside from the CRUD `sale` operations, you also wish to increment and decrement the balance of the users involved.
 
-The example bellow achieves atomicity by following the following steps:
+The example below achieves atomicity by following the following steps:
 
 1. Start a [prisma interactive transaction](https://www.prisma.io/docs/concepts/components/prisma-client/transactions#interactive-transactions-in-preview).
 2. Pass `prismaTransaction` into the `PrismaCrudService` methods.

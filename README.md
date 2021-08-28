@@ -12,7 +12,7 @@ CRUD utility for simple REST use cases. Builds on top of [NestJS](https://github
 
 ## Why
 
-When building REST API's there is common functionality that we would prefer not to implement again and again. This package offers minimal and opinionated out of the box solutions for some of those (see [features](#features) bellow).
+When building REST API's there is common functionality that we would prefer not to implement again and again. This package offers minimal and opinionated out of the box solutions for some of those (see [features](#features) below).
 
 ## ✔ Features
 

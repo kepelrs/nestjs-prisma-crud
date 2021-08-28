@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # Built-in Policies
 
-`nestjs-prisma-crud` comes with built in policies that can serve a large portion of common use cases. Bellow you can learn more about them.
+`nestjs-prisma-crud` comes with built in policies that can serve a large portion of common use cases. Below you can learn more about them.
 
 For more complex scenarios you can also [create your own custom policies](./custom-policy).
 
@@ -30,7 +30,7 @@ MustMatchAuthAttribute(entityAttributePath: string, authDataAttributePath: strin
 ### Example usage
 
 :::danger Important!
-Passing `crudQuery` into your function call is mandatory for `MustMatchAuthAttribute` to work. See bellow.
+Passing `crudQuery` into your function call is mandatory for `MustMatchAuthAttribute` to work. See below.
 :::
 
 ```ts title=post.controller.ts {5,7}
@@ -65,7 +65,7 @@ MustMatchValue(entityAttributePath: string, targetValue: any) => PolicyMethod
 ### Example usage
 
 :::danger Important!
-Passing `crudQuery` into your function call is mandatory for `MustMatchValue` to work. See bellow.
+Passing `crudQuery` into your function call is mandatory for `MustMatchValue` to work. See below.
 :::
 
 ```ts title=post.controller.ts {5,7}

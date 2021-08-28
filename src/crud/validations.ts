@@ -11,7 +11,7 @@ export function validateNestedWhere(
     whereObject: any,
     allowedJoinsSet: Set<string>,
 
-    // TODO: Document that bellow keywords should be forbidden in all models
+    // TODO: Document that below keywords should be forbidden in all models
     prismaBlacklistKeywords = [
         // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries
         'some',

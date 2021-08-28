@@ -23,7 +23,7 @@ A short summary of what the parameters mean:
 ## Recipes
 
 :::tip
-Examples bellow only seek to illustrate the custom policies capabilities.
+Examples below only seek to illustrate the custom policies capabilities.
 
 The features they implement would likely not be implemented like that in practice!!
 :::
@@ -137,7 +137,7 @@ In this section we are going to write a policy that modifies the final prisma qu
 
 This is extremely useful when a user must be granted access to only a subset of records from a given table. This method ensures that we scope the client's access while not breaking the requested sorting/filtering/pagination.
 
-Bellow is a policy that only retrieves non-draft `parties` from the database. The highlighted `additionalConstraints` can be any [prisma filter object](https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#filter-conditions-and-operators) .
+Below is a policy that only retrieves non-draft `parties` from the database. The highlighted `additionalConstraints` can be any [prisma filter object](https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#filter-conditions-and-operators) .
 
 #### Implementation
 

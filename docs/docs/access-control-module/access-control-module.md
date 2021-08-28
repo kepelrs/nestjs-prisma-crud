@@ -32,7 +32,7 @@ export interface AccessPolicyInterceptorOpts {
 }
 ```
 
-Bellow you can find the documentation for each option.
+Below you can find the documentation for each option.
 
 ### opts.authDataKey
 
