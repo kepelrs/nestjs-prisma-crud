@@ -8,7 +8,7 @@ CRUD utility for simple REST use cases. Builds on top of [NestJS](https://github
 ## Installation
 
     npm i nestjs-prisma-crud --save
-    npm i -g nestjs-prisma-crud-schematics
+    npm i nestjs-prisma-crud-schematics --save-dev
 
 ## Why
 
@@ -42,7 +42,7 @@ An overview of the provided functionality:
 
     ```
     npm i nestjs-prisma-crud
-    npm i -g nestjs-prisma-crud-schematics
+    npm i nestjs-prisma-crud-schematics --save-dev
     ```
 
 2. Generate the entire crud module with a single command (replace **post** with your entity name):

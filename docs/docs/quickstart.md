@@ -14,7 +14,7 @@ This guide assumes you have already setup **NestJS** and **Prisma**. See [Gettin
 
     ```
     npm i nestjs-prisma-crud --save
-    npm i -g nestjs-prisma-crud-schematics
+    npm i nestjs-prisma-crud-schematics --save-dev
     ```
 
 2. Generate the entire crud module with the following command (replace **post** with your table's name from your Prisma schema):

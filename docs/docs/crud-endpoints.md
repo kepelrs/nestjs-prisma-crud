@@ -16,7 +16,7 @@ We recommend using the schematics package to quickly scaffold your CRUD modules:
 1. Install `nestjs-prisma-crud-schematics` globally:
 
     ```
-    npm i -g nestjs-prisma-crud-schematics
+    npm i nestjs-prisma-crud-schematics --save-dev
     ```
 
 2. Scaffold the entire module and CRUD endpoints (replace **post** with your entity name):
