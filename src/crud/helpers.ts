@@ -3,11 +3,11 @@ import { traverse } from 'object-traversal';
 import { getNestedProperty } from './utils';
 
 /**
- * Converts raw json structures into prisma's nested .create syntax
+ * Converts raw json structures into prisma's nested .create/.update syntax
  * Turns  {name: 'hello', friends: [{name: 'rick'}]}
  * into   {name: 'hello', friends: {create: [{name: 'rick'}]}}
  */
-export function transformForNestedCreate(
+export function plainToPrismaNestedQuery(
     objectToPersist: any,
     currentPersistedObject: any,
     allowedJoinSet: Set<string>,

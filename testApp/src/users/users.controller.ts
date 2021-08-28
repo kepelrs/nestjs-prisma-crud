@@ -9,7 +9,7 @@ import {
     Post,
     Query,
 } from '@nestjs/common';
-import { AccessPolicy, PrismaTransaction } from 'nestjs-prisma-crud';
+import { AccessPolicy } from 'nestjs-prisma-crud';
 import { RoleID } from '../authentication.middleware';
 import { PrismaService } from '../prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -94,7 +94,7 @@ export class TransactionUsersController {
         private readonly prismaService: PrismaService,
     ) {}
 
-    private createLog(logContent: string, prismaTransaction?: PrismaTransaction) {
+    private createLog(logContent: string, prismaTransaction?: any) {
         prismaTransaction = prismaTransaction || this.prismaService;
 
         return prismaTransaction.auditLog.create({

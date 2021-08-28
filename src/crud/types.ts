@@ -6,18 +6,36 @@ export type PaginationConfig = {
     defaultOrderBy?: { [key: string]: 'asc' | 'desc' }[];
 };
 
-export type PrismaTransaction = Omit<
-    PrismaClient,
-    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
->;
-
-export type CrudQuery = {
+export type CrudQueryObj = {
     where?: CrudWhere;
     joins?: string[];
     select?: { only?: string[]; except?: string[] };
     orderBy?: any[];
     page?: number;
     pageSize?: number;
+};
+
+export type CrudQueryFull = Required<CrudQueryObj>;
+
+export type CrudQuery = CrudQueryObj | string | null | undefined;
+
+export type FindOneQuery = {
+    where: CrudWhere;
+    include?: any;
+};
+
+export type FindManyQuery = FindOneQuery & {
+    orderBy: any[];
+    skip: number;
+    take: number;
+};
+
+export type PaginationData = {
+    skip: number;
+    take: number;
+    orderBy: any[];
+    page: number;
+    pageSize: number;
 };
 
 export type CrudWhere = any;
@@ -30,9 +48,9 @@ export type CrudMethodOpts = {
      *
      * This helps with codebase intuition about `nestjs-prisma-crud`'s inner workings, as well as prevents serious accidental mistakes related to access control (ie. forgetting to pass crudQuery).
      */
-    crudQuery: CrudQuery | string | null | undefined;
+    crudQuery: CrudQuery;
     excludeForbiddenPaths?: boolean;
-    prismaTransaction?: PrismaTransaction;
+    prismaTransaction?: any; // TODO: Import type when available
 };
 
 export interface CrudServiceOpts {

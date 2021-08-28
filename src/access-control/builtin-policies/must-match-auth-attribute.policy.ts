@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { PolicyMethod } from '../';
-import { CrudQuery } from '../../crud/types';
+import { CrudQueryObj } from '../../crud/types';
 import { createWhereObject, getNestedProperty } from '../../crud/utils';
 
 export const MustMatchAuthAttribute = (
@@ -27,7 +27,7 @@ export const MustMatchAuthAttribute = (
         );
     }
 
-    const parsedCrudQuery: CrudQuery = crudQuery ? JSON.parse(crudQuery) : {};
+    const parsedCrudQuery: CrudQueryObj = crudQuery ? JSON.parse(crudQuery) : {};
     const originalWhere = parsedCrudQuery.where || {};
     parsedCrudQuery.where = {
         AND: [createWhereObject(entityAttributePath, targetValue), originalWhere],

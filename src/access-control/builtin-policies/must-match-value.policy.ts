@@ -1,7 +1,7 @@
 import { ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { PolicyMethod } from '../';
-import { CrudQuery } from '../../crud/types';
+import { CrudQueryObj } from '../../crud/types';
 import { createWhereObject } from '../../crud/utils';
 
 export const MustMatchValue = (entityAttributePath: string, targetValue: any): PolicyMethod => (
@@ -19,7 +19,7 @@ export const MustMatchValue = (entityAttributePath: string, targetValue: any): P
     const query = request.query;
     const crudQuery: string = query.crudQuery;
 
-    const parsedCrudQuery: CrudQuery = crudQuery ? JSON.parse(crudQuery) : {};
+    const parsedCrudQuery: CrudQueryObj = crudQuery ? JSON.parse(crudQuery) : {};
     const originalWhere = parsedCrudQuery.where || {};
     parsedCrudQuery.where = {
         AND: [createWhereObject(entityAttributePath, targetValue), originalWhere],
