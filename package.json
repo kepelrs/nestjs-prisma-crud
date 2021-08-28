@@ -1,5 +1,5 @@
 {
-    "version": "0.1.1",
+    "version": "1.0.0-beta.0",
     "description": "CRUD package for NestJS and Prisma2",
     "homepage": "https://kepelrs.github.io/nestjs-prisma-crud",
     "license": "MIT",
@@ -54,9 +54,9 @@
     "peerDependencies": {
         "@nestjs/common": "^8.0.0",
         "@nestjs/core": "^8.0.0",
-        "rxjs": "^7.3.0",
         "@prisma/client": "^2.25.0",
-        "reflect-metadata": "^0.1.13"
+        "reflect-metadata": "^0.1.13",
+        "rxjs": "^7.3.0"
     },
     "dependencies": {
         "joi": "^17.4.2",
