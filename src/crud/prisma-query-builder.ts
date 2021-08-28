@@ -15,14 +15,7 @@ import {
 } from './validations';
 
 export class PrismaQueryBuilder {
-    private DEFAULT_CRUD_QUERY: CrudQueryFull = {
-        where: {},
-        joins: this.crudServiceOpts.defaultJoins,
-        select: {},
-        orderBy: this.crudServiceOpts.paginationConfig.defaultOrderBy,
-        page: 1,
-        pageSize: this.crudServiceOpts.paginationConfig.defaultPageSize,
-    };
+    private DEFAULT_CRUD_QUERY: CrudQueryFull;
 
     constructor(
         private crudServiceOpts: {
@@ -31,7 +24,16 @@ export class PrismaQueryBuilder {
             idPropertyName: string;
             allowedJoinsSet: Set<string>;
         },
-    ) {}
+    ) {
+        this.DEFAULT_CRUD_QUERY = {
+            where: {},
+            joins: this.crudServiceOpts.defaultJoins,
+            select: {},
+            orderBy: this.crudServiceOpts.paginationConfig.defaultOrderBy,
+            page: 1,
+            pageSize: this.crudServiceOpts.paginationConfig.defaultPageSize,
+        };
+    }
 
     private buildPagination(parsedCrudQuery: CrudQueryFull): PaginationData {
         let { page, pageSize, orderBy } = parsedCrudQuery;
