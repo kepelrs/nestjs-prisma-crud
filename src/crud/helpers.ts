@@ -42,7 +42,7 @@ export function plainToPrismaNestedQuery(
             key = key!;
 
             if (!pathIsWithinAllowedJoins) {
-                throw new ForbiddenException();
+                throw new ForbiddenException('Provided nested relation is not allowed');
             }
 
             if (valueIsArray) {
