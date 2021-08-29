@@ -182,35 +182,39 @@ export function deleteObjectProperties(
         for (let i = 0; i < blacklistedPropertyPaths!.length; i++) {
             const deniedPath = blacklistedPropertyPaths![i];
 
-            let pathMatches = false;
+            let pathIsBlacklisted = false;
             if (typeof deniedPath === 'string') {
-                pathMatches = deniedPath === currentPath;
+                pathIsBlacklisted = deniedPath === currentPath;
             }
             if (deniedPath instanceof RegExp) {
-                pathMatches = deniedPath.test(currentPath);
+                pathIsBlacklisted = deniedPath.test(currentPath);
             }
 
-            if (pathMatches) {
+            if (pathIsBlacklisted) {
                 delete parent[key];
                 break;
             }
         }
 
-        // delete all paths that do not match whitelistedPropertyPaths
-        for (let i = 0; i < whitelistedPropertyPaths!.length; i++) {
-            const allowedPath = whitelistedPropertyPaths![i];
+        if (whitelistedPropertyPaths?.length) {
+            // delete all paths that do not match whitelistedPropertyPaths
+            let pathIsWhiteListed = false;
+            for (let i = 0; i < whitelistedPropertyPaths!.length; i++) {
+                const allowedPath = whitelistedPropertyPaths![i];
 
-            let pathMatches = false;
-            if (typeof allowedPath === 'string') {
-                pathMatches = allowedPath.startsWith(currentPath);
-            }
-            if (allowedPath instanceof RegExp) {
-                pathMatches = allowedPath.test(currentPath);
-            }
+                if (typeof allowedPath === 'string') {
+                    pathIsWhiteListed = allowedPath.startsWith(currentPath);
+                }
+                if (allowedPath instanceof RegExp) {
+                    pathIsWhiteListed = allowedPath.test(currentPath);
+                }
 
-            if (!pathMatches) {
+                if (pathIsWhiteListed) {
+                    break;
+                }
+            }
+            if (!pathIsWhiteListed) {
                 delete parent[key];
-                break;
             }
         }
     });

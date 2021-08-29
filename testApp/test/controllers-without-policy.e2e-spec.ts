@@ -500,13 +500,13 @@ describe('CRUD controllers (without policy) e2e', () => {
                 await request(app.getHttpServer())
                     .get(`/users`)
                     .query({
-                        crudQuery: JSON.stringify({ select: { only: ['email'] } }),
+                        crudQuery: JSON.stringify({ select: { only: ['email', 'id'] } }),
                     })
                     .expect(200)
                     .then((res) => {
                         const firstObject = res.body?.data[0];
                         const keys = Object.keys(firstObject);
-                        expect(keys).toEqual(['email']);
+                        expect(keys.sort()).toEqual(['email', 'id'].sort());
                     });
             });
 
@@ -514,12 +514,12 @@ describe('CRUD controllers (without policy) e2e', () => {
                 await request(app.getHttpServer())
                     .get(`/users/${needleString0}`)
                     .query({
-                        crudQuery: JSON.stringify({ select: { only: ['email'] } }),
+                        crudQuery: JSON.stringify({ select: { only: ['email', 'id'] } }),
                     })
                     .expect(200)
                     .then((res) => {
                         const keys = Object.keys(res.body);
-                        expect(keys).toEqual(['email']);
+                        expect(keys.sort()).toEqual(['email', 'id'].sort());
                     });
             });
         });
@@ -530,7 +530,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     .get(`/users`)
                     .query({
                         crudQuery: JSON.stringify({
-                            select: { only: ['posts.id'] },
+                            select: { only: ['posts.id', 'id'] },
                             joins: ['posts'],
                         }),
                     })
@@ -538,11 +538,11 @@ describe('CRUD controllers (without policy) e2e', () => {
                     .then((res) => {
                         const firstObject = res.body?.data[0];
                         const rootKeys = Object.keys(firstObject);
-                        expect(rootKeys).toEqual(['posts']);
+                        expect(rootKeys.sort()).toEqual(['posts', 'id'].sort());
 
                         const post = firstObject.posts[0];
                         const postKeys = Object.keys(post);
-                        expect(postKeys).toEqual(['id']);
+                        expect(postKeys.sort()).toEqual(['id'].sort());
                     });
             });
 
@@ -551,18 +551,18 @@ describe('CRUD controllers (without policy) e2e', () => {
                     .get(`/users/${needleString0}`)
                     .query({
                         crudQuery: JSON.stringify({
-                            select: { only: ['posts.id'] },
+                            select: { only: ['posts.id', 'id'] },
                             joins: ['posts'],
                         }),
                     })
                     .expect(200)
                     .then((res) => {
                         const rootKeys = Object.keys(res.body);
-                        expect(rootKeys).toEqual(['posts']);
+                        expect(rootKeys.sort()).toEqual(['posts', 'id'].sort());
 
                         const post = res.body.posts[0];
                         const postKeys = Object.keys(post);
-                        expect(postKeys).toEqual(['id']);
+                        expect(postKeys.sort()).toEqual(['id'].sort());
                     });
             });
 
@@ -1171,7 +1171,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                 });
         });
 
-        it('GET many forbiddenPaths can be ignored by function parameter', async () => {
+        it('GET many excludeForbiddenPaths can be ignored by function parameter', async () => {
             const userService = app.get(UsersService);
             const originalFindMany = userService.findMany;
             const mockedFindMany = function ({ ...opts }) {
@@ -1203,7 +1203,7 @@ describe('CRUD controllers (without policy) e2e', () => {
             }
         });
 
-        it('GET one forbiddenPaths can be ignored by function parameter', async () => {
+        it('GET one excludeForbiddenPaths can be ignored by function parameter', async () => {
             const userService = app.get(UsersService);
             const originalFindOne = userService.findOne;
             const mockedFindOne = function (id, { ...opts }) {
