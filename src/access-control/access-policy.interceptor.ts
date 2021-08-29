@@ -1,6 +1,7 @@
 import {
     CallHandler,
     ExecutionContext,
+    forwardRef,
     Inject,
     Injectable,
     NestInterceptor,
@@ -19,6 +20,7 @@ export class AccessPolicyInterceptor implements NestInterceptor {
     constructor(
         @Inject(ACCESS_POLICY_OPTS_KEY)
         private opts: AccessPolicyInterceptorOpts,
+        @Inject(forwardRef(() => ModuleRef))
         private moduleRef: ModuleRef,
     ) {}
 
