@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaCrudService } from 'nestjs-prisma-crud';
-import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class CommentsService extends PrismaCrudService {
-    constructor(public prismaService: PrismaService) {
+    constructor() {
         super({
-            prismaClient: prismaService,
             model: 'comment',
             allowedJoins: ['post'],
             defaultJoins: [],
@@ -17,9 +15,8 @@ export class CommentsService extends PrismaCrudService {
 /** Invalid class for testing purposes (allowedJoins/defaultJoins mismatch) */
 @Injectable()
 export class InvalidCommentsService extends PrismaCrudService {
-    constructor(public prismaService: PrismaService) {
+    constructor() {
         super({
-            prismaClient: prismaService,
             model: 'comment',
             allowedJoins: ['post'],
             defaultJoins: ['post', 'post.comments'],

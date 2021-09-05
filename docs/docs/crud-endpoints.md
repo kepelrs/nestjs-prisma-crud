@@ -19,7 +19,7 @@ We recommend using the schematics package to quickly scaffold your CRUD modules:
     npm i nestjs-prisma-crud-schematics --save-dev
     ```
 
-2. Scaffold the entire module and CRUD endpoints (replace **post** with your entity name):
+2. Scaffold the CRUD module and endpoints (replace **post** with your model's name):
 
     ```
     nest g -c nestjs-prisma-crud-schematics crud-resource post
@@ -34,7 +34,7 @@ The above will scaffold the entire CRUD module for you, most notably:
 
 The CRUD controller is just a regular NestJS controller with a few characteristics:
 
--   All routes use the generated `YourEntityService` for performing the CRUD operations.
+-   All routes use the generated `<ModelName>Service` for performing the CRUD operations.
 -   All routes retrieve `@Query('crudQuery') crudQuery: string` and pass it along to the service.
 
 :::tip
@@ -95,14 +95,12 @@ The [schematic](#schematics) generates this file for you.
 ```ts title=post.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaCrudService } from 'nestjs-prisma-crud';
-import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class PostService extends PrismaCrudService {
-    constructor(public prismaService: PrismaService) {
+    constructor() {
         super({
             model: 'post',
-            prismaClient: prismaService,
             allowedJoins: [],
         });
     }
@@ -114,7 +112,7 @@ The configuration of your crud endpoints is defined in the `super()` call:
 ```ts
 export interface CrudServiceOpts {
     model: string;
-    prismaClient: PrismaClient;
+    prismaClient?: PrismaClient;
     allowedJoins: string[];
     defaultJoins?: string[];
     forbiddenPaths?: Array<string | RegExp>;
@@ -140,10 +138,12 @@ The `prismaClient.model` on which you wish to perform the CRUD operations.
 ### opts.prismaClient
 
 **Type:** `PrismaClient | PrismaService` <br/>
-**Mandatory:** Yes<br/>
+**Mandatory:** No<br/>
 **Description:**
 
-The `PrismaClient` instance. You can also user your `PrismaService` if it extends the `PrismaClient`.
+Set this value if for some reason want to use a different `PrismaService` from the globally provided one.
+
+For most use cases it can be left blank.
 
 **Example:** `prismaService`
 

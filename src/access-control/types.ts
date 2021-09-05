@@ -19,6 +19,6 @@ export interface AccessPolicyInterceptorOpts {
 
 export type AllowedRolesId = string[] | number[] | Set<string> | Set<number>;
 
-export type GetRolesReturnType = string[] | number[] | Set<string> | Set<number> | null | undefined;
+export type GetRolesReturnType = AllowedRolesId;
 
 export type GetRolesFunction = (request: any) => GetRolesReturnType;

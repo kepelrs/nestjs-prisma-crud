@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+sidebar_label: Quickstart
 ---
 
 # Overview
@@ -12,17 +13,20 @@ sidebar_position: 1
 
 ## Quickstart
 
-To start using the access control utilities you must first register the `AccessControlModule` in your `app.module.ts`:
+To start using the access control utilities you must first register the `.accessControl` settings in your `PrismaCrudModule` registration:
 
-```ts title=app.module.ts
+```ts title=app.module.ts {7-11}
+import { PrismaCrudModule } from 'nestjs-prisma-crud';
+
 @Module({
-    // ...
     imports: [
-        // ..
-        AccessControlModule.register({
-            authDataKey: 'authenticatedUser',
-            getRolesFromAuthDataFn: (authenticatedUser) => authenticatedUser?.roles,
-            strictMode: false,
+        PrismaCrudModule.register({
+            prismaService: PrismaService,
+            accessControl: {
+                authDataKey: 'user',
+                getRolesFromAuthDataFn: (authenticatedUser) => authenticatedUser?.roles,
+                strictMode: false,
+            },
         }),
     ],
     // ...

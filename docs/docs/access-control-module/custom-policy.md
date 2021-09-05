@@ -25,7 +25,7 @@ A short summary of what the parameters mean:
 :::tip
 Examples below only seek to illustrate the custom policies capabilities.
 
-The features they implement would likely not be implemented like that in practice!!
+The features themselves would likely be implemented differently in practice!!
 :::
 
 ### JohnnyIsBanned Policy
@@ -135,7 +135,7 @@ export class PartyController {
 
 In this section we are going to write a policy that modifies the final prisma query, by extending the client's provided [`crudQuery`](../client-side) and adding additional constraints to it.
 
-This is extremely useful when a user must be granted access to only a subset of records from a given table. This method ensures that we scope the client's access while not breaking the requested sorting/filtering/pagination.
+This technique is extremely useful when a user must be granted access to only a subset of records from a given table. It ensures that we scope the client's access while not breaking the requested sorting/filtering/pagination.
 
 Below is a policy that only retrieves non-draft `parties` from the database. The highlighted `additionalConstraints` can be any [prisma filter object](https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#filter-conditions-and-operators) .
 

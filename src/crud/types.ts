@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { GetRolesFunction } from '../access-control/types';
 
 export type PaginationConfig = {
     defaultPageSize?: number;
@@ -56,7 +57,8 @@ export type CrudMethodOpts = {
 export interface CrudServiceOpts {
     /** The model name as used by `prismaClient.model`. Eg: 'user' if your prisma schema contains `model User {}` */
     model: string;
-    prismaClient: PrismaClient;
+    /** Use this if for some reason you don't want to use the globally provided PrismaService */
+    prismaClient?: PrismaClient;
     allowedJoins: string[];
     defaultJoins?: string[];
     forbiddenPaths?: Array<string | RegExp>;
@@ -64,3 +66,12 @@ export interface CrudServiceOpts {
     idPropertyName?: string;
     paginationConfig?: PaginationConfig;
 }
+
+export type PrismaCrudModuleOpts = {
+    prismaService: any;
+    accessControl?: {
+        strict: boolean;
+        authDataKey: string;
+        getRolesFromAuthDataFn: GetRolesFunction;
+    };
+};

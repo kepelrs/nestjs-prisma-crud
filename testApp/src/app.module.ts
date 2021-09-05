@@ -6,12 +6,12 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { AccessControlModule } from 'nestjs-prisma-crud';
+import { PrismaCrudModule } from 'nestjs-prisma-crud';
 import { AuthenticationMiddleware } from './authentication.middleware';
 import { CommentsModule } from './comments/comments.module';
+import { EntityWithIntIdModule } from './entity-with-int-id/entity-with-int-id.module';
 import { PrismaService } from './prisma.service';
 import { UsersModule } from './users/users.module';
-import { EntityWithIntIdModule } from './entity-with-int-id/entity-with-int-id.module';
 
 function createModuleMetadata(opts: { strictMode: boolean }) {
     return {
@@ -19,15 +19,17 @@ function createModuleMetadata(opts: { strictMode: boolean }) {
             UsersModule,
             CommentsModule,
             EntityWithIntIdModule,
-            AccessControlModule.register({
-                authDataKey: 'user',
-                getRolesFromAuthDataFn: (authData) => authData?.roles?.map((r) => r.name),
-                strictMode: opts.strictMode,
+            PrismaCrudModule.register({
+                prismaService: PrismaService,
+                accessControl: {
+                    authDataKey: 'user',
+                    strict: opts.strictMode,
+                    getRolesFromAuthDataFn: (authData) => authData?.roles?.map((r) => r.name),
+                },
             }),
         ],
         controllers: [],
         providers: [
-            PrismaService,
             { provide: APP_INTERCEPTOR, useClass: ClassSerializerInterceptor },
             {
                 provide: APP_PIPE,

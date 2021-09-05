@@ -5,7 +5,6 @@ import {
     WithMustMatchAuthAttributePolicyCommentsController,
     WithMustMatchValuePolicyCommentsController,
 } from './comments.controller';
-import { PrismaService } from '../prisma.service';
 
 @Module({
     controllers: [
@@ -13,7 +12,7 @@ import { PrismaService } from '../prisma.service';
         WithMustMatchAuthAttributePolicyCommentsController,
         WithMustMatchValuePolicyCommentsController,
     ],
-    providers: [CommentsService, PrismaService],
+    providers: [CommentsService],
 })
 export class CommentsModule {}
 
@@ -24,6 +23,6 @@ export class CommentsModule {}
         WithMustMatchAuthAttributePolicyCommentsController,
         WithMustMatchValuePolicyCommentsController,
     ],
-    providers: [InvalidCommentsService, PrismaService],
+    providers: [InvalidCommentsService],
 })
 export class InvalidCommentsModule {}

@@ -53,11 +53,12 @@ cd my-project
     npx prisma migrate dev
     ```
 
-4. Create the prisma service under the **src** folder:
+4. Create the prisma service:
 
     ```ts title=my-project/src/prisma.service.ts
     import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
     import { PrismaClient } from '@prisma/client';
+
     @Injectable()
     export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
         async onModuleInit() {
@@ -78,19 +79,37 @@ cd my-project
     npm i nestjs-prisma-crud-schematics --save-dev
     ```
 
-2. Generate the entire crud module with the following command (replace **post** with your table's name from your Prisma schema):
+2. Register the module:
+
+    ```ts title=app.module.ts
+    import { PrismaCrudModule } from 'nestjs-prisma-crud';
+
+    @Module({
+        imports: [
+            /**
+             *  PrismaCrudModule registers the PrismaService provider globally.
+             *  No need to provide it anywhere else!
+             */
+            PrismaCrudModule.register({
+                prismaService: PrismaService,
+            }),
+        ],
+        // ...
+    })
+    export class AppModule {}
+    ```
+
+3. Generate the entire crud module with the following command (replace **post** with your table's name from your Prisma schema):
 
     ```
     nest g -c nestjs-prisma-crud-schematics crud-resource post
     ```
 
-3. Start the server:
-
+4. Start the server and verify installation:
     ```
     npm run start:dev
+    curl http://localhost:3000/post # 200 response json object
     ```
-
-4. Verify installation by navigating to [http://localhost:3000/post](http://localhost:3000/post)
 
 ## Whats next?
 

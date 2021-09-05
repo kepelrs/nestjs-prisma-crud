@@ -12,17 +12,17 @@ For more complex scenarios you can also [create your own custom policies](./cust
 
 ### Description
 
-Scopes the controller access to database records where `entityAttributePath` matches some dynamic property of [`authData`](access-control-module#optsauthdatakey), defined by `authDataAttributePath`.
+Scopes the controller access to database records where `modelAttributePath` matches some dynamic property of [`authData`](access-control-module#optsauthdatakey), defined by `authDataAttributePath`.
 
 ### Function signature
 
 ```ts
-MustMatchAuthAttribute(entityAttributePath: string, authDataAttributePath: string) =>
+MustMatchAuthAttribute(modelAttributePath: string, authDataAttributePath: string) =>
     PolicyMethod
 ```
 
 :::info
-`entityAttributePath` can traverse relations via dot notation, as long as the joins are present in [allowedJoins](../crud-endpoints#optsallowedjoins).
+`modelAttributePath` can traverse relations via dot notation, as long as the joins are present in [allowedJoins](../crud-endpoints#optsallowedjoins).
 
 `authDataAttributePath` also supports dot notation for traversing nested properties of the `authData` object.
 :::
@@ -55,11 +55,11 @@ export class PostController {
 ### Function signature
 
 ```ts
-MustMatchValue(entityAttributePath: string, targetValue: any) => PolicyMethod
+MustMatchValue(modelAttributePath: string, targetValue: any) => PolicyMethod
 ```
 
 :::info
-`entityAttributePath` can traverse relations via dot notation, as long as the joins are present in [allowedJoins](../crud-endpoints#optsallowedjoins).
+`modelAttributePath` can traverse relations via dot notation, as long as the joins are present in [allowedJoins](../crud-endpoints#optsallowedjoins).
 :::
 
 ### Example usage

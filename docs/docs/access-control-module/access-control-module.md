@@ -2,18 +2,25 @@
 sidebar_position: 2
 ---
 
-# AccessControlModule
+# Module Registration
 
-The `AccessControlModule` registers interceptors and the necessary business logic for [AccessPolicy](./access-policy) to work.
+Add `.accessControl` to your module registration to setup interceptors and other necessary logic for [AccessPolicy](./access-policy) to work.
 
 ## Usage
 
-```ts title=app.module.ts {5}
+```ts title=app.module.ts {7-11}
+import { PrismaCrudModule } from 'nestjs-prisma-crud';
+
 @Module({
-    // ...
     imports: [
-        // ..
-        AccessControlModule.register(opts),
+        PrismaCrudModule.register({
+            prismaService: PrismaService,
+            accessControl: {
+                authDataKey: 'user',
+                getRolesFromAuthDataFn: (authenticatedUser) => authenticatedUser?.roles,
+                strictMode: false,
+            },
+        }),
     ],
     // ...
 })
@@ -22,7 +29,7 @@ export class AppModule {}
 
 ## Configuration
 
-The `AccessControlModule.register` method receives a configuration object with the following shape:
+The `.accessControl` property is a configuration object with the following shape:
 
 ```ts
 export interface AccessPolicyInterceptorOpts {
@@ -42,13 +49,16 @@ Below you can find the documentation for each option.
 
 The property of the `request` where your authentication middleware stores the information about the user (we call that `authData`) after verifying authentication (token/cookies/session).
 
-**Example:** `'user'` - this would make `AccessControlModule` search for the authentication data in the `request.user` property.
+Common implementations typically use `'user'` for this value (eg. [Passport](https://docs.nestjs.com/security/authentication))
+
+**Example:** `'authenticatedUser'` <br/>
+This would make `AccessControlModule` search for the authentication data in the `request.authenticatedUser` property.
 
 <hr/>
 
 ### opts.getRolesFromAuthDataFn
 
-**Type:** `(authData) => string[] | number[] | Set<string> | Set<number> | null | undefined` <br/>
+**Type:** `(authData) => string[] | number[] | Set<string> | Set<number>` <br/>
 **Mandatory:** Yes<br/>
 **Description:**
 
@@ -68,6 +78,6 @@ These ids will later be compared with the ones passed to `@AccessPolicy`.
 
 Strict mode helps you prevent accidentally forgetting to implement access control on sensitive routes. If set to `true`, routes that were not decorated with `@AccessPolicy` will throw `501 Not Implemented` errors.
 
-If your app has non-CRUD endpoints, you can decorate them with `@AccessPolicy('everyone')` or set `strictMode` to `false` if you wish to turn it off altogether.
+If your app has non-CRUD endpoints, you can decorate them with `@AccessPolicy('everyone')`. Alternatively, set `strictMode` to `false` if you wish to turn it off altogether.
 
 **Recommended:** `true`

@@ -1,3 +1,4 @@
+import { PrismaClient } from '.prisma/client';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { deleteObjectProperties, getAllJoinSubsets } from './helpers';
 import { PrismaQueryBuilder } from './prisma-query-builder';
@@ -10,6 +11,7 @@ const DEFAULT_CRUD_METHOD_OPTS: Required<CrudMethodOpts> = {
 };
 
 export class PrismaCrudService {
+    public static prismaClient: PrismaClient;
     private paginationConfig: Required<PaginationConfig>;
     private allowedJoinsSet: Set<string>;
     private defaultJoins: string[];
@@ -21,7 +23,7 @@ export class PrismaCrudService {
 
     constructor(args: CrudServiceOpts) {
         this.model = args.model;
-        this.prismaClient = args.prismaClient;
+        this.prismaClient = args.prismaClient || PrismaCrudService.prismaClient;
         this.idPropertyName = args.idPropertyName || 'id';
 
         this.allowedJoinsSet = getAllJoinSubsets(args.allowedJoins);
@@ -138,6 +140,10 @@ export class PrismaCrudService {
     }
 
     public async findOne(id: string | number, opts: CrudMethodOpts) {
+        if (id === null || id === undefined) {
+            throw new InternalServerErrorException(`findOne received invalid id ${id}`);
+        }
+
         const fullOpts = this.getFullCrudOpts(opts);
         const repo = this.getRepo(fullOpts);
 

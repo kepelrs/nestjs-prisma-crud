@@ -32,7 +32,7 @@ An overview of the provided functionality:
     - `crud-resource`: a modified NestJS `resource` schematic that scaffolds the entire CRUD module for you.<br/> One-line scaffolding with: _`nest g -c nestjs-prisma-crud-schematics crud-resource <YOUR-TABLE-NAME-HERE>`_
 5. Plug and play
     - Can be used alongside your other non `nestjs-prisma-crud` controllers.
-    - You can use `PrismaCrudService` and `@AccessPolicy` in your custom controllers if you want to retain some of `nestjs-prisma-crud`'s functionalities.
+    - You can still use `PrismaCrudService` and `@AccessPolicy` in your custom controllers if you want to retain some of `nestjs-prisma-crud`'s functionalities.
 
 ## Quickstart
 
@@ -45,26 +45,24 @@ An overview of the provided functionality:
     npm i nestjs-prisma-crud-schematics --save-dev
     ```
 
-2. Generate the entire crud module with a single command (replace **post** with your entity name):
+2. Generate the entire crud module with a single command (replace **post** with your model's name):
 
     ```
     nest g -c nestjs-prisma-crud-schematics crud-resource post
     ```
 
-3. Configure your service
+3. Setup your service and controller
 
     ```ts
     // post.service.ts
     import { Injectable } from '@nestjs/common';
     import { PrismaCrudService } from 'nestjs-prisma-crud';
-    import { PrismaService } from '../prisma.service';
 
     @Injectable()
     export class PostService extends PrismaCrudService {
-        constructor(public prismaService: PrismaService) {
+        constructor() {
             super({
                 model: 'post',
-                prismaClient: prismaService,
                 allowedJoins: ['comments.author'],
             });
         }

@@ -1,15 +1,17 @@
 ---
 sidebar_position: 7
-sidebar_label: Limitations & v1 Roadmap
+sidebar_label: Limitations & Roadmap
 hide_title: true
 ---
 
-# Limitations & & known issues
+# Limitations & Known Issues
 
--   NO JSON column support. `nestjs-prisma-crud` assumes a nested object is a relation.
+-   No JSON column support.
+    -   `nestjs-prisma-crud` assumes a nested object is a relation.
     -   Suggested workaround if you really want JSON objects: use middleware for transforming into string on both frontend and backend
+    -   Planned for v1.x.x
 -   Prisma keywords may not be used as model properties
-    -   TODO: document which are those
+    -   TODO: document or link which are those
 -   No type safety: given the `crudQuery`'s dynamic nature, `PrismaCrudService` makes no effort to provide type safety on it's return values.
     -   If you really need great type safety, its recommended that you create a plain NestJS + Prisma controller.
 -   No bulk operations
@@ -37,6 +39,13 @@ hide_title: true
 -   [x] additional transaction support tests and implementation.
 -   [x] test nested create cannot happen passed allowed joins
 -   [x] rename AccessPolicyModule to AccessControlModule
+-   [ ] Test access control plays nicely with websockets
+
+## Roadmap for v1.x.x
+
+-   [ ] Configurable global settings
+-   [ ] Some JSON support
+-   [ ] Start benchmarking
 
 ## Thank You
 

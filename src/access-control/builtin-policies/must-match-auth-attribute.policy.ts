@@ -9,7 +9,7 @@ import { CrudQueryObj } from '../../crud/types';
 import { createWhereObject, getNestedProperty } from '../../crud/utils';
 
 export const MustMatchAuthAttribute = (
-    entityAttributePath: string,
+    modelAttributePath: string,
     authDataAttributePath: string,
 ): PolicyMethod => (ctx: ExecutionContext, authData: any, _moduleRef: ModuleRef) => {
     const request = ctx.switchToHttp().getRequest();
@@ -30,7 +30,7 @@ export const MustMatchAuthAttribute = (
     const parsedCrudQuery: CrudQueryObj = crudQuery ? JSON.parse(crudQuery) : {};
     const originalWhere = parsedCrudQuery.where || {};
     parsedCrudQuery.where = {
-        AND: [createWhereObject(entityAttributePath, targetValue), originalWhere],
+        AND: [createWhereObject(modelAttributePath, targetValue), originalWhere],
     };
 
     request.query.crudQuery = JSON.stringify(parsedCrudQuery);

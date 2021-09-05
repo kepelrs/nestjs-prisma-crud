@@ -21,10 +21,10 @@ Every public method of `PrismaCrudService` used in your [CRUD endpoints](./crud-
 
 ```ts
 export type CrudQuery = {
-    where?: object;
+    where?: any;
     joins?: string[];
     select?: { only?: string[]; except?: string[] };
-    orderBy?: object;
+    orderBy?: any[];
     page?: number;
     pageSize?: number;
 };
@@ -56,11 +56,11 @@ fetch('http://localhost:3000?' + new URLSearchParams({ crudQuery: JSON.stringify
 
 ### CrudQuery.where
 
-**Type:** `object`<br/>
+**Type:** `any`<br/>
 **Mandatory:** No<br/>
 **Description:**
 
-This must be valid prisma [`.where`](https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#where) for your specific entity.
+This must be valid prisma [`.where`](https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#where) for your specific model.
 
 Querying nested joins is supported, as long as the joined relations are present in your service's [allowedJoins](crud-endpoints#optsallowedjoins).
 

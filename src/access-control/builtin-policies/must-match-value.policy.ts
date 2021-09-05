@@ -4,7 +4,7 @@ import { PolicyMethod } from '../';
 import { CrudQueryObj } from '../../crud/types';
 import { createWhereObject } from '../../crud/utils';
 
-export const MustMatchValue = (entityAttributePath: string, targetValue: any): PolicyMethod => (
+export const MustMatchValue = (modelAttributePath: string, targetValue: any): PolicyMethod => (
     ctx: ExecutionContext,
     _authData: any,
     _moduleRef: ModuleRef,
@@ -22,7 +22,7 @@ export const MustMatchValue = (entityAttributePath: string, targetValue: any): P
     const parsedCrudQuery: CrudQueryObj = crudQuery ? JSON.parse(crudQuery) : {};
     const originalWhere = parsedCrudQuery.where || {};
     parsedCrudQuery.where = {
-        AND: [createWhereObject(entityAttributePath, targetValue), originalWhere],
+        AND: [createWhereObject(modelAttributePath, targetValue), originalWhere],
     };
 
     request.query.crudQuery = JSON.stringify(parsedCrudQuery);
