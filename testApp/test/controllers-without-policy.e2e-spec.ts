@@ -6,6 +6,7 @@ import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma.service';
 import { UsersService } from '../src/users/users.service';
 
+// TODO: Rename file and split into outlined test groups
 describe('CRUD controllers (without policy) e2e', () => {
     let app: INestApplication;
     let prismaService: PrismaService;
@@ -1012,6 +1013,34 @@ describe('CRUD controllers (without policy) e2e', () => {
                     const responsePosts = res?.body?.posts;
                     expect(responsePosts.length).toBe(1);
                     expect(responsePosts[0].id).not.toBe(id);
+                });
+        });
+
+        it('creating and keeping different relations at once works (new object without id + one old adjacent object)', async () => {
+            let users;
+            await request(app.getHttpServer())
+                .get(`/users`)
+                .expect(200)
+                .then((res) => {
+                    users = res.body.data;
+                });
+
+            const [user] = users.filter((u) => u.posts.length);
+            const { id, authorId, ...post } = user.posts[0];
+            const reqBody = {
+                ...user,
+                posts: [...user.posts, { ...post }],
+            };
+
+            await request(app.getHttpServer())
+                .patch(`/users/${user.id}`)
+                .send(reqBody)
+                .expect(200)
+                .then((res) => {
+                    const responsePosts = res?.body?.posts;
+                    expect(responsePosts.length).toBe(2);
+                    expect(responsePosts.some((p) => p.id === id)).toBe(true);
+                    expect(responsePosts.some((p) => p.id !== id)).toBe(true);
                 });
         });
 
