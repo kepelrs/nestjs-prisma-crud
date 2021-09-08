@@ -171,3 +171,39 @@ export class WithMustMatchValuePolicyCommentsController {
         return deleted;
     }
 }
+
+/**
+ * For testing Multiple combined policies
+ */
+@Controller('combined-policies/comments')
+export class WithMustCombinedPoliciesCommentsController {
+    private readonly commentsService = new PrismaCrudService({
+        prismaClient: this.prismaService,
+        model: 'comment',
+        allowedJoins: ['post.author'],
+    });
+
+    constructor(private readonly prismaService: PrismaService) {}
+
+    @Get('impossible')
+    @AccessPolicy(
+        'everyone',
+        MustMatchValue('post.author.id', seedEntityIds[0]),
+        MustMatchValue('post.author.id', seedEntityIds[1]),
+    )
+    async getImpossible(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany({ crudQuery });
+        return match;
+    }
+
+    @Get('repeated')
+    @AccessPolicy(
+        'everyone',
+        MustMatchValue('post.author.id', seedEntityIds[0]),
+        MustMatchValue('post.author.id', seedEntityIds[0]),
+    )
+    async getRepeated(@Query('crudQuery') crudQuery: string) {
+        const match = await this.commentsService.findMany({ crudQuery });
+        return match;
+    }
+}

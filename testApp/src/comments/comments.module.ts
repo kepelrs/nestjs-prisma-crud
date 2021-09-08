@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CommentsService, InvalidCommentsService } from './comments.service';
 import {
     CommentsController,
+    WithMustCombinedPoliciesCommentsController,
     WithMustMatchAuthAttributePolicyCommentsController,
     WithMustMatchValuePolicyCommentsController,
 } from './comments.controller';
@@ -11,6 +12,7 @@ import {
         CommentsController,
         WithMustMatchAuthAttributePolicyCommentsController,
         WithMustMatchValuePolicyCommentsController,
+        WithMustCombinedPoliciesCommentsController,
     ],
     providers: [CommentsService],
 })
@@ -22,6 +24,7 @@ export class CommentsModule {}
         CommentsController,
         WithMustMatchAuthAttributePolicyCommentsController,
         WithMustMatchValuePolicyCommentsController,
+        WithMustCombinedPoliciesCommentsController,
     ],
     providers: [InvalidCommentsService],
 })

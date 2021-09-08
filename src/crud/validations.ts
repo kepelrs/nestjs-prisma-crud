@@ -59,9 +59,10 @@ export function validateNestedWhere(
             // leaf paths are the longest
             const leafPath = meta.currentPath!;
 
-            let cleanedupString = leafPath.replace(startOperatorsRegex, '');
             // remove operators from the middle of string
-            cleanedupString = cleanedupString.replace(midOperatorsRegex, '.');
+            let cleanedupString = leafPath.replace(midOperatorsRegex, '.');
+            // remove from beginning
+            cleanedupString = cleanedupString.replace(startOperatorsRegex, '');
             // remove operators from the end of string
             cleanedupString = cleanedupString.replace(endOperatorsRegex, '');
             // remove last fragment, as it is a property (eg. author.firstName)
