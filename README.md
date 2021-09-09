@@ -1,4 +1,4 @@
-[![Build Status](https://www.travis-ci.com/kepelrs/nestjs-prisma-crud.svg?branch=master)](https://www.travis-ci.com/kepelrs/nestjs-prisma-crud)
+[![tests](https://github.com/kepelrs/nestjs-prisma-crud/actions/workflows/tests.yml/badge.svg)](https://github.com/kepelrs/nestjs-prisma-crud/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/kepelrs/nestjs-prisma-crud/branch/master/graph/badge.svg?token=X2KQ8AMFA7)](https://codecov.io/gh/kepelrs/nestjs-prisma-crud)
 
 # nestjs-prisma-crud
