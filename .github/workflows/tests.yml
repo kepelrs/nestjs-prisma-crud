@@ -1,0 +1,18 @@
+name: tests
+on:
+ push:
+    branches:
+      - master
+      - 'v*.*.*'
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: cd testApp && npm i && cp .env-example .env && cd ..
+      - run: npm install -g codecov
+      - run: cd docs && npm i && npm run build && cd ..
+      - run: npm run test:cov && codecov
