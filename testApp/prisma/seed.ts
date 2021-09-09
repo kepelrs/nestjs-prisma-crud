@@ -74,13 +74,13 @@ for (let i = 0; i < NUMBER_OF_TEST_USER_SEEDS; i++) {
 
 export async function seed(deleteAll = false) {
     if (deleteAll === true) {
-        await prisma.$queryRaw(`Delete from Category`);
-        await prisma.$queryRaw(`Delete from Comment`);
-        await prisma.$queryRaw(`Delete from Country`);
-        await prisma.$queryRaw(`Delete from Post`);
-        await prisma.$queryRaw(`Delete from Profile`);
-        await prisma.$queryRaw(`Delete from User`);
-        await prisma.$queryRaw(`Delete from EntityWithIntId`);
+        await prisma.$queryRaw`Delete from Category`;
+        await prisma.$queryRaw`Delete from Comment`;
+        await prisma.$queryRaw`Delete from Country`;
+        await prisma.$queryRaw`Delete from Post`;
+        await prisma.$queryRaw`Delete from Profile`;
+        await prisma.$queryRaw`Delete from User`;
+        await prisma.$queryRaw`Delete from EntityWithIntId`;
     }
 
     const userSeeds: TestSeed[] = [];

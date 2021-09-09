@@ -42,7 +42,7 @@
     "devDependencies": {
         "@nestjs/common": "^8.0.6",
         "@nestjs/core": "^8.0.6",
-        "@prisma/client": "^2.30.0",
+        "@prisma/client": "^3.0.2",
         "husky": "^6.0.0",
         "prisma": "^2.30.0",
         "reflect-metadata": "^0.1.13",
@@ -54,7 +54,7 @@
     "peerDependencies": {
         "@nestjs/common": "^8.0.0",
         "@nestjs/core": "^8.0.0",
-        "@prisma/client": "^2.25.0",
+        "@prisma/client": "^3.0.2",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^7.3.0"
     },

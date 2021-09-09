@@ -3,7 +3,7 @@
 
 # nestjs-prisma-crud
 
-CRUD utility for simple REST use cases. Builds on top of [NestJS](https://github.com/nestjs/nest) and [Prisma 2](https://github.com/prisma/prisma). Inspired by [@nestjsx/crud](https://github.com/nestjsx).
+CRUD utility for simple REST use cases. Builds on top of [NestJS](https://github.com/nestjs/nest) and [Prisma](https://github.com/prisma/prisma). Inspired by [@nestjsx/crud](https://github.com/nestjsx).
 
 ## Installation
 

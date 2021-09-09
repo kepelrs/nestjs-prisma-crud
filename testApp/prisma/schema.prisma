@@ -8,7 +8,7 @@ datasource db {
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions", "orderByRelation"]
+  previewFeatures = ["interactiveTransactions"]
 }
 
 model User {
