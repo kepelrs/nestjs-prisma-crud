@@ -1,5 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { PrismaCrudModuleOpts, PrismaCrudService } from '.';
+import { PrismaCrudService } from './prisma-crud.service';
+import { PrismaCrudModuleOpts } from './types';
 import { AccessControlModule } from '../access-control/access-control.module';
 
 @Module({})
