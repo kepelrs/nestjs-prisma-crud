@@ -15,8 +15,8 @@
     "create-doc-version": "docusaurus docs:version"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-beta.4",
-    "@docusaurus/preset-classic": "2.0.0-beta.4",
+    "@docusaurus/core": "^2.0.0-beta.6",
+    "@docusaurus/preset-classic": "^2.0.0-beta.6",
     "@docusaurus/theme-search-algolia": "^2.0.0-beta.6",
     "@mdx-js/react": "^1.6.21",
     "@svgr/webpack": "^5.5.0",
