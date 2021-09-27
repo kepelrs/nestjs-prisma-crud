@@ -1,9 +1,10 @@
 name: tests
-on:
- push:
-    branches:
-      - master
-      - 'v*.*.*'
+on: [push, pull_request]
+# on:
+  # push:
+  #   branches:
+  #     - master
+  #     - 'v*.*.*'
 jobs:
   run-tests:
     runs-on: ubuntu-latest
