@@ -87,6 +87,21 @@ module.exports = {
       theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
     },
+    algolia: {
+      apiKey: 'c53ed6b37ae84621e6cb880e498345f9',
+      indexName: 'nestjs-prisma-crud',
+
+      // Optional: see docs
+      // contextualSearch: true,
+
+      // Optional: see docs
+      // appId: 'YOUR_APP_ID',
+
+      // Optional: Algolia search parameters
+      // searchParameters: {},
+
+      //... other Algolia params
+    },
   },
   presets: [
     [
