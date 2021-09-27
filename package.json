@@ -15,10 +15,10 @@
     "scripts": {
         "start": "tsdx watch",
         "build": "tsdx build",
-        "test": "cd testApp && yarn run test",
-        "test:watch": "cd testApp && yarn run test:watch",
-        "test:cov": "cd testApp && yarn run test:cov",
-        "test:clear": "cd testApp && yarn run test:clear",
+        "test": "cd test && yarn run test",
+        "test:watch": "cd test && yarn run test:watch",
+        "test:cov": "cd test && yarn run test:cov",
+        "test:clear": "cd test && yarn run test:clear",
         "lint": "tsdx lint src test",
         "prepare": "tsdx build",
         "pretty": "prettier --write \"./**/*.{js,ts,json}\""

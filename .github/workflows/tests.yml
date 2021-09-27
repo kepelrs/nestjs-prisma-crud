@@ -12,7 +12,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - run: cd testApp && npm i && cp .env-example .env && cd ..
+      - run: cd test && npm i && cp .env-example .env && cd ..
       - run: npm install -g codecov
       - run: cd docs && npm i && npm run build && cd ..
       - run: npm i -g yarn

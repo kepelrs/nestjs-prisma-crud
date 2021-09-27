@@ -4,18 +4,18 @@
     "testEnvironment": "node",
     "testRegex": ".e2e-spec.ts$",
     "transform": {
-        "^.+\\.(t|j)s$": "<rootDir>/testApp/node_modules/ts-jest/preprocessor.js"
+        "^.+\\.(t|j)s$": "<rootDir>/test/node_modules/ts-jest/preprocessor.js"
     },
     "globals": {
         "ts-jest": {
             "diagnostics": false,
-            "tsconfig": "<rootDir>/testApp/tsconfig.json"
+            "tsconfig": "<rootDir>/test/tsconfig.json"
         }
     },
     "moduleNameMapper": {
-        "^@nestjs/common$": "<rootDir>testApp//node_modules/@nestjs/common",
-        "^@nestjs/core$": "<rootDir>/testApp/node_modules/@nestjs/core",
-        "^reflect-metadata$": "<rootDir>/testApp/node_modules/reflect-metadata",
+        "^@nestjs/common$": "<rootDir>test//node_modules/@nestjs/common",
+        "^@nestjs/core$": "<rootDir>/test/node_modules/@nestjs/core",
+        "^reflect-metadata$": "<rootDir>/test/node_modules/reflect-metadata",
         "^nestjs-prisma-crud$": "<rootDir>/src"
     },
     "collectCoverageFrom": ["<rootDir>/src/**/*.ts"],
