@@ -1,6 +1,6 @@
 {
     "version": "1.0.0-beta.8",
-    "description": "CRUD package for NestJS and Prisma2",
+    "description": "CRUD package for NestJS and Prisma ORM",
     "homepage": "https://kepelrs.github.io/nestjs-prisma-crud",
     "license": "MIT",
     "main": "dist/index.js",
@@ -42,9 +42,9 @@
     "devDependencies": {
         "@nestjs/common": "^8.0.6",
         "@nestjs/core": "^8.0.6",
-        "@prisma/client": "^3.1.1",
+        "@prisma/client": "^3.2.1",
         "husky": "^6.0.0",
-        "prisma": "^2.30.0",
+        "prisma": "^3.2.1",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^7.3.0",
         "tsdx": "^0.14.1",
