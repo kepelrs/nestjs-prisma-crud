@@ -105,7 +105,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     },
                     country: countries[0],
                 })
-                .expect(403);
+                .expect(400);
 
             const categoryCountAfter = await prismaService.category.count();
             expect(categoryCountBefore).toBe(categoryCountAfter);
@@ -242,7 +242,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     .query({
                         crudQuery: JSON.stringify(crudQuery),
                     })
-                    .expect(403)
+                    .expect(400)
                     .then((res) => {
                         expect(
                             res.body?.data?.[0]?.posts?.[0]?.comments?.[0]?.title,
@@ -448,7 +448,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     await request(app.getHttpServer())
                         .get(`/comments`)
                         .query({ crudQuery: JSON.stringify({ orderBy }) })
-                        .expect(403);
+                        .expect(400);
                 });
             });
         });
@@ -487,7 +487,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     .query({
                         crudQuery: JSON.stringify({ joins: ['posts.comments.post'] }),
                     })
-                    .expect(403)
+                    .expect(400)
                     .then((res) => {
                         expect(res.body?.data?.[0]?.posts[0].comments.post).not.toBeTruthy();
                     });

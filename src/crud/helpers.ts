@@ -1,4 +1,4 @@
-import { ForbiddenException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { traverse } from 'object-traversal';
 import { getNestedProperty } from './utils';
 
@@ -32,9 +32,8 @@ export function plainToPrismaNestedQuery(
         const parentIsNotArray = !(parent instanceof Array);
         const valueIsObject = value instanceof Object;
         const valueIsArray = value instanceof Array;
-        const pathIsWithinAllowedJoins = allowedJoinSet.has(
-            meta.currentPath?.replace(/.\d+./, '.') as string,
-        );
+        const pathWithoutDigits = meta.currentPath?.replace(/.\d+./, '.');
+        const pathIsWithinAllowedJoins = allowedJoinSet.has(pathWithoutDigits as string);
 
         // TODO: Refactor, split into named subfunctions at least the main condition blocks
         if (parentIsObject && parentIsNotArray && valueIsObject && keyIsNotKeyword) {
@@ -42,7 +41,9 @@ export function plainToPrismaNestedQuery(
             key = key!;
 
             if (!pathIsWithinAllowedJoins) {
-                throw new ForbiddenException('Provided nested relation is not allowed');
+                throw new BadRequestException(
+                    `Provided nested relation is not allowed: ${pathWithoutDigits}`,
+                );
             }
 
             if (valueIsArray) {
