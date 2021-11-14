@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import * as Joi from 'joi';
 import { traverse } from 'object-traversal';
 import { CrudQueryFull } from './types';
@@ -70,7 +70,7 @@ export function validateNestedWhere(
 
             const isAllowed = !cleanedupString || allowedJoinsSet.has(cleanedupString);
             if (!isAllowed) {
-                throw new ForbiddenException(`Join relation not allowed: ${cleanedupString}`);
+                throw new BadRequestException(`Join relation not allowed: ${cleanedupString}`);
             }
         }
     });
@@ -80,7 +80,7 @@ export function validateJoins(requestedJoins: string[], allowedJoinsSet: Set<str
     for (let i = 0; i < requestedJoins.length; i++) {
         const reqInclude = requestedJoins[i];
         if (!allowedJoinsSet.has(reqInclude)) {
-            throw new ForbiddenException(`Join relation not allowed: ${reqInclude}`);
+            throw new BadRequestException(`Join relation not allowed: ${reqInclude}`);
         }
     }
 }
@@ -103,7 +103,7 @@ export function validateNestedOrderBy(orderByObjects: any[], allowedJoinsSet: Se
                 const isAllowed =
                     !pathWithoutLastFragment || allowedJoinsSet.has(pathWithoutLastFragment);
                 if (!isAllowed) {
-                    throw new ForbiddenException(
+                    throw new BadRequestException(
                         `Join relation not allowed: ${pathWithoutLastFragment}`,
                     );
                 }
