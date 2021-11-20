@@ -277,6 +277,47 @@ describe('CRUD controllers (without policy) e2e', () => {
                     });
             });
 
+            it(`correctly handles consecutive operators`, () => {
+                // NOTE: this test only cares about correctly handling of consecutive operators, hence repeated validCondition everywhere
+                const validCondition = {
+                    posts: {
+                        some: {
+                            comments: {
+                                some: {
+                                    title: needleString0,
+                                },
+                            },
+                        },
+                    },
+                };
+                const crudQuery = {
+                    where: {
+                        AND: [
+                            validCondition,
+                            {
+                                AND: [
+                                    validCondition,
+                                    {
+                                        OR: [validCondition, validCondition],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                };
+                return request(app.getHttpServer())
+                    .get('/users')
+                    .query({
+                        crudQuery: JSON.stringify(crudQuery),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data?.[0]?.posts?.[0]?.comments?.[0]?.title).toEqual(
+                            needleString0,
+                        );
+                    });
+            });
+
             it(`correctly handles 'notIn' special case`, () => {
                 const crudQuery = {
                     where: {

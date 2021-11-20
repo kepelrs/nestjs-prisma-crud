@@ -41,9 +41,9 @@ export function validateNestedWhere(
     ],
 ) {
     const blackListedWordsRegex = `(${prismaBlacklistKeywords.join('|')})`;
-    const midOperatorsRegex = new RegExp(`\\.${blackListedWordsRegex}\\.`, 'g');
+    const midOperatorsRegex = new RegExp(`(?<!^)\\.?${blackListedWordsRegex}\\.`, 'g');
     const endOperatorsRegex = new RegExp(`\\.${blackListedWordsRegex}$`, 'g');
-    const startOperatorsRegex = new RegExp(`^${blackListedWordsRegex}(\\.|$)`, 'g');
+    const startOperatorsRegex = new RegExp(`^${blackListedWordsRegex}(\\.+|$)`, 'g');
     const lastFragmentRegex = /\.?[^.]+$/;
     const leafArrayContentRegex = /\.(in|notIn)\.\d+$/;
     const leafArrayRegex = /\.(in|notIn)$/;
@@ -60,13 +60,13 @@ export function validateNestedWhere(
             const leafPath = meta.currentPath!;
 
             // remove operators from the middle of string
-            let cleanedupString = leafPath.replace(midOperatorsRegex, '.');
+            const midCleanedupString = leafPath.replace(midOperatorsRegex, '.');
             // remove from beginning
-            cleanedupString = cleanedupString.replace(startOperatorsRegex, '');
+            const startCleanedupString = midCleanedupString.replace(startOperatorsRegex, '');
             // remove operators from the end of string
-            cleanedupString = cleanedupString.replace(endOperatorsRegex, '');
+            const endCleanedupString = startCleanedupString.replace(endOperatorsRegex, '');
             // remove last fragment, as it is a property (eg. author.firstName)
-            cleanedupString = cleanedupString.replace(lastFragmentRegex, '');
+            const cleanedupString = endCleanedupString.replace(lastFragmentRegex, '');
 
             const isAllowed = !cleanedupString || allowedJoinsSet.has(cleanedupString);
             if (!isAllowed) {
