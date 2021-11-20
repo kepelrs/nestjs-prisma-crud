@@ -277,7 +277,7 @@ describe('CRUD controllers (without policy) e2e', () => {
                     });
             });
 
-            it(`correctly handles consecutive operators`, () => {
+            it(`correctly handles consecutive operators at the beginning`, () => {
                 // NOTE: this test only cares about correctly handling of consecutive operators, hence repeated validCondition everywhere
                 const validCondition = {
                     posts: {
@@ -303,6 +303,43 @@ describe('CRUD controllers (without policy) e2e', () => {
                                 ],
                             },
                         ],
+                    },
+                };
+                return request(app.getHttpServer())
+                    .get('/users')
+                    .query({
+                        crudQuery: JSON.stringify(crudQuery),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data?.[0]?.posts?.[0]?.comments?.[0]?.title).toEqual(
+                            needleString0,
+                        );
+                    });
+            });
+
+            it(`correctly handles consecutive operators in the middle`, () => {
+                // NOTE: this test only cares about correctly handling of consecutive operators, hence repeated validCondition everywhere
+                const crudQuery = {
+                    where: {
+                        posts: {
+                            some: {
+                                AND: [
+                                    { title: needleString0 },
+                                    {
+                                        AND: [
+                                            { title: needleString0 },
+                                            {
+                                                OR: [
+                                                    { title: needleString0 },
+                                                    { title: needleString0 },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
                     },
                 };
                 return request(app.getHttpServer())
