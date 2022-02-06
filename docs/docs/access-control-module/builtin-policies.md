@@ -12,7 +12,7 @@ For more complex scenarios you can also [create your own custom policies](./cust
 
 ### Description
 
-Scopes the controller access to database records where `modelAttributePath` matches some dynamic property of [`authData`](access-control-module#optsauthdatakey), defined by `authDataAttributePath`.
+Scopes the controller access to database records where `modelAttributePath` matches some dynamic property of [`authData`](/nestjs-prisma-crud/access-control-module#optsauthdatakey), defined by `authDataAttributePath`.
 
 ### Function signature
 
