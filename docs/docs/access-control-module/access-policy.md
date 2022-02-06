@@ -25,7 +25,7 @@ Acceptable values are:
 
 1. **'everyone'**: This option makes the route public, granting access to anyone regardless if they are authenticated or not.
 1. **'anyRole'**: This option makes the route accessible to anyone who is authenticated and has at least one role.
-1. **An Array or Set of ids**: the specific role ids which should be granted access to the decorated route. These will be compared with roles retrieved from [authData](./access-control-module/#optsauthdatakey) by passing it to [getRolesFromAuthDataFn](./access-control-module/#optsgetrolesfromauthdatafn).
+1. **An Array or Set of ids**: the specific role ids which should be granted access to the decorated route. These will be compared with roles retrieved from [authData](/nestjs-prisma-crud/access-control-module#optsauthdatakey) by passing it to [getRolesFromAuthDataFn](/nestjs-prisma-crud/access-control-module#optsgetrolesfromauthdatafn).
 
 ### policyMethods
 

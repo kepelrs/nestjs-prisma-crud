@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Module Registration
 
-Add `.accessControl` to your module registration to setup interceptors and other necessary logic for [AccessPolicy](./access-policy) to work.
+Add `.accessControl` to your module registration to setup interceptors and other necessary logic for [AccessPolicy](/nestjs-prisma-crud/access-control-module/access-policy) to work.
 
 ## Usage
 
