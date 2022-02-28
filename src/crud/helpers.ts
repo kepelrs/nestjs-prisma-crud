@@ -32,7 +32,7 @@ export function plainToPrismaNestedQuery(
         const parentIsNotArray = !(parent instanceof Array);
         const valueIsObject = value instanceof Object;
         const valueIsArray = value instanceof Array;
-        const pathWithoutDigits = meta.currentPath?.replace(/.\d+./, '.');
+        const pathWithoutDigits = meta.nodePath?.replace(/.\d+./, '.');
         const pathIsWithinAllowedJoins = allowedJoinSet.has(pathWithoutDigits as string);
 
         // TODO: Refactor, split into named subfunctions at least the main condition blocks
@@ -53,7 +53,7 @@ export function plainToPrismaNestedQuery(
                     .map((v: any) => ({ [idPropertyName]: v[idPropertyName] }));
                 const idsToDisconnect = getIdsToDisconnect(
                     toConnect,
-                    getNestedProperty(currentPersistedObject, meta.currentPath!),
+                    getNestedProperty(currentPersistedObject, meta.nodePath!),
                     idPropertyName,
                 );
                 parent[key] = {
@@ -66,7 +66,7 @@ export function plainToPrismaNestedQuery(
             else if (value[idPropertyName]) {
                 const currentPersistedId = getNestedProperty(
                     currentPersistedObject,
-                    `${meta.currentPath}.${idPropertyName}`,
+                    `${meta.nodePath}.${idPropertyName}`,
                 );
                 const idChanged = value[idPropertyName] !== currentPersistedId;
 
@@ -85,7 +85,7 @@ export function plainToPrismaNestedQuery(
             key = key!;
 
             // TODO: Refactor, split into named subfunctions at least the main condition blocks
-            const persistedValue = getNestedProperty(currentPersistedObject, `${meta.currentPath}`);
+            const persistedValue = getNestedProperty(currentPersistedObject, `${meta.nodePath}`);
             const persistedValueIsRelation = persistedValue instanceof Object;
             const persistedValueIsAlreadyNull = persistedValue === null;
             if (persistedValueIsRelation) {
@@ -169,14 +169,14 @@ export function deleteObjectProperties(
 
     traverse(object, (context) => {
         const { parent, key, meta } = context;
-        if (!parent || !key || !meta.currentPath) {
+        if (!parent || !key || !meta.nodePath) {
             return;
         }
 
-        let currentPath = meta.currentPath!;
+        let nodePath = meta.nodePath!;
         if (ignoreArrayIndexes) {
-            currentPath = currentPath.replace(/\.\d+\./g, '.');
-            currentPath = currentPath.replace(/\.\d+$/, '');
+            nodePath = nodePath.replace(/\.\d+\./g, '.');
+            nodePath = nodePath.replace(/\.\d+$/, '');
         }
 
         // delete all paths that match blacklistedPropertyPaths
@@ -185,10 +185,10 @@ export function deleteObjectProperties(
 
             let pathIsBlacklisted = false;
             if (typeof deniedPath === 'string') {
-                pathIsBlacklisted = deniedPath === currentPath;
+                pathIsBlacklisted = deniedPath === nodePath;
             }
             if (deniedPath instanceof RegExp) {
-                pathIsBlacklisted = deniedPath.test(currentPath);
+                pathIsBlacklisted = deniedPath.test(nodePath);
             }
 
             if (pathIsBlacklisted) {
@@ -204,10 +204,10 @@ export function deleteObjectProperties(
                 const allowedPath = whitelistedPropertyPaths![i];
 
                 if (typeof allowedPath === 'string') {
-                    pathIsWhiteListed = allowedPath.startsWith(currentPath);
+                    pathIsWhiteListed = allowedPath.startsWith(nodePath);
                 }
                 if (allowedPath instanceof RegExp) {
-                    pathIsWhiteListed = allowedPath.test(currentPath);
+                    pathIsWhiteListed = allowedPath.test(nodePath);
                 }
 
                 if (pathIsWhiteListed) {

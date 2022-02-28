@@ -60,7 +60,7 @@
     },
     "dependencies": {
         "joi": "^17.4.2",
-        "object-traversal": "^0.1.2"
+        "object-traversal": "^1.0.0-beta.1"
     },
     "np": {
         "yarn": true,

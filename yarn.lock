@@ -4649,10 +4649,10 @@ object-keys@^1.0.12, object-keys@^1.1.1:
   resolved "https://registry.yarnpkg.com/object-keys/-/object-keys-1.1.1.tgz#1c47f272df277f3b1daf061677d9c82e2322c60e"
   integrity sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==
 
-object-traversal@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/object-traversal/-/object-traversal-0.1.2.tgz#c1676c98b6964a585f52d9da9a0f42a6543c53ae"
-  integrity sha512-Q5My9GgntrOS5VrHN0d+VGN9SxjeEmZx97prSVeFVyuKSghQp3KHf0BRZOL4razE7cXvskMEuAk5BiDZhbCLag==
+object-traversal@^1.0.0-beta.1:
+  version "1.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/object-traversal/-/object-traversal-1.0.0-beta.1.tgz#8cba8d5ae0c53c7dc3b0f6d1b75ba4a0fa379e82"
+  integrity sha512-INCwNAMxo3CerQ7lzGusEFLn7GbskAbRzeqYreUGi9vGOfgIrvj6hIwMnMvJFIeg/KjPWwx1sBLqnIKJB2ji7A==
 
 object.assign@^4.1.0, object.assign@^4.1.2:
   version "4.1.2"

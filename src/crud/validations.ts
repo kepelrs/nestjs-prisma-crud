@@ -50,14 +50,14 @@ export function validateNestedWhere(
 
     traverse(whereObject, (context) => {
         const { value, meta } = context;
-        const isLeafArrayContent = leafArrayContentRegex.test(meta.currentPath || '');
+        const isLeafArrayContent = leafArrayContentRegex.test(meta.nodePath || '');
         const isLeafArray =
-            meta.currentPath && value instanceof Array && leafArrayRegex.test(meta.currentPath);
+            meta.nodePath && value instanceof Array && leafArrayRegex.test(meta.nodePath);
         const isLeafNonArray = !isLeafArrayContent && !(value instanceof Object); // when value is non-objects it means parent are final nodes (except when isLeafArrayContent)
         const isLeaf = isLeafArray || isLeafNonArray;
         if (isLeaf) {
             // leaf paths are the longest
-            const leafPath = meta.currentPath!;
+            const leafPath = meta.nodePath!;
 
             // remove operators from the middle of string
             const midCleanedupString = leafPath.replace(midOperatorsRegex, '.');
@@ -98,7 +98,7 @@ export function validateNestedOrderBy(orderByObjects: any[], allowedJoinsSet: Se
             const isLeaf = !(value instanceof Object); // nulls and non-objects are final nodes, except when using 'in' or 'notIn'
             if (isLeaf) {
                 // leaf paths are the longest
-                const leafPath = meta.currentPath!;
+                const leafPath = meta.nodePath!;
                 const pathWithoutLastFragment = leafPath.replace(lastFragmentRegex, '');
 
                 const isAllowed =
