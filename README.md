@@ -1,5 +1,24 @@
-[![tests](https://github.com/kepelrs/nestjs-prisma-crud/actions/workflows/tests.yml/badge.svg)](https://github.com/kepelrs/nestjs-prisma-crud/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/kepelrs/nestjs-prisma-crud/branch/master/graph/badge.svg?token=X2KQ8AMFA7)](https://codecov.io/gh/kepelrs/nestjs-prisma-crud)
+<div>
+<a href="https://github.com/kepelrs/nestjs-prisma-crud/actions/workflows/tests.yml">
+<img src="https://github.com/kepelrs/nestjs-prisma-crud/actions/workflows/tests.yml/badge.svg" alt="build" />
+</a>
+
+<a href="https://codecov.io/gh/kepelrs/nestjs-prisma-crud">
+<img src="https://codecov.io/gh/kepelrs/nestjs-prisma-crud/branch/master/graph/badge.svg?token=X2KQ8AMFA7" alt="codecov" />
+</a>
+
+<a href="https://www.npmjs.com/package/nestjs-prisma-crud">
+<img src="https://img.shields.io/npm/dm/nestjs-prisma-crud.svg" alt="npm downloads" />
+</a>
+
+<a href="https://github.com/kepelrs/nestjs-prisma-crud/blob/master/package.json">
+  <img src="https://img.shields.io/librariesio/release/npm/nestjs-prisma-crud" alt="License" />
+</a>
+
+<a href="https://github.com/kepelrs/nestjs-prisma-crud/blob/master/LICENSE">
+  <img src="https://img.shields.io/github/license/kepelrs/nestjs-prisma-crud.svg" alt="License" />
+</a>
+</div>
 
 # nestjs-prisma-crud
 
