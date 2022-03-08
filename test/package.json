@@ -36,7 +36,7 @@
         "object-traversal": "1.0.0",
         "reflect-metadata": "0.1.13",
         "rimraf": "3.0.2",
-        "rxjs": "7.5.4"
+        "rxjs": "7.5.5"
     },
     "devDependencies": {
         "@nestjs/cli": "8.2.2",
