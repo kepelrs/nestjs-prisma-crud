@@ -26,10 +26,10 @@
         "scaffold-module": "nest g -c nestjs-prisma-crud-schematics crud-resource"
     },
     "dependencies": {
-        "@nestjs/common": "8.4.1",
-        "@nestjs/core": "8.4.1",
+        "@nestjs/common": "8.4.2",
+        "@nestjs/core": "8.4.2",
         "@nestjs/mapped-types": "1.0.1",
-        "@nestjs/platform-express": "8.4.1",
+        "@nestjs/platform-express": "8.4.2",
         "@prisma/client": "3.11.0",
         "class-transformer": "0.5.1",
         "class-validator": "0.13.2",
@@ -39,9 +39,9 @@
         "rxjs": "7.5.5"
     },
     "devDependencies": {
-        "@nestjs/cli": "8.2.3",
+        "@nestjs/cli": "8.2.4",
         "@nestjs/schematics": "8.0.8",
-        "@nestjs/testing": "8.4.1",
+        "@nestjs/testing": "8.4.2",
         "@types/express": "4.17.13",
         "@types/jest": "27.4.1",
         "@types/node": "16.11.26",
