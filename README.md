@@ -3,6 +3,10 @@
 <img src="https://github.com/kepelrs/nestjs-prisma-crud/actions/workflows/tests.yml/badge.svg" alt="build" />
 </a>
 
+<a href="https://codeclimate.com/github/kepelrs/nestjs-prisma-crud/maintainability">
+<img src="https://api.codeclimate.com/v1/badges/d5807bc933d427ef4c61/maintainability" />
+</a>
+
 <a href="https://codecov.io/gh/kepelrs/nestjs-prisma-crud">
 <img src="https://codecov.io/gh/kepelrs/nestjs-prisma-crud/branch/master/graph/badge.svg?token=X2KQ8AMFA7" alt="codecov" />
 </a>
