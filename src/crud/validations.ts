@@ -41,7 +41,7 @@ export function validateNestedWhere(
     ],
 ) {
     const blackListedWordsRegex = `(${prismaBlacklistKeywords.join('|')})`;
-    const midOperatorsRegex = new RegExp(`(?<!^)\\.?${blackListedWordsRegex}\\.`, 'g');
+    const midOperatorsRegex = new RegExp(`(?<!^)\\.${blackListedWordsRegex}\\.`, 'g');
     const endOperatorsRegex = new RegExp(`\\.${blackListedWordsRegex}$`, 'g');
     const startOperatorsRegex = new RegExp(`^${blackListedWordsRegex}(\\.|$)`, 'g');
     const lastFragmentRegex = /\.?[^.]+$/;
@@ -56,11 +56,23 @@ export function validateNestedWhere(
         const isLeafNonArray = !isLeafArrayContent && !(value instanceof Object); // when value is non-objects it means parent are final nodes (except when isLeafArrayContent)
         const isLeaf = isLeafArray || isLeafNonArray;
         if (isLeaf) {
-            // leaf paths are the longest
+            // leaf paths are the longest, therefore validating them is the same as validating its subsets
             const leafPath = meta.nodePath!;
 
             // remove operators from the middle of string
-            const midCleanedupString = leafPath.replace(midOperatorsRegex, '.');
+            let midCleanedupString = leafPath.replace(midOperatorsRegex, '.');
+            while (true) {
+                // trim consecutive prisma operators. TODO: see if better regex is possible instead of loop. if not, move cleanup logic into standalone function
+                const consecutiveCleanedupString = midCleanedupString.replace(
+                    midOperatorsRegex,
+                    '.',
+                );
+                if (consecutiveCleanedupString === midCleanedupString) {
+                    break;
+                }
+                midCleanedupString = consecutiveCleanedupString;
+            }
+
             const withoutDuplicateDots = midCleanedupString.replace(/\.+/g, '.');
             // remove from beginning
             const startCleanedupString = withoutDuplicateDots.replace(startOperatorsRegex, '');

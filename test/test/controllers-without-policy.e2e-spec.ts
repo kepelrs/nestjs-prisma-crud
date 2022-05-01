@@ -277,6 +277,31 @@ describe('CRUD controllers (without policy) e2e', () => {
                     });
             });
 
+            it(`[Regression] correctly handles cases where columns end with 'in'`, () => {
+                const crudQuery = {
+                    where: {
+                        posts: {
+                            some: {
+                                comments: {
+                                    some: {
+                                        testin: { someProp: 1 },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                };
+                return request(app.getHttpServer())
+                    .get('/users')
+                    .query({
+                        crudQuery: JSON.stringify(crudQuery),
+                    })
+                    .expect(200)
+                    .then((res) => {
+                        expect(res.body?.data?.length).toEqual(0);
+                    });
+            });
+
             it(`correctly handles consecutive operators at the beginning`, () => {
                 // NOTE: this test only cares about correctly handling of consecutive operators, hence repeated validCondition everywhere
                 const validCondition = {
