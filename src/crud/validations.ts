@@ -134,13 +134,17 @@ const crudQueryFullSchema = Joi.object({
         only: Joi.array().items(Joi.string()),
         except: Joi.array().items(Joi.string()),
     }).required(),
-    orderBy: Joi.array().items(Joi.object()),
+    orderBy: Joi.array()
+        .items(Joi.object())
+        .required(),
     page: Joi.number()
         .integer()
-        .min(1),
+        .min(1)
+        .required(),
     pageSize: Joi.number()
         .integer()
-        .min(1),
+        .min(1)
+        .required(),
 });
 export function validateCrudQueryFull(fullCrudQuery: CrudQueryFull) {
     const { error } = crudQueryFullSchema.validate(fullCrudQuery);
