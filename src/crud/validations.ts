@@ -40,10 +40,12 @@ export function validateNestedWhere(
         'NOT',
     ],
 ) {
-    const blackListedWordsRegex = `(${prismaBlacklistKeywords.join('|')})`;
-    const midOperatorsRegex = new RegExp(`(?<!^)\\.${blackListedWordsRegex}\\.`, 'g');
-    const endOperatorsRegex = new RegExp(`\\.${blackListedWordsRegex}$`, 'g');
-    const startOperatorsRegex = new RegExp(`^${blackListedWordsRegex}(\\.|$)`, 'g');
+    const blackListedWordsRegex = new RegExp(
+        `(^|\\.)${`(${prismaBlacklistKeywords.join('|')})`}*(?=\\.|$)`,
+        'g',
+    );
+    const trimDotsRegex = /(^\.+)|(\.+$)/g;
+    const repeatedDotsRegex = /\.+/g;
     const lastFragmentRegex = /\.?[^.]+$/;
     const leafArrayContentRegex = /\.(in|notIn)\.\d+$/;
     const leafArrayRegex = /\.(in|notIn)$/;
@@ -56,30 +58,10 @@ export function validateNestedWhere(
         const isLeafNonArray = !isLeafArrayContent && !(value instanceof Object); // when value is non-objects it means parent are final nodes (except when isLeafArrayContent)
         const isLeaf = isLeafArray || isLeafNonArray;
         if (isLeaf) {
-            // leaf paths are the longest, therefore validating them is the same as validating its subsets
-            const leafPath = meta.nodePath!;
-
-            // remove operators from the middle of string
-            let midCleanedupString = leafPath.replace(midOperatorsRegex, '.');
-            while (true) {
-                // trim consecutive prisma operators. TODO: see if better regex is possible instead of loop. if not, move cleanup logic into standalone function
-                const consecutiveCleanedupString = midCleanedupString.replace(
-                    midOperatorsRegex,
-                    '.',
-                );
-                if (consecutiveCleanedupString === midCleanedupString) {
-                    break;
-                }
-                midCleanedupString = consecutiveCleanedupString;
-            }
-
-            const withoutDuplicateDots = midCleanedupString.replace(/\.+/g, '.');
-            // remove from beginning
-            const startCleanedupString = withoutDuplicateDots.replace(startOperatorsRegex, '');
-            // remove operators from the end of string
-            const endCleanedupString = startCleanedupString.replace(endOperatorsRegex, '');
-            // remove last fragment, as it is a property (eg. author.firstName)
-            const cleanedupString = endCleanedupString.replace(lastFragmentRegex, '');
+            const withoutBlacklistedWords = meta.nodePath!.replace(blackListedWordsRegex, '.');
+            const withoutRepeatedDots = withoutBlacklistedWords.replace(repeatedDotsRegex, '.');
+            const withoutLeadingAndTrailingDots = withoutRepeatedDots.replace(trimDotsRegex, '');
+            const cleanedupString = withoutLeadingAndTrailingDots.replace(lastFragmentRegex, '');
 
             const isAllowed = !cleanedupString || allowedJoinsSet.has(cleanedupString);
             if (!isAllowed) {
