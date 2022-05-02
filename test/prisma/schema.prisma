@@ -63,8 +63,10 @@ model Comment {
   // author   User @relation(fields: [authorId], references: [id])
   // authorId String
 
-  post   Post   @relation(fields: [postId], references: [id])
-  postId String
+  post     Post    @relation(fields: [postId], references: [id])
+  postId   String
+  testin   Testin? @relation(fields: [testinId], references: [id])
+  testinId String?
 }
 
 model Category {
@@ -83,4 +85,10 @@ model EntityWithIntId {
 model AuditLog {
   id      String @id @default(uuid())
   content String
+}
+
+model Testin {
+  id       String    @id @default(uuid())
+  someProp Int
+  comments  Comment[]
 }

@@ -85,12 +85,7 @@ export class PrismaQueryBuilder {
             crudQuery = JSON.parse(crudQuery);
         }
 
-        const crudQueryFull = Object.assign(
-            {},
-            this.DEFAULT_CRUD_QUERY,
-            crudQuery,
-        ) as CrudQueryFull;
-
+        const crudQueryFull: CrudQueryFull = Object.assign({}, this.DEFAULT_CRUD_QUERY, crudQuery);
         validateCrudQueryFull(crudQueryFull);
 
         return crudQueryFull;
