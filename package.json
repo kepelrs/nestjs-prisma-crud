@@ -73,8 +73,8 @@
     "resolutions": {
         "**/@typescript-eslint/eslint-plugin": "^5.0.0",
         "**/@typescript-eslint/parser": "^5.0.0",
-        "**/jest": "^27.0.0",
-        "**/ts-jest": "^27.0.0",
+        "**/jest": "^28.0.0",
+        "**/ts-jest": "^28.0.0",
         "**/typescript": "4.6.4"
     }
 }
