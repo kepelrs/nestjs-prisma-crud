@@ -16,7 +16,7 @@
 </a>
 
 <a href="https://github.com/kepelrs/nestjs-prisma-crud/blob/master/package.json">
-  <img src="https://img.shields.io/librariesio/release/npm/nestjs-prisma-crud" alt="License" />
+    <img src="https://img.shields.io/badge/dependencies-2-brightgreen" alt="Dependencies" />
 </a>
 
 <a href="https://github.com/kepelrs/nestjs-prisma-crud/blob/master/LICENSE">
