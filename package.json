@@ -48,7 +48,7 @@
         "reflect-metadata": "0.1.13",
         "rxjs": "7.5.7",
         "tsdx": "0.14.1",
-        "tslib": "2.4.0",
+        "tslib": "2.4.1",
         "typescript": "4.8.4"
     },
     "peerDependencies": {
