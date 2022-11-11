@@ -42,9 +42,9 @@
     "devDependencies": {
         "@nestjs/common": "9.2.0",
         "@nestjs/core": "9.2.0",
-        "@prisma/client": "4.6.0",
+        "@prisma/client": "4.6.1",
         "husky": "8.0.1",
-        "prisma": "4.6.0",
+        "prisma": "4.6.1",
         "reflect-metadata": "0.1.13",
         "rxjs": "7.5.7",
         "tsdx": "0.14.1",
