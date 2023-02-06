@@ -40,8 +40,8 @@
     "author": "Kepelrs",
     "module": "dist/nestjs-prisma-crud.esm.js",
     "devDependencies": {
-        "@nestjs/common": "9.3.2",
-        "@nestjs/core": "9.3.2",
+        "@nestjs/common": "9.3.3",
+        "@nestjs/core": "9.3.3",
         "@prisma/client": "4.9.0",
         "husky": "8.0.3",
         "prisma": "4.9.0",
