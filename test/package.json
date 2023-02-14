@@ -28,7 +28,7 @@
     "dependencies": {
         "@nestjs/common": "9.3.8",
         "@nestjs/core": "9.3.8",
-        "@nestjs/mapped-types": "1.2.0",
+        "@nestjs/mapped-types": "1.2.2",
         "@nestjs/platform-express": "9.3.8",
         "@prisma/client": "4.10.1",
         "class-transformer": "0.5.1",
