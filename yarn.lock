@@ -4470,9 +4470,9 @@ object-keys@^1.0.12, object-keys@^1.1.1:
   integrity sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==
 
 object-traversal@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/object-traversal/-/object-traversal-1.0.0.tgz#55da740085540685cf306e6663b243dfe227aa9f"
-  integrity sha512-oc9JRLVwTU0xS5BxGybWhNxYNClYZOEoRnovEqrJYaQmxgRZMCHe327HPrjB8vrvGC8Kr2kySK1cyt+1EC6I6g==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/object-traversal/-/object-traversal-1.0.1.tgz#9803bebf619c1ac514fcf6c698cd1037998ceb38"
+  integrity sha512-aLXtM9kbcG/ePyZfB45B0FrIdu1yy3udQjIVmp2IVl2np52dBK5ZZBhdyUKFT6neCutwDhCW/kQ+e/0K5n/Jhw==
 
 object.assign@^4.1.0, object.assign@^4.1.2:
   version "4.1.2"
