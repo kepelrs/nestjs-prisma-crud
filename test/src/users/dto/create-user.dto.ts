@@ -1,4 +1,4 @@
-import { Prisma } from '.prisma/client';
+import { Prisma } from '@prisma/client';
 import { IsArray, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserDto implements Prisma.UserCreateInput {

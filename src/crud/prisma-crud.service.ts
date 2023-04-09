@@ -1,5 +1,5 @@
-import { PrismaClient } from '.prisma/client';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 import { deleteObjectProperties, getAllJoinSubsets } from './helpers';
 import { PrismaQueryBuilder } from './prisma-query-builder';
 import { CrudMethodOpts, CrudServiceOpts, PaginationConfig } from './types';
