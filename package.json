@@ -46,7 +46,7 @@
         "husky": "8.0.3",
         "prisma": "4.13.0",
         "reflect-metadata": "0.1.13",
-        "rxjs": "7.8.0",
+        "rxjs": "7.8.1",
         "tsdx": "0.14.1",
         "tslib": "2.5.0",
         "typescript": "5.0.4"
