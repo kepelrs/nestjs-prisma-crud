@@ -61,23 +61,6 @@
         "tsconfig-paths": "4.2.0",
         "typescript": "5.1.6"
     },
-    "jest": {
-        "moduleFileExtensions": [
-            "js",
-            "json",
-            "ts"
-        ],
-        "rootDir": "src",
-        "testRegex": ".*\\.spec\\.ts$",
-        "transform": {
-            "^.+\\.(t|j)s$": "ts-jest"
-        },
-        "collectCoverageFrom": [
-            "**/*.(t|j)s"
-        ],
-        "coverageDirectory": "../coverage",
-        "testEnvironment": "node"
-    },
     "resolutions": {
         "**/@typescript-eslint/eslint-plugin": "5.60.1",
         "**/@typescript-eslint/parser": "5.60.1",
