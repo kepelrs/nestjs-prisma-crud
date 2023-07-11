@@ -11,14 +11,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ['14.x', '16.x']
+        node: ['18.x']
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '18'
       - run: cd test && npm i && cp .env-example .env && cd ..
       - run: npm install -g codecov
       - run: cd docs && yarn install && npm run build && cd ..
