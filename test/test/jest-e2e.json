@@ -15,7 +15,6 @@
     "moduleNameMapper": {
         "^@nestjs/common$": "<rootDir>test//node_modules/@nestjs/common",
         "^@nestjs/core$": "<rootDir>/test/node_modules/@nestjs/core",
-        "^reflect-metadata$": "<rootDir>/test/node_modules/reflect-metadata",
         "^nestjs-prisma-crud$": "<rootDir>/src"
     },
     "collectCoverageFrom": ["<rootDir>/src/**/*.ts"],
