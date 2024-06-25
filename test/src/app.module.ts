@@ -13,6 +13,9 @@ import { EntityWithIntIdModule } from './entity-with-int-id/entity-with-int-id.m
 import { PrismaService } from './prisma.service';
 import { UsersModule } from './users/users.module';
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 function createModuleMetadata(opts: { strictMode: boolean }) {
     return {
         imports: [
