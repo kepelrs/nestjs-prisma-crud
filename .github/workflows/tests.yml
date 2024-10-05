@@ -11,14 +11,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ["18.x", "20.x", "22.x", "24.x"]
+        node: ["18.x", "20.x", "22.x"]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: ${{ matrix.node }}
       - run: cd test && npm i && cp .env-example .env && cd ..
       - run: cd docs && yarn install && npm run build && cd ..
       - run: npm i -g yarn
