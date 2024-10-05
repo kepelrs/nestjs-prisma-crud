@@ -1,27 +1,28 @@
 name: build
 on: [push, pull_request]
 # on:
-  # push:
-  #   branches:
-  #     - master
-  #     - 'v*.*.*'
+# push:
+#   branches:
+#     - master
+#     - 'v*.*.*'
 jobs:
   run-tests:
     name: Build and test on Node ${{ matrix.node }} and ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ['18.x']
+        node: ["18.x", "20.x", "22.x", "24.x"]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
       - run: cd test && npm i && cp .env-example .env && cd ..
-      - run: npm install -g codecov
       - run: cd docs && yarn install && npm run build && cd ..
       - run: npm i -g yarn
       - run: yarn install
-      - run: npm run test:cov && codecov
+      - run: npm run test:cov
+      - name: Codecov
+        uses: codecov/codecov-action@v4.6.0
