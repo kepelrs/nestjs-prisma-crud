@@ -20,8 +20,9 @@ jobs:
         with:
           node-version: '18'
       - run: cd test && npm i && cp .env-example .env && cd ..
-      - run: npm install -g codecov
       - run: cd docs && yarn install && npm run build && cd ..
       - run: npm i -g yarn
       - run: yarn install
-      - run: npm run test:cov && codecov
+      - run: npm run test:cov
+      - name: Codecov
+        uses: codecov/codecov-action@v4.6.0
