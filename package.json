@@ -47,7 +47,7 @@
         "prisma": "5.20.0",
         "rxjs": "7.8.1",
         "tsdx": "0.14.1",
-        "tslib": "2.7.0",
+        "tslib": "2.8.0",
         "typescript": "5.6.3"
     },
     "peerDependencies": {
