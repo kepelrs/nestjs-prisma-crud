@@ -36,7 +36,7 @@
         "dotenv": "^16.4.5",
         "object-traversal": "1.0.1",
         "rimraf": "6.0.1",
-        "rxjs": "7.8.1"
+        "rxjs": "7.8.2"
     },
     "devDependencies": {
         "@nestjs/cli": "10.4.9",
