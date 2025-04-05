@@ -1,10 +1,10 @@
 name: build
-on: [push, pull_request]
-# on:
-# push:
-#   branches:
-#     - master
-#     - 'v*.*.*'
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
 jobs:
   run-tests:
     name: Build and test on Node ${{ matrix.node }} and ${{ matrix.os }}
