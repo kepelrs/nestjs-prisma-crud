@@ -1,17 +1,17 @@
 name: build
-on: [push, pull_request]
-# on:
-# push:
-#   branches:
-#     - master
-#     - 'v*.*.*'
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
 jobs:
   run-tests:
     name: Build and test on Node ${{ matrix.node }} and ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ["18.x", "20.x", "22.x"]
+        node: ["20.x", "22.x"]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:

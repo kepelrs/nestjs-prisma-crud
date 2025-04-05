@@ -1,26 +1,18 @@
-import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as request from 'supertest';
 import { needleStrings, seed, TestSeed } from '../prisma/seed';
-import { AppModule, StrictModeAppModule } from '../src/app.module';
-import { multiAppTest } from './helpers';
+import { createTestingApp, multiAppTest } from './helpers';
 
 describe('Multiple policies e2e', () => {
-    let nonStrictApp: INestApplication;
-    let strictApp: INestApplication;
+    let nonStrictApp: NestExpressApplication;
+    let strictApp: NestExpressApplication;
     let userSeeds: TestSeed[];
     const [needleString0] = needleStrings;
 
     beforeAll(async () => {
-        const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
-        }).compile();
-        const strictModuleFixture: TestingModule = await Test.createTestingModule({
-            imports: [StrictModeAppModule],
-        }).compile();
+        nonStrictApp = await createTestingApp({ strict: false });
+        strictApp = await createTestingApp({ strict: true });
 
-        nonStrictApp = moduleFixture.createNestApplication();
-        strictApp = strictModuleFixture.createNestApplication();
         await nonStrictApp.init();
         await strictApp.init();
     });
@@ -42,7 +34,7 @@ describe('Multiple policies e2e', () => {
         it('impossible combination results in 0 records', async () => {
             await multiAppTest([nonStrictApp, strictApp], async (app) => {
                 await request(app.getHttpServer())
-                    .get('/combined-policies/comments/impossible')
+                    .get('/combined-policies/comments/impossible?a=1&b=2')
                     .expect(200)
                     .then((res) => {
                         expect(res?.body?.data?.length).toBe(0);

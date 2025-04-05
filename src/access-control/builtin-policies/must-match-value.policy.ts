@@ -5,8 +5,9 @@ import { CrudQueryObj } from '../../crud/types';
 import { createWhereObject } from '../../crud/utils';
 
 export const MustMatchValue = (modelAttributePath: string, targetValue: any): PolicyMethod => (
-    ctx: ExecutionContext,
+    crudQuery: CrudQueryObj,
     _authData: any,
+    _ctx: ExecutionContext,
     _moduleRef: ModuleRef,
 ) => {
     if (!targetValue) {
@@ -15,15 +16,9 @@ export const MustMatchValue = (modelAttributePath: string, targetValue: any): Po
         );
     }
 
-    const request = ctx.switchToHttp().getRequest();
-    const query = request.query;
-    const crudQuery: string = query.crudQuery;
-
-    const parsedCrudQuery: CrudQueryObj = crudQuery ? JSON.parse(crudQuery) : {};
-    const originalWhere = parsedCrudQuery.where || {};
-    parsedCrudQuery.where = {
-        AND: [createWhereObject(modelAttributePath, targetValue), originalWhere],
+    const originalWhere = crudQuery?.where || {};
+    return {
+        ...crudQuery,
+        where: { AND: [createWhereObject(modelAttributePath, targetValue), originalWhere] },
     };
-
-    request.query.crudQuery = JSON.stringify(parsedCrudQuery);
 };

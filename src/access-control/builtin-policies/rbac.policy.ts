@@ -1,5 +1,6 @@
 import { ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { CrudQueryObj } from '../../crud/types';
 import { ACCESS_POLICY_OPTS_KEY } from '../constants';
 import { AccessPolicyInterceptorOpts, AllowedRoles, AllowedRolesId, PolicyMethod } from '../types';
 
@@ -7,9 +8,14 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
     allowedRoles: AllowedRoles<T>,
     authData: any,
     moduleRef: ModuleRef,
-): PolicyMethod => (_: ExecutionContext) => {
+): PolicyMethod => (
+    crudQuery: CrudQueryObj,
+    _authData: any,
+    _ctx: ExecutionContext,
+    _moduleRef: ModuleRef,
+) => {
     if (allowedRoles === 'everyone') {
-        return;
+        return crudQuery;
     }
 
     // not 'everyone', therefore the user must be denied if not authenticated:
@@ -33,7 +39,7 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
     // if this code is reached, user is authenticated and has at least one role
     if (allowedRoles === 'anyRole') {
         // 'anyRole' and at least one userRole exists, access is granted
-        return;
+        return crudQuery;
     }
 
     // if this code is reached allowedRoles is an array or set of ids. Check if any roles overlap:
@@ -42,7 +48,7 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
     for (let i = 0; i < userRolesArray.length; i++) {
         const role = userRolesArray[i];
         if (allowedRolesSet.has(role)) {
-            return;
+            return crudQuery;
         }
     }
 

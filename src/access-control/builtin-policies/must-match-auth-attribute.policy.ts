@@ -11,11 +11,12 @@ import { createWhereObject, getNestedProperty } from '../../crud/utils';
 export const MustMatchAuthAttribute = (
     modelAttributePath: string,
     authDataAttributePath: string,
-): PolicyMethod => (ctx: ExecutionContext, authData: any, _moduleRef: ModuleRef) => {
-    const request = ctx.switchToHttp().getRequest();
-    const query = request.query;
-    const crudQuery: string = query.crudQuery;
-
+): PolicyMethod => (
+    crudQuery: CrudQueryObj,
+    authData: any,
+    _ctx: ExecutionContext,
+    _moduleRef: ModuleRef,
+) => {
     if (!authData) {
         throw new UnauthorizedException('This route requires user to be logged in!');
     }
@@ -27,11 +28,11 @@ export const MustMatchAuthAttribute = (
         );
     }
 
-    const parsedCrudQuery: CrudQueryObj = crudQuery ? JSON.parse(crudQuery) : {};
-    const originalWhere = parsedCrudQuery.where || {};
-    parsedCrudQuery.where = {
-        AND: [createWhereObject(modelAttributePath, targetValue), originalWhere],
+    const originalWhere = crudQuery?.where || {};
+    return {
+        ...crudQuery,
+        where: {
+            AND: [createWhereObject(modelAttributePath, targetValue), originalWhere],
+        },
     };
-
-    request.query.crudQuery = JSON.stringify(parsedCrudQuery);
 };
