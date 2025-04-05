@@ -15,15 +15,10 @@ export const MustMatchValue = (modelAttributePath: string, targetValue: any): Po
         );
     }
 
-    const request = ctx.switchToHttp().getRequest();
-    const query = request.query;
-    const crudQuery: string = query.crudQuery;
-
-    const parsedCrudQuery: CrudQueryObj = crudQuery ? JSON.parse(crudQuery) : {};
-    const originalWhere = parsedCrudQuery.where || {};
-    parsedCrudQuery.where = {
-        AND: [createWhereObject(modelAttributePath, targetValue), originalWhere],
+    const crudQuery: CrudQueryObj | null = ctx.switchToHttp().getRequest().crudQuery;
+    const originalWhere = crudQuery?.where || {};
+    return {
+        ...crudQuery,
+        where: { AND: [createWhereObject(modelAttributePath, targetValue), originalWhere] },
     };
-
-    request.query.crudQuery = JSON.stringify(parsedCrudQuery);
 };

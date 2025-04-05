@@ -9,7 +9,7 @@ import {
     Post,
     Query,
 } from '@nestjs/common';
-import { AccessPolicy } from 'nestjs-prisma-crud';
+import { AccessPolicy, CrudQueryObj, CrudQueryParams } from 'nestjs-prisma-crud';
 import { RoleID } from '../authentication.middleware';
 import { PrismaService } from '../prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -21,13 +21,13 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Post()
-    async create(@Body() createUserDto: CreateUserDto, @Query('crudQuery') crudQuery: string) {
+    async create(@Body() createUserDto: CreateUserDto, @CrudQueryParams() crudQuery: CrudQueryObj) {
         const created = await this.usersService.create(createUserDto, { crudQuery });
         return created;
     }
 
     @Get()
-    async findMany(@Query('crudQuery') crudQuery: string) {
+    async findMany(@CrudQueryParams() crudQuery: CrudQueryObj) {
         const matches = await this.usersService.findMany({ crudQuery });
         return matches;
     }
@@ -39,7 +39,7 @@ export class UsersController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
+    async findOne(@Param('id') id: string, @CrudQueryParams() crudQuery: CrudQueryObj) {
         const match = await this.usersService.findOne(id, { crudQuery });
         return match;
     }
@@ -48,14 +48,14 @@ export class UsersController {
     async update(
         @Param('id') id: string,
         @Body() updateUserDto: UpdateUserDto,
-        @Query('crudQuery') crudQuery: string,
+        @CrudQueryParams() crudQuery: CrudQueryObj,
     ) {
         const updated = await this.usersService.update(id, updateUserDto, { crudQuery });
         return updated;
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: string, @Query('crudQuery') crudQuery: string) {
+    async remove(@Param('id') id: string, @CrudQueryParams() crudQuery: CrudQueryObj) {
         return this.usersService.remove(id, { crudQuery });
     }
 }
@@ -66,21 +66,21 @@ export class WithRBACUsersController {
 
     @Get('everyone')
     @AccessPolicy('everyone')
-    async findMany(@Query('crudQuery') crudQuery: string) {
+    async findMany(@CrudQueryParams() crudQuery: CrudQueryObj) {
         const matches = await this.usersService.findMany({ crudQuery });
         return matches;
     }
 
     @Get('anyRole')
     @AccessPolicy('anyRole')
-    async findManyAuthententicated(@Query('crudQuery') crudQuery: string) {
+    async findManyAuthententicated(@CrudQueryParams() crudQuery: CrudQueryObj) {
         const matches = await this.usersService.findMany({ crudQuery });
         return matches;
     }
 
     @Get('specificRoles')
     @AccessPolicy([RoleID.ALWAYS_ACCESS])
-    async findManySpecificRoles(@Query('crudQuery') crudQuery: string) {
+    async findManySpecificRoles(@CrudQueryParams() crudQuery: CrudQueryObj) {
         const matches = await this.usersService.findMany({ crudQuery });
         return matches;
     }
@@ -105,7 +105,7 @@ export class TransactionUsersController {
     @Post('no-transaction')
     async createWithoutTransaction(
         @Body() createUserDto: CreateUserDto,
-        @Query('crudQuery') crudQuery: string,
+        @CrudQueryParams() crudQuery: CrudQueryObj,
     ) {
         try {
             await this.createLog('example');
@@ -123,7 +123,7 @@ export class TransactionUsersController {
     @Post('fail')
     async createFailWithTransaction(
         @Body() createUserDto: CreateUserDto,
-        @Query('crudQuery') crudQuery: string,
+        @CrudQueryParams() crudQuery: CrudQueryObj,
     ) {
         try {
             let createdUser;
@@ -148,7 +148,7 @@ export class TransactionUsersController {
     @Post('success')
     async createSuccessWithTransaction(
         @Body() createUserDto: CreateUserDto,
-        @Query('crudQuery') crudQuery: string,
+        @CrudQueryParams() crudQuery: CrudQueryObj,
     ) {
         let createdUser;
         await this.prismaService.$transaction(async (prismaTransaction) => {

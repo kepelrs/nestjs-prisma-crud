@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { needleStrings, seed, TestSeed } from '../prisma/seed';
@@ -9,7 +9,7 @@ import { CommentsModule, InvalidCommentsModule } from '../src/comments/comments.
  * This test outlines the added sane defaults to help developers with the more common careless mistakes
  */
 describe('Misuse resistance', () => {
-    let app: INestApplication;
+    let app: NestExpressApplication;
     let userSeeds: TestSeed[];
     let [seededUser0] = [] as TestSeed[];
     const [needleString0] = needleStrings;
@@ -20,6 +20,7 @@ describe('Misuse resistance', () => {
         }).compile();
 
         app = moduleFixture.createNestApplication();
+        app.set('query parser', 'extended');
         await app.init();
     });
 

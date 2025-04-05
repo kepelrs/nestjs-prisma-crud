@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { needleStrings, NUMBER_OF_TEST_USER_SEEDS, seed, TestSeed } from '../prisma/seed';
@@ -8,7 +8,7 @@ import { UsersService } from '../src/users/users.service';
 
 // TODO: Rename file and split into outlined test groups
 describe('CRUD controllers (without policy) e2e', () => {
-    let app: INestApplication;
+    let app: NestExpressApplication;
     let prismaService: PrismaService;
     let userSeeds: TestSeed[];
     let [seededUser0] = [] as TestSeed[];
@@ -21,6 +21,7 @@ describe('CRUD controllers (without policy) e2e', () => {
         }).compile();
 
         app = moduleFixture.createNestApplication();
+        app.set('query parser', 'extended');
         await app.init();
         prismaService = app.get(PrismaService);
     });

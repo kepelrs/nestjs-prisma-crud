@@ -51,7 +51,8 @@ export class AccessPolicyInterceptor implements NestInterceptor {
         // Apply policies
         for (let i = 0; i < policies.length; i++) {
             const policy = policies[i];
-            await policy(ctx, authData, this.moduleRef);
+            const crudQuery = await policy(ctx, authData, this.moduleRef);
+            request.crudQuery = crudQuery;
         }
 
         return next.handle();

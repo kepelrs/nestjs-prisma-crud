@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { needleStrings, seed, TestSeed } from '../prisma/seed';
@@ -7,8 +7,8 @@ import { RoleID } from '../src/authentication.middleware';
 import { multiAppTest } from './helpers';
 
 describe('MustMatchAuthAttributePolicy e2e', () => {
-    let nonStrictApp: INestApplication;
-    let strictApp: INestApplication;
+    let nonStrictApp: NestExpressApplication;
+    let strictApp: NestExpressApplication;
     let userSeeds: TestSeed[];
     const [needleString0] = needleStrings;
 
@@ -21,7 +21,9 @@ describe('MustMatchAuthAttributePolicy e2e', () => {
         }).compile();
 
         nonStrictApp = moduleFixture.createNestApplication();
+        nonStrictApp.set('query parser', 'extended');
         strictApp = strictModuleFixture.createNestApplication();
+        strictApp.set('query parser', 'extended');
         await nonStrictApp.init();
         await strictApp.init();
     });

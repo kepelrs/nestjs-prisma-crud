@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { needleStrings, seed } from '../prisma/seed';
@@ -7,8 +7,8 @@ import { RoleID } from '../src/authentication.middleware';
 import { multiAppTest } from './helpers';
 
 describe('AccessPolicy RBAC e2e', () => {
-    let nonStrictApp: INestApplication;
-    let strictApp: INestApplication;
+    let nonStrictApp: NestExpressApplication;
+    let strictApp: NestExpressApplication;
     const [needleString0] = needleStrings;
 
     beforeAll(async () => {
@@ -19,8 +19,11 @@ describe('AccessPolicy RBAC e2e', () => {
             imports: [StrictModeAppModule],
         }).compile();
 
+        // TODO: deduplicate this logic across all tests
         nonStrictApp = moduleFixture.createNestApplication();
+        nonStrictApp.set('query parser', 'extended');
         strictApp = strictModuleFixture.createNestApplication();
+        strictApp.set('query parser', 'extended');
         await nonStrictApp.init();
         await strictApp.init();
     });
@@ -81,9 +84,7 @@ describe('AccessPolicy RBAC e2e', () => {
         describe('denies access', () => {
             it('when client is unauthenticated', async () => {
                 await multiAppTest([nonStrictApp, strictApp], async (app) => {
-                    await request(app.getHttpServer())
-                        .get('/rbac/users/anyRole')
-                        .expect(401);
+                    await request(app.getHttpServer()).get('/rbac/users/anyRole').expect(401);
                 });
             });
 

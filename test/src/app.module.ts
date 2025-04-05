@@ -48,7 +48,7 @@ function createModuleMetadata(opts: { strictMode: boolean }) {
 @Module(createModuleMetadata({ strictMode: false }))
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AuthenticationMiddleware).forRoutes('*');
+        consumer.apply(AuthenticationMiddleware).forRoutes('*wildcard');
     }
 }
 

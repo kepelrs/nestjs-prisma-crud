@@ -1,5 +1,6 @@
 import { ExecutionContext } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { CrudQueryObj } from '../crud/types';
 
 export type AllowedRoles<T extends AllowedRolesId = AllowedRolesId> = 'everyone' | 'anyRole' | T;
 
@@ -7,7 +8,7 @@ export type PolicyMethod = (
     ctx: ExecutionContext,
     authData: any,
     moduleRef: ModuleRef,
-) => void | any;
+) => CrudQueryObj | Promise<CrudQueryObj>;
 
 export type AccessPolicyConfig = [AllowedRoles, ...PolicyMethod[]];
 
