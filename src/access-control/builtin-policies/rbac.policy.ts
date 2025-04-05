@@ -1,5 +1,6 @@
 import { ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { CrudQueryObj } from '../../crud/types';
 import { ACCESS_POLICY_OPTS_KEY } from '../constants';
 import { AccessPolicyInterceptorOpts, AllowedRoles, AllowedRolesId, PolicyMethod } from '../types';
 
@@ -7,9 +8,12 @@ export const RBAC = <T extends AllowedRolesId = AllowedRolesId>(
     allowedRoles: AllowedRoles<T>,
     authData: any,
     moduleRef: ModuleRef,
-): PolicyMethod => (executionContext: ExecutionContext) => {
-    const crudQuery = executionContext.switchToHttp().getRequest().crudQuery;
-
+): PolicyMethod => (
+    crudQuery: CrudQueryObj,
+    _authData: any,
+    _ctx: ExecutionContext,
+    _moduleRef: ModuleRef,
+) => {
     if (allowedRoles === 'everyone') {
         return crudQuery;
     }

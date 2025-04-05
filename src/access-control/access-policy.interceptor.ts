@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ModuleRef, Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
+import { CrudQueryObj } from '../crud';
 import { RBAC } from './builtin-policies';
 import { ACCESS_POLICY_OPTS_KEY, POLICY_KEY } from './constants';
 import { AccessPolicyConfig, AccessPolicyInterceptorOpts, PolicyMethod } from './types';
@@ -49,9 +50,10 @@ export class AccessPolicyInterceptor implements NestInterceptor {
         ];
 
         // Apply policies
+        let crudQuery: CrudQueryObj = request.crudQuery || null;
         for (let i = 0; i < policies.length; i++) {
             const policy = policies[i];
-            const crudQuery = await policy(ctx, authData, this.moduleRef);
+            crudQuery = await policy(crudQuery, authData, ctx, this.moduleRef);
             request.crudQuery = crudQuery;
         }
 

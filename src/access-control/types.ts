@@ -4,9 +4,10 @@ import { CrudQueryObj } from '../crud/types';
 
 export type AllowedRoles<T extends AllowedRolesId = AllowedRolesId> = 'everyone' | 'anyRole' | T;
 
-export type PolicyMethod = (
+export type PolicyMethod<A = any> = (
+    crudQueryObj: CrudQueryObj,
+    authData: A,
     ctx: ExecutionContext,
-    authData: any,
     moduleRef: ModuleRef,
 ) => CrudQueryObj | Promise<CrudQueryObj>;
 
