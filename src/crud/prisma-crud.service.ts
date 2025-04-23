@@ -10,6 +10,10 @@ const DEFAULT_CRUD_METHOD_OPTS: Required<CrudMethodOpts> = {
     prismaTransaction: undefined,
 };
 
+type AggregationFields = {
+    [K in '_count' | '_avg' | '_sum']: { [key: string]: boolean };
+};
+
 export class PrismaCrudService {
     public static prismaClient: PrismaClient;
     private paginationConfig: Required<PaginationConfig>;
@@ -195,5 +199,24 @@ export class PrismaCrudService {
         await repo.delete({ where: { [this.idPropertyName]: entity[this.idPropertyName] } });
 
         return null;
+    }
+
+    public async groupBy(by: string[], fields: AggregationFields, opts: CrudMethodOpts) {
+        if (by.length === 0) {
+            throw new InternalServerErrorException(`groupBy requires at least one field`);
+        }
+
+        const fullOpts = this.getFullCrudOpts(opts);
+        const repo = this.getRepo(fullOpts);
+        const parsedCrudQuery = this.prismaQueryBuilder.parseCrudQuery(fullOpts.crudQuery);
+        const { findManyQuery } = this.prismaQueryBuilder.buildFindManyQuery(parsedCrudQuery);
+
+        const groupByQuery = {
+            by,
+            ...fields,
+            where: findManyQuery.where,
+        };
+
+        return repo.groupBy(groupByQuery);
     }
 }
