@@ -215,6 +215,8 @@ export class PrismaCrudService {
             by,
             ...fields,
             where: findManyQuery.where,
+            take: findManyQuery.take,
+            skip: findManyQuery.skip,
         };
 
         return repo.groupBy(groupByQuery);
