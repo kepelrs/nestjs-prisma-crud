@@ -201,7 +201,7 @@ export class PrismaCrudService {
         return null;
     }
 
-    public async groupBy(by: string[], fields: AggregationFields, opts: CrudMethodOpts) {
+    public async groupBy(by: string |string[], fields: AggregationFields, opts: CrudMethodOpts) {
         if (by.length === 0) {
             throw new InternalServerErrorException(`groupBy requires at least one field`);
         }
@@ -211,13 +211,27 @@ export class PrismaCrudService {
         const parsedCrudQuery = this.prismaQueryBuilder.parseCrudQuery(fullOpts.crudQuery);
         const { findManyQuery } = this.prismaQueryBuilder.buildFindManyQuery(parsedCrudQuery);
 
-        const groupByQuery = {
+        const groupByQuery: { by: string |string[]; where?: any; orderBy?: any; take?: number; skip?: number } = {
             by,
             ...fields,
-            where: findManyQuery.where,
+            orderBy: findManyQuery.orderBy,
             take: findManyQuery.take,
-            skip: findManyQuery.skip,
+            skip: findManyQuery.skip
         };
+
+        if (findManyQuery.where) {
+            groupByQuery.where = findManyQuery.where;
+        }
+        // If no orderBy is specified in the crudQuery, use the default orderBy based on the by grouping
+        if (!('orderBy' in (fullOpts.crudQuery as object))) {
+            if (typeof by === 'string') {
+                by = [by];
+            }
+            // Default orderBy
+            groupByQuery.orderBy = by.map((field) => {
+                return { [field]: 'asc' };
+            });
+        }
 
         return repo.groupBy(groupByQuery);
     }
