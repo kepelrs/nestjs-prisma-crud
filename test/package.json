@@ -55,7 +55,7 @@
         "prettier": "3.7.3",
         "prisma": "6.19.0",
         "supertest": "7.1.4",
-        "ts-jest": "29.4.5",
+        "ts-jest": "29.4.6",
         "ts-loader": "9.5.4",
         "ts-node": "10.9.2",
         "tsconfig-paths": "4.2.0",
@@ -65,7 +65,7 @@
         "**/@typescript-eslint/eslint-plugin": "8.49.0",
         "**/@typescript-eslint/parser": "8.49.0",
         "**/jest": "30.2.0",
-        "**/ts-jest": "29.4.5",
+        "**/ts-jest": "29.4.6",
         "**/typescript": "5.9.3"
     },
     "prisma": {
