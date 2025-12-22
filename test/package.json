@@ -46,8 +46,8 @@
         "@types/jest": "30.0.0",
         "@types/node": "22.19.3",
         "@types/supertest": "6.0.3",
-        "@typescript-eslint/eslint-plugin": "8.50.0",
-        "@typescript-eslint/parser": "8.50.0",
+        "@typescript-eslint/eslint-plugin": "8.50.1",
+        "@typescript-eslint/parser": "8.50.1",
         "eslint": "9.39.2",
         "eslint-config-prettier": "10.1.8",
         "eslint-plugin-prettier": "5.5.4",
@@ -62,8 +62,8 @@
         "typescript": "5.9.3"
     },
     "resolutions": {
-        "**/@typescript-eslint/eslint-plugin": "8.50.0",
-        "**/@typescript-eslint/parser": "8.50.0",
+        "**/@typescript-eslint/eslint-plugin": "8.50.1",
+        "**/@typescript-eslint/parser": "8.50.1",
         "**/jest": "30.2.0",
         "**/ts-jest": "29.4.6",
         "**/typescript": "5.9.3"
