@@ -123,16 +123,19 @@ export function transformJoinsToInclude(joins: string[]) {
         const join = joins[i];
         const fragments = join.split('.');
         let workingNestedObject = stringToObject;
+
+        const isCount = fragments[0] == '_count';
+
         for (let j = 0; j < fragments.length; j++) {
             const fragment = fragments[j];
             const fragmentAlreadyAdded = !!workingNestedObject[fragment];
             const isLastFragment = j === fragments.length - 1;
             if (!fragmentAlreadyAdded) {
-                workingNestedObject[fragment] = isLastFragment || {
+                workingNestedObject[fragment] = isLastFragment || (isCount ? {} : {
                     include: {},
-                };
+                });
             }
-            workingNestedObject = workingNestedObject[fragment].include;
+            workingNestedObject = isCount ? workingNestedObject[fragment] : workingNestedObject[fragment].include;
         }
     }
 
