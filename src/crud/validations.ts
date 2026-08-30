@@ -33,6 +33,7 @@ export function validateNestedWhere(
         'mode',
         'startsWith',
         'endsWith',
+        'search',
         'AND\\.\\d+',
         'AND',
         'OR\\.\\d+',
